@@ -22,11 +22,6 @@ class Particle extends Entity {
       this.life = this.MAX_LIFE = life
    }
 
-   static percentageToHex(perc) {
-      // e.g. 0.5 -> '7f'
-      return Math.floor(perc * 255).toString(16).padStart(2, '0')
-   }
-
    isAlive() {
       return this.life > 0
    }
@@ -112,12 +107,11 @@ export class RockDebris extends Particle {
 
       ctx.translate(this.x, this.y)
 
-      const slowedPerc = Math.sin(0.5 * Math.PI * this.life / this.MAX_LIFE)
-      const alpha = Particle.percentageToHex(slowedPerc)
-
       ctx.fillStyle = this.color
-      ctx.fillStyle = `${ctx.fillStyle}${alpha}`
-      ctx.strokeStyle = `#000000${alpha}`
+      ctx.strokeStyle = "black"
+
+      const slowedPerc = Math.sin(0.5 * Math.PI * this.life / this.MAX_LIFE)
+      ctx.globalAlpha = slowedPerc
 
       ctx.beginPath()
       ctx.arc(0, 0, this.radius, 0, Math.PI * 2)
@@ -145,6 +139,9 @@ export class ShipDebris extends Particle {
 
       ctx.fillStyle = this.color
       ctx.strokeStyle = "black"
+
+      const slowedPerc = Math.sin(0.5 * Math.PI * this.life / this.MAX_LIFE)
+      ctx.globalAlpha = slowedPerc
 
       ctx.beginPath()
       ctx.moveTo(-this.radius, -this.radius)
