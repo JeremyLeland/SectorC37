@@ -1,0 +1,69 @@
+<!DOCTYPE HTML>
+<html>
+   <head>
+      <title>Sector C37 Tests: TimeUntilHit()</title>
+      <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+      <style>
+         html, body { margin: 0; padding: 0; }
+      </style>
+   </head>
+   <body bgcolor="black" text="white">
+      <script type="module">
+         import { Game } from "../game.js"
+         import { Asteroid } from "../asteroid.js"
+         import { Player } from "../player.js"
+
+         class Test extends Game {
+            constructor() {
+               super()
+
+               this.player = new Player(100, 100)
+               this.asteroid = new Asteroid(400, 100, 0, 0, 30, "brown", null)
+               this.canvas.style.cursor = "crosshair"
+
+               this.startGame()
+            }
+
+            prepareUI() {
+               super.prepareUI()
+
+               this.debugUI = document.createElement('div')
+               this.debugUI.style = "position: absolute; white-space: pre; left: 2px; top: 2px; font: 10px sans-serif"
+               document.body.appendChild(this.debugUI)
+            }
+
+            update(dt) {
+               if (this.mouseIsDown) {
+                  this.player.x = this.mousex
+                  this.player.y = this.mousey
+               }
+
+               this.player.turnTowardPoint(this.mousex, this.mousey, dt)
+            }
+
+            draw(ctx) {
+               ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+               this.player.draw(ctx)
+               this.asteroid.draw(ctx)
+
+               const time = this.player.timeUntilHit(this.asteroid, 10)
+               this.debugUI.textContent = "Time to hit: " + time
+
+               if (time != Number.POSITIVE_INFINITY) {
+                  const hitX = this.player.x + this.player.dx * time
+                  const hitY = this.player.y + this.player.dy * time
+
+                  ctx.fillStyle = "red"
+                  ctx.beginPath()
+                  ctx.arc(hitX, hitY, this.player.radius, 0, Math.PI * 2)
+                  ctx.fill()
+               }
+            }
+         }
+
+         globalThis.test = new Test()
+
+      </script>
+   </body>
+   </body>
+</html>

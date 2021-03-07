@@ -1,0 +1,83 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+   <title>Sector C37 Tests: Bullet Response</title>
+   <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+   <style>
+      html,
+      body {
+         margin: 0;
+         padding: 0;
+      }
+   </style>
+</head>
+
+<body bgcolor="black" text="white">
+   <script type="module">
+      import { Game } from "../game.js"
+      import { Level } from "../level.js"
+      import { Asteroid } from "../asteroid.js"
+      import { Player } from "../player.js"
+      import { Ship } from "../ship.js"
+
+      export class DummyShip extends Ship {
+         constructor(x, y, level) {
+            super({
+               x: x, y: y, 
+               radius: 10, 
+               mass: 1,
+               health: 100, 
+               damage: 50, 
+               speed: 0, 
+               turnSpeed: 0.005,
+               color: "red",
+               level: level
+            })
+         }
+      }
+
+      class Test extends Game {
+         constructor() {
+            super()
+
+            this.level = new Level(window.innerWidth, window.innerHeight)
+            this.player = new Player(100, 100, this.level)
+            this.player.speed = 0
+            this.level.addActor(this.player)
+
+            this.level.addActor(new Asteroid(400, 100, 0, 0, 30, "brown", this.level))
+            this.level.addActor(new DummyShip(100, 200, this.level))
+
+            this.canvas.style.cursor = "crosshair"
+
+            this.startGame()
+         }
+
+         update(dt) {
+            if (this.mouseIsDown) {
+               this.player.startShooting()
+            }
+            else {
+               this.player.stopShooting()
+            }
+
+            this.player.setGoal(this.mousex, this.mousey)
+
+            this.level.update(dt)
+         }
+
+         draw(ctx) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+            
+            this.level.draw(ctx)
+         }
+      }
+
+      globalThis.test = new Test()
+
+   </script>
+</body>
+</body>
+
+</html>
