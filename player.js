@@ -17,13 +17,14 @@ class PlayerGun extends Gun {
 
 export class Player extends Ship {
    static COLOR = "green"
+   static MAX_HEALTH = 100
 
    constructor(x, y, level) {
       super({
          x: x, y: y, 
          radius: 10, 
          mass: 1,
-         health: 100, 
+         health: Player.MAX_HEALTH, 
          damage: 50, 
          speed: 0.2, 
          turnSpeed: 0.005,

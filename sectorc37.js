@@ -15,12 +15,12 @@ class GameLevel extends Level {
       this.spawnAsteroidDelay = this.timeBetweenAsteroids = 14000
 
       // Initial spawns are inside of level, future spawns will be outside level
-      for (let i = 0; i < 5; i ++) {
-         this.addRandomEnemy(this.width/4 + this.width*i/5)
+      for (let i = 0; i < 5; i++) {
+         this.addRandomEnemy(this.width / 4 + this.width * i / 5)
       }
 
-      for (let i = 0; i < 40; i ++) {
-         this.addRandomAsteroid(this.width/4 + this.width*i/40)
+      for (let i = 0; i < 40; i++) {
+         this.addRandomAsteroid(this.width / 4 + this.width * i / 40)
       }
    }
 
@@ -96,8 +96,8 @@ export class SectorC37 extends Game {
       const w = this.context.canvas.width
       const h = this.context.canvas.height
 
-      this.scrollX = Math.max(0, Math.min(this.level.width - w, this.player.x - w/2))
-      this.scrollY = Math.max(0, Math.min(this.level.height - h, this.player.y - h/2))
+      this.scrollX = Math.max(0, Math.min(this.level.width - w, this.player.x - w / 2))
+      this.scrollY = Math.max(0, Math.min(this.level.height - h, this.player.y - h / 2))
    }
 
    controlPlayer() {
@@ -129,10 +129,32 @@ export class SectorC37 extends Game {
       this.level.update(dt)
    }
 
+   drawUIBar(ctx, x, y, w, h, percent, color) {
+      if (percent > 0) {
+         ctx.fillStyle = color
+         ctx.globalAlpha = 0.5
+         ctx.fillRect(x, y, Math.floor(w * percent), h)
+         ctx.globalAlpha = 1
+      }
+
+      ctx.strokeStyle = "white"
+      ctx.strokeRect(x, y, w, h)
+   }
+
+   drawUI(ctx) {
+      // const w = this.context.canvas.width
+      // const h = this.context.canvas.height
+
+      const lifePerc = this.player.health / Player.MAX_HEALTH
+      this.drawUIBar(ctx, 5.5, 5.5, 200, 12, lifePerc, "red")
+   }
+
    draw(ctx) {
       ctx.save()
       ctx.translate(-this.scrollX, -this.scrollY)
       this.level.draw(ctx)
       ctx.restore()
+
+      this.drawUI(ctx)
    }
 }
