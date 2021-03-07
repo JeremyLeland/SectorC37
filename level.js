@@ -1,4 +1,5 @@
 import { Actor } from "./actor.js"
+import { Bullet } from "./bullet.js"
 
 export class Level {
    constructor(width, height) {
@@ -23,11 +24,16 @@ export class Level {
    }
 
    update(dt) {
-      this.actors.forEach(a => {
+      for (const a of this.actors) {
          a.update(dt)
 
          const nearby = this.getActorsNear(a)
-         nearby.forEach(n => {
+         for (const n of nearby) {
+            // Ignore bullets hitting each other
+            if (a instanceof Bullet && n instanceof Bullet) {
+               continue
+            }
+
             const hitTime = a.timeUntilHit(n)
             if (-dt < hitTime && hitTime < 0) {
                // Roll back actors to time of collision
@@ -44,8 +50,8 @@ export class Level {
                a.updatePosition(-hitTime)
                n.updatePosition(-hitTime)
             }
-         })
-      })
+         }
+      }
       this.actors = this.actors.filter(a => a.isAlive())
 
       this.particles.forEach(p => p.update(dt))

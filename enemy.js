@@ -3,7 +3,7 @@ import { Player } from "./player.js"
 import { Gun } from "./gun.js"
 
 class EnemyGun extends Gun {
-   constructor(frontOffset, sideOffset, level) {
+   constructor(frontOffset, sideOffset, owner) {
       super({
          frontOffset: frontOffset,
          sideOffset: sideOffset,
@@ -11,7 +11,7 @@ class EnemyGun extends Gun {
          bulletSpeed: 0.3,
          bulletDamage: 5,
          bulletColor: Enemy.COLOR,
-         level: level
+         owner: owner
       })
    }
 }
@@ -32,7 +32,7 @@ export class Enemy extends Ship {
          level: level
       })
 
-      this.setGuns(new EnemyGun(this.radius * 2, 0, level))
+      this.setGuns(new EnemyGun(this.radius * 2, 0, this))
 
       this.targetActor = null
       this.avoidActor = null

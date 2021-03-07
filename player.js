@@ -2,15 +2,16 @@ import { Ship } from "./ship.js"
 import { Gun } from "./gun.js"
 
 class PlayerGun extends Gun {
-   constructor(frontOffset, sideOffset, level) {
+   constructor(frontOffset, sideOffset, angleOffset, owner) {
       super({
          frontOffset: frontOffset,
          sideOffset: sideOffset,
+         angleOffset: angleOffset,
          timeBetweenShots: 100,
          bulletSpeed: 0.4,
          bulletDamage: 10,
          bulletColor: Player.COLOR,
-         level: level
+         owner: owner
       })
    }
 }
@@ -32,8 +33,9 @@ export class Player extends Ship {
          level: level
       })
 
-      const leftGun = new PlayerGun(this.radius * 2, -this.radius / 2, level)
-      const rightGun = new PlayerGun(this.radius * 2, this.radius / 2, level)
+      const GUN_ANGLE = 0.05
+      const leftGun = new PlayerGun(this.radius * 2, -this.radius / 2, -GUN_ANGLE, this)
+      const rightGun = new PlayerGun(this.radius * 2, this.radius / 2,  GUN_ANGLE, this)
 
       this.setGuns(leftGun, rightGun)
    }

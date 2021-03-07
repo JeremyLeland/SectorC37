@@ -101,7 +101,7 @@ export class Ship extends Actor {
          g.update(dt)
 
          if (this.isShooting && g.isReadyToShoot()) {
-            g.shoot(this.x, this.y, this.angle)
+            this.level.addActor(g.shoot())
          }
       })
 

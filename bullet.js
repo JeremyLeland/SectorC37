@@ -14,15 +14,6 @@ export class Bullet extends Actor {
       return this.life > 0
    }
 
-   hitWith(actor) {
-      if (actor instanceof Bullet) {
-         // Ignore other bullets
-      }
-      else {
-         super.hitWith(actor)
-      }
-   }
-
    die() {
       this.life = 0
 
