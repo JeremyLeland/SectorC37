@@ -18,7 +18,7 @@ class Particle extends Entity {
 
       const radius = minRadius + Math.random() * (maxRadius - minRadius)
       
-      super(x, y, dx, dy, angle, dAngle, radius)
+      super({x: x, y: y, dx: dx, dy: dy, angle: angle, dAngle: dAngle, radius: radius})
       this.life = this.MAX_LIFE = life
    }
 
@@ -36,21 +36,6 @@ class Particle extends Entity {
       const slowedPerc = Math.sin(0.5 * Math.PI * this.life / this.MAX_LIFE)
       ctx.globalAlpha = slowedPerc
    }
-
-   drawParticle(ctx) {
-      // particle itself, to be overriden by subclasses
-   }
-
-   draw(ctx) {
-      ctx.save()
-
-      ctx.translate(this.x, this.y)
-      ctx.rotate(this.angle)
-
-      this.drawParticle(ctx)
-
-      ctx.restore()
-   }
 }
 
 export class Fire extends Particle {
@@ -59,7 +44,7 @@ export class Fire extends Particle {
              maxSpeed: 0.04, maxRadius: 16, life: 1000})
    }
 
-   drawParticle(ctx) {
+   drawEntity(ctx) {
       const lifePerc = this.life / this.MAX_LIFE
       const size = Math.sin(Math.PI * lifePerc) * this.radius
 
@@ -85,7 +70,7 @@ export class EngineTrail extends Particle {
              maxSpeed: 0, minRadius: EngineTrail.RADIUS, maxRadius: EngineTrail.RADIUS, life: 300})
    }
 
-   drawParticle(ctx) {
+   drawEntity(ctx) {
       const lifePerc = this.life / this.MAX_LIFE
       const size = lifePerc * this.radius
 
@@ -143,7 +128,7 @@ export class RockDebris extends Particle {
       this.color = asteroid.color
    }
 
-   drawParticle(ctx) {
+   drawEntity(ctx) {
       ctx.fillStyle = this.color
       ctx.strokeStyle = "black"
 
@@ -165,7 +150,7 @@ export class ShipDebris extends Particle {
       this.color = ship.color
    }
 
-   drawParticle(ctx) {
+   drawEntity(ctx) {
       ctx.fillStyle = this.color
       ctx.strokeStyle = "black"
 

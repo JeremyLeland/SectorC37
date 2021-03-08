@@ -20,7 +20,7 @@ export class Player extends Ship {
    static COLOR = "green"
    static MAX_HEALTH = 100
 
-   constructor(x, y, level) {
+   constructor(x, y) {
       super({
          x: x, y: y, 
          radius: 10, 
@@ -29,8 +29,7 @@ export class Player extends Ship {
          damage: 50, 
          speed: 0.2, 
          turnSpeed: 0.005,
-         color: Player.COLOR,
-         level: level
+         color: Player.COLOR
       })
 
       const GUN_ANGLE = 0.05

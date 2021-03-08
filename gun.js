@@ -29,7 +29,7 @@ export class Gun {
       const dy = Math.sin(ang) * this.bulletSpeed
 
       this.shootDelay = this.timeBetweenShots
-      return new Bullet(x, y, dx, dy, this.bulletDamage, this.bulletColor, this.owner.level)
+      return new Bullet(x, y, dx, dy, this.bulletDamage, this.bulletColor)
    }
 
    update(dt) {

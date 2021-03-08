@@ -1,3 +1,4 @@
+import { Entity } from "./entity.js"
 import { Actor } from "./actor.js"
 import { Bullet } from "./bullet.js"
 
@@ -6,53 +7,70 @@ export class Level {
       this.width = width
       this.height = height
 
-      this.actors = []
+      this.entities = []
       this.particles = []
-   }
-
-   addActor(actor) {
-      this.actors.push(actor)
-   }
-
-   addParticle(part) {
-      this.particles.push(part)
    }
 
    getActorsNear(actor) {
       // TODO: only return actors close to given actor
-      return this.actors.filter(a => a != actor && a.isAlive())
+      // Only return entities we can collide with
+      return this.entities.filter(e => e != actor && e.isAlive() && e.damage > 0)
+   }
+
+   addEntity(entity) {
+      // Track zero-damage entities seperately as particles
+      if (entity.damage == 0) {
+         this.particles.push(entity)
+      }
+      else {
+         this.entities.push(entity)
+      }
+   }
+
+   addCreatedEntities(entities) {
+      for (const e of entities) {
+         this.addEntity(e)
+      }
    }
 
    update(dt) {
-      for (const a of this.actors) {
-         a.update(dt)
+      for (const e of this.entities) {
+         if (e instanceof Actor) {
+            e.think(this)
+         }
 
-         const nearby = this.getActorsNear(a)
+         e.update(dt)
+         this.addCreatedEntities(e.getCreatedEntities())
+
+         const nearby = this.getActorsNear(e)
          for (const n of nearby) {
             // Ignore bullets hitting each other
-            if (a instanceof Bullet && n instanceof Bullet) {
+            if (e instanceof Bullet && n instanceof Bullet) {
                continue
             }
 
-            const hitTime = a.timeUntilHit(n)
+            const hitTime = e.timeUntilHit(n)
             if (-dt < hitTime && hitTime < 0) {
                // Roll back actors to time of collision
-               a.updatePosition(hitTime)
+               e.updatePosition(hitTime)
                n.updatePosition(hitTime)
 
                // Collision response
-               Actor.handleBounce(a, n)
-               a.hitWith(n)
-               n.hitWith(a)
+               Entity.handleBounce(e, n)
+               e.hitWith(n)
+               n.hitWith(e)
+
+               this.addCreatedEntities(e.getCreatedEntities())
+               this.addCreatedEntities(n.getCreatedEntities())
 
                // Finish the update with new velocity
                // TODO: Do we need this? Can't tell if its having an effect...
-               a.updatePosition(-hitTime)
+               e.updatePosition(-hitTime)
                n.updatePosition(-hitTime)
             }
          }
       }
-      this.actors = this.actors.filter(a => a.isAlive())
+      this.entities = this.entities.filter(e => e.isAlive())
 
       this.particles.forEach(p => p.update(dt))
       this.particles = this.particles.filter(p => p.isAlive())
@@ -60,6 +78,6 @@ export class Level {
 
    draw(ctx) {
       this.particles.forEach(p => p.draw(ctx))
-      this.actors.forEach(e => e.draw(ctx))
+      this.entities.forEach(e => e.draw(ctx))
    }
 }

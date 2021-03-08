@@ -19,7 +19,7 @@ class EnemyGun extends Gun {
 export class Enemy extends Ship {
    static COLOR = "blue"
 
-   constructor(x, y, level) {
+   constructor(x, y) {
       super({
          x: x, y: y, 
          radius: 10, 
@@ -28,16 +28,13 @@ export class Enemy extends Ship {
          damage: 50, 
          speed: 0.15, 
          turnSpeed: 0.003,
-         color: Enemy.COLOR,
-         level: level
+         color: Enemy.COLOR
       })
 
       this.setGuns(new EnemyGun(this.radius * 2, 0, this))
 
       this.targetActor = null
       this.avoidActor = null
-
-      this.setRandomGoal()
 
       this.SHOOT_DISTANCE = 300
       this.SHOOT_ANGLE = 0.5
@@ -47,19 +44,35 @@ export class Enemy extends Ship {
    }
 
    setRandomGoal() {
-      this.setGoal(Math.random() * this.level.width, Math.random() * this.level.height)
+      
    }
 
    checkForGoal() {
-      // TODO: also change this after time, in case the goal is somewhere we must avoid?
-      if (this.distanceFromPoint(this.goalX, this.goalY) < this.radius * 2) {
-         this.setRandomGoal()
-      }
+      
    }
 
-   evaluateNearbyActors() {
+   think(level) {
+      //
+      // Goals
+      //
+
+      // Head toward random location in level if nothing else is going on
+      // TODO: also change this after time, in case the goal is somewhere we must avoid?
+      if (this.distanceFromPoint(this.goalX, this.goalY) < this.radius * 2) {
+         this.setGoal(Math.random() * level.width, Math.random() * level.height)
+      }
+
+      //
+      // Avoid and targets
+      //
+
+      // TODO: Flocking?
+      // - https://www.red3d.com/cwr/boids/
+      // - https://gamedevelopment.tutsplus.com/tutorials/3-simple-rules-of-flocking-behaviors-alignment-cohesion-and-separation--gamedev-3444
+
+
       // Look for actors to avoid or target
-      const nearby = this.level.getActorsNear(this)
+      const nearby = level.getActorsNear(this)
 
       let closestAvoid = null, closestAvoidTime = Number.POSITIVE_INFINITY
       let closestPlayer = null, closestPlayerDist = Number.POSITIVE_INFINITY
@@ -93,13 +106,6 @@ export class Enemy extends Ship {
    }
 
    update(dt) {
-      this.checkForGoal()
-      this.evaluateNearbyActors()
-
-      // TODO: Flocking?
-      // - https://www.red3d.com/cwr/boids/
-      // - https://gamedevelopment.tutsplus.com/tutorials/3-simple-rules-of-flocking-behaviors-alignment-cohesion-and-separation--gamedev-3444
-
       if (this.avoidActor != null) {
          this.turnAwayFrom(this.avoidActor, dt)
       }
@@ -122,18 +128,18 @@ export class Enemy extends Ship {
       super.update(dt)
    }
 
-   draw(ctx) {
-      super.draw(ctx)
+   // draw(ctx) {
+   //    super.draw(ctx)
 
-      // // DEBUG
-      // if (this.avoidActor != null) {
-      //    ctx.beginPath()
-      //    ctx.moveTo(this.avoidActor.x, this.avoidActor.y)
-      //    ctx.lineTo(this.x, this.y)
+   //    // // DEBUG
+   //    // if (this.avoidActor != null) {
+   //    //    ctx.beginPath()
+   //    //    ctx.moveTo(this.avoidActor.x, this.avoidActor.y)
+   //    //    ctx.lineTo(this.x, this.y)
 
-      //    ctx.setLineDash([1, 8])
-      //    ctx.strokeStyle = "red"
-      //    ctx.stroke()
-      // }
-   }
+   //    //    ctx.setLineDash([1, 8])
+   //    //    ctx.strokeStyle = "red"
+   //    //    ctx.stroke()
+   //    // }
+   // }
 }

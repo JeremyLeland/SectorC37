@@ -1,118 +1,102 @@
 import { Entity } from "./entity.js"
 
 export class Actor extends Entity {
-   constructor(x, y, dx, dy, angle, dAngle, radius, mass, health, damage, level) {
-      super(x, y, dx, dy, angle, dAngle, radius)
-      this.mass = mass
-      this.health = health
-      this.damage = damage
-      this.level = level
+   constructor({x, y, radius, mass, health, damage}) {
+      super({x: x, y: y, radius: radius, mass: mass, health: health, damage: damage})
+      
+      this.guns = []
+      this.isShooting = false
    }
 
-   isAlive() {
-      return this.health > 0
+   //
+   // Guns
+   //
+
+   setGuns(...guns) {
+      this.guns = guns
    }
 
-   hitWith(actor) {
-      this.health -= actor.damage
+   startShooting() {
+      this.isShooting = true
+   }
 
-      if (this.health <= 0) {
-         this.die()
+   stopShooting() {
+      this.isShooting = false
+   }
+
+   handleGuns(dt) {
+      for (const g of this.guns) {
+         g.update(dt)
+
+         if (this.isShooting && g.isReadyToShoot()) {
+            this.createEntity(g.shoot())
+         }
       }
    }
 
-   die() {
+   //
+   // Turning
+   //
+
+   turnToward(actor, dt) {
+      this.turnTowardPoint(actor.x, actor.y, dt)
    }
 
-   isCollidingWith(actor) {
-      return this.distanceFrom(actor) < this.radius + actor.radius
-   }
+   turnTowardPoint(towardX, towardY, dt) {
+      const towardAngle = Math.atan2(towardY - this.y, towardX - this.x)
 
-   distanceFrom(actor) {
-      return this.distanceFromPoint(actor.x, actor.y)
-   }
-
-   distanceFromPoint(x, y) {
-      const cx = x - this.x
-      const cy = y - this.y
-      return Math.sqrt(cx*cx + cy*cy)
-   }
-
-   angleTo(actor) {
-      return this.angleToPoint(actor.x, actor.y)
-   }
-
-   angleToPoint(x, y) {
-      return Math.atan2(y - this.y, x - this.x) - this.angle
-   }
-
-   timeUntilHit(other, buffer = 0) {
-      // See when ships would collide if continuing at their current direction and rate of speed
-      // This will return a negative value if the collision would have occurred in the past
-      // See https://stackoverflow.com/questions/33140999/at-what-delta-time-will-two-objects-collide
-      // (Line-Line was http://www.jeffreythompson.org/collision-detection/line-line.php)
-      const cx = this.x - other.x
-      const cy = this.y - other.y
-
-      const dx1 = this.dx
-      const dy1 = this.dy
-      const dx2 = other.dx
-      const dy2 = other.dy
-      const vx = dx1 - dx2
-      const vy = dy1 - dy2
-
-      const rr = this.radius + other.radius + buffer
-
-      const a = vx*vx + vy*vy
-      const b = 2 * (cx * vx + cy * vy)
-      const c = cx*cx + cy*cy - rr*rr
-
-      const disc = b*b - 4*a*c
-
-      // If the objects don't collide, the discriminant will be negative
-      if (disc < 0) {
-         return Number.POSITIVE_INFINITY
+      // Adjust our angle so we can use towardAngle
+      if (towardAngle - this.angle > Math.PI) {
+         this.angle += Math.PI * 2
       }
-      else {
-         const t0 = (-b - Math.sqrt(disc)) / (2*a)
-
-         return t0
-
-         // if (t0 >= 0) {
-         //    return t0
-         // }
-         // else {
-         //    const t1 = (-b + Math.sqrt(disc)) / (2*a)
-
-         //    console.log("t0 = " + t0)
-         //    console.log("t1 = " + t1)
-         //    console.log("\n")
-
-         //    return t1 < 0 ? Number.POSITIVE_INFINITY : t1
-         // }
+      else if (this.angle - towardAngle > Math.PI) {
+         this.angle -= Math.PI * 2
       }
+
+      if (towardAngle < this.angle) {
+         this.angle = Math.max(towardAngle, this.angle - this.turnSpeed * dt)
+      }
+      else if (towardAngle > this.angle) {
+         this.angle = Math.min(towardAngle, this.angle + this.turnSpeed * dt)
+      }
+
+      this.dx = Math.cos(this.angle) * this.speed
+      this.dy = Math.sin(this.angle) * this.speed
    }
 
-   static handleBounce(a1, a2) {
-      // See https://ericleong.me/research/circle-circle/#dynamic-circle-circle-collision
-      // TODO: try something from this monster? http://www.euclideanspace.com/physics/dynamics/collision/twod/index.htm
-      const diffX = a2.x - a1.x
-      const diffY = a2.y - a1.y
-      const distBetween = Math.sqrt(diffX * diffX + diffY * diffY)
-      const normX = diffX / distBetween
-      const normY = diffY / distBetween
+   turnAwayFrom(actor, dt) {
+      this.turnAwayFromPoint(actor.x, actor.y, dt)
+   }
 
-      const p = 2 * (a1.dx * normX + a1.dy * normY - a2.dx * normX - a2.dy * normY) / (a1.mass + a2.mass)
+   turnAwayFromPoint(avoidX, avoidY, dt) {
+      const avoidAngle = Math.atan2(avoidY - this.y, avoidX - this.x)
 
-      // console.log(`Before bounce: a1 ${a1.dx}, ${a1.dy}`)
-      // console.log(`Before bounce: a2 ${a2.dx}, ${a2.dy}`)
+      // Adjust our angle so we can use goalAngle
+      if (avoidAngle - this.angle > Math.PI) {
+         this.angle += Math.PI * 2
+      }
+      else if (this.angle - avoidAngle > Math.PI) {
+         this.angle -= Math.PI * 2
+      }
 
-      a1.dx -= p * a2.mass * normX
-      a1.dy -= p * a2.mass * normY
-      a2.dx += p * a1.mass * normX
-      a2.dy += p * a1.mass * normY
+      if (avoidAngle <= this.angle) {
+         this.angle += this.turnSpeed * dt
+      }
+      else if (avoidAngle > this.angle) {
+         this.angle -= this.turnSpeed * dt
+      }
 
-      // console.log(`After bounce: a1 ${a1.dx}, ${a1.dy}`)
-      // console.log(`After bounce: a2 ${a2.dx}, ${a2.dy}`)
+      this.dx = Math.cos(this.angle) * this.speed
+      this.dy = Math.sin(this.angle) * this.speed
+   }
+
+   think(level) {
+      // Sub-classes should override
+   }
+
+   update(dt) {
+      this.handleGuns(dt)
+
+      super.update(dt)
    }
 }

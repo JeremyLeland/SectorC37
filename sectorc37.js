@@ -26,12 +26,12 @@ class GameLevel extends Level {
 
    addRandomEnemy(distFromCenter) {
       const [x, y] = this.getRandomSpawnLocation(distFromCenter)
-      this.addActor(new Enemy(x, y, this))
+      this.addEntity(new Enemy(x, y, this))
    }
 
    addRandomAsteroid(distFromCenter) {
       const [x, y] = this.getRandomSpawnLocation(distFromCenter)
-      this.addActor(Asteroid.randomAsteroid(x, y, this))
+      this.addEntity(Asteroid.randomAsteroid(x, y, this))
    }
 
    getRandomSpawnLocation(distFromCenter) {
@@ -45,7 +45,9 @@ class GameLevel extends Level {
    spawnEnemies(dt) {
       this.spawnEnemyDelay -= dt
       if (this.spawnEnemyDelay < 0) {
-         this.addRandomEnemy(this.width * 1.5)
+         for (let i = 0; i < 5; i ++) {
+            this.addRandomEnemy(this.width * 1.5)
+         }
          this.spawnEnemyDelay = this.timeBetweenEnemies
       }
    }
@@ -87,8 +89,8 @@ export class SectorC37 extends Game {
    }
 
    spawnPlayer() {
-      this.player = new Player(this.level.width / 2, this.level.height / 2, this.level)
-      this.level.addActor(this.player)
+      this.player = new Player(this.level.width / 2, this.level.height / 2)
+      this.level.addEntity(this.player)
       this.spawnDelay = this.timeBeforeSpawn
    }
 
@@ -142,9 +144,6 @@ export class SectorC37 extends Game {
    }
 
    drawUI(ctx) {
-      // const w = this.context.canvas.width
-      // const h = this.context.canvas.height
-
       const lifePerc = this.player.health / Player.MAX_HEALTH
       this.drawUIBar(ctx, 5.5, 5.5, 200, 12, lifePerc, "red")
    }
