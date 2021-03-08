@@ -9,7 +9,7 @@ class GameLevel extends Level {
    constructor(width, height) {
       super(width, height)
 
-      this.starfield = new Starfield(this.width, this.height, 1000)
+      this.starfield = new Starfield(this.width, this.height)
 
       this.spawnEnemyDelay = this.timeBetweenEnemies = 12000
       this.spawnAsteroidDelay = this.timeBetweenAsteroids = 14000
@@ -76,11 +76,9 @@ class GameLevel extends Level {
 
 export class SectorC37 extends Game {
    constructor() {
-      Game.VERSION = "Sector C37 v0.11"
-
       super()
 
-      this.level = new GameLevel(2000, 2000)
+      this.level = new GameLevel(4000, 4000)
       this.spawnDelay = this.timeBeforeSpawn = 1000
       this.spawnPlayer()
 

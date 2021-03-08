@@ -1,6 +1,4 @@
 export class Game {
-   static VERSION = 0
-
    constructor() {
       // Canvas
       this.canvas = document.createElement("canvas")
@@ -14,7 +12,8 @@ export class Game {
       this.context = this.canvas.getContext("2d")
 
       // UI
-      this.prepareUI()
+      this.framesLastSec = this.frames = 0
+      setInterval(() => this.updateFPS(), 1000)
 
       // Keyboard
       this.keyBindings = {}
@@ -35,23 +34,6 @@ export class Game {
    resize() {
       this.canvas.width = window.innerWidth
       this.canvas.height = window.innerHeight
-   }
-
-   prepareUI() {
-      this.fpsUI = document.createElement('div')
-      this.fpsUI.style = "position: absolute; left: 100%; top: 100%; transform: translate(-14px, -14px); font: 10px sans-serif"
-      document.body.appendChild(this.fpsUI)
-      this.frames = 0
-      setInterval(() => this.updateFPS(), 1000)
-
-      this.versionUI = document.createElement('div')
-      this.versionUI.textContent = Game.VERSION
-      this.versionUI.style = "position: absolute; left: 2px; top: 100%; transform: translate(0, -14px); font: 10px sans-serif"
-      document.body.appendChild(this.versionUI)
-
-      this.debugUI = document.createElement('div')
-      this.debugUI.style = "position: absolute; white-space: pre; left: 2px; top: 2px; font: 10px sans-serif"
-      document.body.appendChild(this.debugUI)
    }
 
    startGame() {
@@ -112,10 +94,20 @@ export class Game {
 
       this.draw(this.context)
       this.frames ++
+
+      this.drawFPS(this.context)
+   }
+
+   drawFPS(ctx) {
+      ctx.textAlign = "end"
+      ctx.textBaseline = "bottom"
+      ctx.fillStyle = "white"
+      ctx.font = "10px Arial"
+      ctx.fillText(this.framesLastSec, window.innerWidth, window.innerHeight)
    }
 
    updateFPS() {
-      this.fpsUI.textContent = this.frames
+      this.framesLastSec = this.frames
       this.frames = 0
    }
 
