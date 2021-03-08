@@ -31,6 +31,26 @@ class Particle extends Entity {
 
       super.update(dt)
    }
+
+   setSlowAlphaFade(ctx) {
+      const slowedPerc = Math.sin(0.5 * Math.PI * this.life / this.MAX_LIFE)
+      ctx.globalAlpha = slowedPerc
+   }
+
+   drawParticle(ctx) {
+      // particle itself, to be overriden by subclasses
+   }
+
+   draw(ctx) {
+      ctx.save()
+
+      ctx.translate(this.x, this.y)
+      ctx.rotate(this.angle)
+
+      this.drawParticle(ctx)
+
+      ctx.restore()
+   }
 }
 
 export class Fire extends Particle {
@@ -39,9 +59,7 @@ export class Fire extends Particle {
              maxSpeed: 0.04, maxRadius: 16, life: 1000})
    }
 
-   draw(ctx) {
-      ctx.save()
-
+   drawParticle(ctx) {
       const lifePerc = this.life / this.MAX_LIFE
       const size = Math.sin(Math.PI * lifePerc) * this.radius
 
@@ -54,10 +72,33 @@ export class Fire extends Particle {
       ctx.globalCompositeOperation = 'lighter'
 
       ctx.beginPath()
-      ctx.arc(this.x, this.y, size, 0, Math.PI * 2)
+      ctx.arc(0, 0, size, 0, Math.PI * 2)
       ctx.fill()
+   }
+}
 
-      ctx.restore()
+export class EngineTrail extends Particle {
+   static RADIUS = 4
+
+   constructor(ship) {
+      super({startX: ship.x, startY: ship.y,
+             maxSpeed: 0, minRadius: EngineTrail.RADIUS, maxRadius: EngineTrail.RADIUS, life: 300})
+   }
+
+   drawParticle(ctx) {
+      const lifePerc = this.life / this.MAX_LIFE
+      const size = lifePerc * this.radius
+
+      const r = 140 + 120 * lifePerc
+      const g = 170 - 120 * lifePerc
+      const b = 120 - 120 * lifePerc
+      const a = 0.4 * lifePerc
+      ctx.fillStyle = `rgba(${r}, ${g}, ${b}, ${a})`
+      ctx.globalCompositeOperation = 'lighter'
+
+      ctx.beginPath()
+      ctx.arc(0, 0, size, 0, Math.PI * 2)
+      ctx.fill()
    }
 }
 
@@ -102,23 +143,16 @@ export class RockDebris extends Particle {
       this.color = asteroid.color
    }
 
-   draw(ctx) {
-      ctx.save()
-
-      ctx.translate(this.x, this.y)
-
+   drawParticle(ctx) {
       ctx.fillStyle = this.color
       ctx.strokeStyle = "black"
 
-      const slowedPerc = Math.sin(0.5 * Math.PI * this.life / this.MAX_LIFE)
-      ctx.globalAlpha = slowedPerc
+      this.setSlowAlphaFade(ctx)
 
       ctx.beginPath()
       ctx.arc(0, 0, this.radius, 0, Math.PI * 2)
       ctx.fill()
       ctx.stroke()
-
-      ctx.restore()
    }
 }
 
@@ -131,17 +165,11 @@ export class ShipDebris extends Particle {
       this.color = ship.color
    }
 
-   draw(ctx) {
-      ctx.save()
-
-      ctx.translate(this.x, this.y)
-      ctx.rotate(this.angle)
-
+   drawParticle(ctx) {
       ctx.fillStyle = this.color
       ctx.strokeStyle = "black"
 
-      const slowedPerc = Math.sin(0.5 * Math.PI * this.life / this.MAX_LIFE)
-      ctx.globalAlpha = slowedPerc
+      this.setSlowAlphaFade(ctx)
 
       ctx.beginPath()
       ctx.moveTo(-this.radius, -this.radius)
@@ -150,7 +178,5 @@ export class ShipDebris extends Particle {
       ctx.closePath()
       ctx.fill()
       ctx.stroke()
-
-      ctx.restore()
    }
 }

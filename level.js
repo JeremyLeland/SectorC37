@@ -59,7 +59,7 @@ export class Level {
    }
 
    draw(ctx) {
-      this.actors.forEach(e => e.draw(ctx))
       this.particles.forEach(p => p.draw(ctx))
+      this.actors.forEach(e => e.draw(ctx))
    }
 }

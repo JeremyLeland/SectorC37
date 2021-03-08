@@ -14,6 +14,8 @@ export class Ship extends Actor {
       this.guns = []
       this.isShooting = false
 
+      this.engineTrailDelay = this.timeBetweenEngineTrails = 10
+
       this.color = color
    }
 
@@ -96,14 +98,27 @@ export class Ship extends Actor {
       }
    }
 
-   update(dt) {
-      this.guns.forEach(g => {
+   handleGuns(dt) {
+      for (const g of this.guns) {
          g.update(dt)
 
          if (this.isShooting && g.isReadyToShoot()) {
             this.level.addActor(g.shoot())
          }
-      })
+      }
+   }
+
+   makeEngineTrail(dt) {
+      this.engineTrailDelay -= dt
+      if (this.engineTrailDelay < 0) {
+         this.level.addParticle(new Particles.EngineTrail(this))
+         this.engineTrailDelay = this.timeBetweenEngineTrails
+      }
+   }
+
+   update(dt) {
+      this.handleGuns(dt)
+      this.makeEngineTrail(dt)
 
       super.update(dt)
    }
