@@ -74,7 +74,7 @@ class GameLevel extends Level {
 
 export class SectorC37 extends Game {
    constructor() {
-      Game.VERSION = "Sector C37 v0.1"
+      Game.VERSION = "Sector C37 v0.11"
 
       super()
 

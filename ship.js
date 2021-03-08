@@ -88,6 +88,15 @@ export class Ship extends Actor {
       this.isShooting = false
    }
 
+   hitWith(actor) {
+      // "Bleed" some debris to make it clearer we were hit
+      for (let i = 0; i < 3; i ++) {
+         this.level.addParticle(new Particles.ShipDebris(this))
+      }
+
+      super.hitWith(actor)
+   }
+
    die() {
       for (let i = 0; i < 50; i ++) {
          this.level.addParticle(new Particles.Fire(this))
