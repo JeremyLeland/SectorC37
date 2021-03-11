@@ -78,7 +78,7 @@ export class SectorC37 extends Game {
    constructor() {
       super()
 
-      this.level = new GameLevel(4000, 4000)
+      this.level = new GameLevel(2000, 2000)
       this.spawnDelay = this.timeBeforeSpawn = 1000
       this.spawnPlayer()
 

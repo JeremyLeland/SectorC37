@@ -92,10 +92,12 @@ export class Game {
 
       this.lastTime = now
 
-      this.draw(this.context)
+      const ctx = this.context
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      this.draw(ctx)
       this.frames ++
 
-      this.drawFPS(this.context)
+      this.drawFPS(ctx)
    }
 
    drawFPS(ctx) {

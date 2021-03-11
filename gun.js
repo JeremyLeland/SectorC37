@@ -17,12 +17,7 @@ export class Gun {
    }
 
    shoot() {
-      const sinAngFront = Math.sin(this.owner.angle)
-      const cosAngFront = Math.cos(this.owner.angle)
-      const sinAngSide = Math.sin(this.owner.angle + Math.PI/2)
-      const cosAngSide = Math.cos(this.owner.angle + Math.PI/2)
-      const x = this.owner.x + cosAngFront * this.frontOffset + cosAngSide * this.sideOffset
-      const y = this.owner.y + sinAngFront * this.frontOffset + sinAngSide * this.sideOffset
+      const [x, y] = this.owner.getOffsetPosition(this.frontOffset, this.sideOffset)
       
       const ang = this.owner.angle + this.angleOffset
       const dx = Math.cos(ang) * this.bulletSpeed

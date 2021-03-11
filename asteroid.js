@@ -26,7 +26,7 @@ export class Asteroid extends Entity {
 
    die() {
       for (let i = 0; i < this.radius * 2; i ++) {
-         this.createEntity(new Particles.RockDebris(this))
+         this.createEntity(new Particles.Rock(this))
       }
 
       const NUM_SMALLER = 3

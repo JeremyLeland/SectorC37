@@ -74,35 +74,8 @@ export class Enemy extends Ship {
       // Look for actors to avoid or target
       const nearby = level.getActorsNear(this)
 
-      let closestAvoid = null, closestAvoidTime = Number.POSITIVE_INFINITY
-      let closestPlayer = null, closestPlayerDist = Number.POSITIVE_INFINITY
-      nearby.forEach(n => {
-         //
-         // Look for actors to avoid
-         //
-         const time = this.timeUntilHit(n, 10)
-
-         // Include hits in the near "past", since we may be in our buffer zone
-         if (time > -100 && time < closestAvoidTime) {
-            closestAvoid = n
-            closestAvoidTime = time
-         }
-
-         //
-         // Look for targets
-         //
-         if (n instanceof Player) {
-            const dist = this.distanceFrom(n)
-
-            if (dist < closestPlayerDist) {
-               closestPlayer = n
-               closestPlayerDist = dist
-            }
-         }
-      })
-
-      this.avoidActor = closestAvoidTime < this.AVOID_TIME ? closestAvoid : null
-      this.targetActor = closestPlayerDist < this.TARGET_DIST ? closestPlayer : null
+      this.avoidActor = this.getClosestAvoid(nearby, this.AVOID_TIME)
+      this.targetActor = this.getClosestTarget(nearby, e => e instanceof Player, this.TARGET_DIST)
    }
 
    update(dt) {

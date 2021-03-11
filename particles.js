@@ -120,7 +120,7 @@ export class Spark extends Particle {
    }
 }
 
-export class RockDebris extends Particle {
+export class Rock extends Particle {
    constructor(asteroid) {
       super({startX: asteroid.x, startY: asteroid.y, startSpread: asteroid.radius,
              maxSpeed: 0.06, maxSpin: 0.01, maxRadius: 5, life: 1500})
@@ -141,13 +141,13 @@ export class RockDebris extends Particle {
    }
 }
 
-export class ShipDebris extends Particle {
-   constructor(ship) {
-      super({startX: ship.x, startY: ship.y, startSpread: ship.radius,
-             startDX: ship.dx, startDY: ship.dy, 
+export class Debris extends Particle {
+   constructor(actor) {
+      super({startX: actor.x, startY: actor.y, startSpread: actor.radius,
+             startDX: actor.dx, startDY: actor.dy, 
              maxSpeed: 0.1, maxSpin: 0.01, maxRadius: 3, life: 1000})
 
-      this.color = ship.color
+      this.color = actor.color
    }
 
    drawEntity(ctx) {

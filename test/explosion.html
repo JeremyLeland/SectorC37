@@ -16,7 +16,7 @@
          import { Ship } from "../ship.js"
 
          export class DummyShip extends Ship {
-            constructor(x, y, level) {
+            constructor(x, y) {
                super({
                   x: x, y: y, 
                   radius: 10, 
@@ -25,8 +25,7 @@
                   damage: 50, 
                   speed: 0, 
                   turnSpeed: 0.005,
-                  color: "blue",
-                  level: level
+                  color: "blue"
                })
             }
          }
@@ -36,10 +35,10 @@
                super()
 
                this.level = new Level(window.innerWidth, window.innerHeight)
-               this.asteroid = new Asteroid(400, 100, 0, 0, 30, "brown", this.level)
-               this.ship = new DummyShip(100, 200, this.level)
-               this.level.addActor(this.asteroid)
-               this.level.addActor(this.ship)
+               this.asteroid = new Asteroid(400, 100, 0, 0, 30, "brown")
+               this.ship = new DummyShip(100, 200)
+               this.level.addEntity(this.asteroid)
+               this.level.addEntity(this.ship)
 
                this.canvas.style.cursor = "crosshair"
 
@@ -68,8 +67,6 @@
             }
 
             draw(ctx) {
-               ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-               
                this.level.draw(ctx)
             }
          }

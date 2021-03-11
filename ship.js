@@ -21,23 +21,6 @@ export class Ship extends Actor {
       this.goalY = goalY
    }
 
-   hitWith(actor) {
-      // "Bleed" some debris to make it clearer we were hit
-      for (let i = 0; i < 3; i ++) {
-         this.createEntity(new Particles.ShipDebris(this))
-      }
-      super.hitWith(actor)
-   }
-
-   die() {
-      for (let i = 0; i < 50; i ++) {
-         this.createEntity(new Particles.Fire(this))
-      }
-      for (let i = 0; i < 50; i ++) {
-         this.createEntity(new Particles.ShipDebris(this))
-      }
-   }
-
    makeEngineTrail(dt) {
       this.engineTrailDelay -= dt
       if (this.engineTrailDelay < 0) {
@@ -48,6 +31,9 @@ export class Ship extends Actor {
 
    update(dt) {
       this.makeEngineTrail(dt)
+
+      this.dx = Math.cos(this.angle) * this.speed
+      this.dy = Math.sin(this.angle) * this.speed
 
       super.update(dt)
    }

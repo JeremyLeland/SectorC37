@@ -1,12 +1,37 @@
 import { Entity } from "./entity.js"
+import * as Particles from "./particles.js"
 
 export class Actor extends Entity {
-   constructor({x, y, radius, mass, health, damage}) {
+   constructor({x, y, radius, mass, health, damage, color}) {
       super({x: x, y: y, radius: radius, mass: mass, health: health, damage: damage})
       
       this.guns = []
       this.isShooting = false
+
+      this.color = color
    }
+
+   //
+   // Hit response
+   //
+
+   hitWith(actor) {
+      // "Bleed" some debris to make it clearer we were hit
+      for (let i = 0; i < 3; i ++) {
+         this.createEntity(new Particles.Debris(this))
+      }
+      super.hitWith(actor)
+   }
+
+   die() {
+      for (let i = 0; i < 50; i ++) {
+         this.createEntity(new Particles.Fire(this))
+      }
+      for (let i = 0; i < 50; i ++) {
+         this.createEntity(new Particles.Debris(this))
+      }
+   }
+
 
    //
    // Guns
@@ -59,9 +84,6 @@ export class Actor extends Entity {
       else if (towardAngle > this.angle) {
          this.angle = Math.min(towardAngle, this.angle + this.turnSpeed * dt)
       }
-
-      this.dx = Math.cos(this.angle) * this.speed
-      this.dy = Math.sin(this.angle) * this.speed
    }
 
    turnAwayFrom(actor, dt) {
@@ -88,6 +110,45 @@ export class Actor extends Entity {
 
       this.dx = Math.cos(this.angle) * this.speed
       this.dy = Math.sin(this.angle) * this.speed
+   }
+
+   //
+   // Thinking
+   //
+
+   getClosestAvoid(entities, avoidTime) {
+      const AVOID_BUFFER = 10
+      const RECENT_PAST = -100
+
+      let closestAvoid = null, closestAvoidTime = Number.POSITIVE_INFINITY
+      for (const e of entities) {
+         const time = this.timeUntilHit(e, AVOID_BUFFER)
+
+         // Include hits in the near "past", since we may be in our buffer zone
+         if (RECENT_PAST < time && time < closestAvoidTime) {
+            closestAvoid = e
+            closestAvoidTime = time
+         }
+      }
+
+      return closestAvoidTime < avoidTime ? closestAvoid : null
+   }
+
+   getClosestTarget(entities, test, maxDistance = Number.POSITIVE_INFINITY) {
+      let closestTarget = null, closestTargetDist = Number.POSITIVE_INFINITY
+
+      for (const e of entities) {
+         if (test(e)) {
+            const dist = this.distanceFrom(e)
+
+            if (dist < closestTargetDist) {
+               closestTarget = e
+               closestTargetDist = dist
+            }
+         }
+      }
+
+      return closestTargetDist < maxDistance ? closestTarget : null
    }
 
    think(level) {

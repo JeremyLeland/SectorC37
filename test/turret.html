@@ -2,7 +2,7 @@
 <html>
 
 <head>
-   <title>Sector C37 Tests: Bullet Response</title>
+   <title>Sector C37 Tests: Turrets</title>
    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
    <style>
       html,
@@ -19,22 +19,7 @@
       import { Level } from "../level.js"
       import { Asteroid } from "../asteroid.js"
       import { Player } from "../player.js"
-      import { Ship } from "../ship.js"
-
-      export class DummyShip extends Ship {
-         constructor(x, y) {
-            super({
-               x: x, y: y, 
-               radius: 10, 
-               mass: 1,
-               health: 100, 
-               damage: 50, 
-               speed: 0, 
-               turnSpeed: 0.005,
-               color: "red"
-            })
-         }
-      }
+      import { Turret } from "../turret.js"
 
       class Test extends Game {
          constructor() {
@@ -45,8 +30,15 @@
             this.player.speed = 0
             this.level.addEntity(this.player)
 
-            this.level.addEntity(new Asteroid(400, 100, 0, 0, 30, "brown"))
-            this.level.addEntity(new DummyShip(100, 200))
+            this.asteroid = new Asteroid(400, 100, 0, 0, 30, "brown")
+            this.level.addEntity(this.asteroid)
+
+            this.turret = new Turret({
+               frontOffset: 0, sideOffset: 0, radius: 20, 
+               mass: 1, health: 20, damage: 10, 
+               turnSpeed: 0.01, color: "gray", owner: this.asteroid
+            })
+            this.level.addEntity(this.turret)
 
             this.canvas.style.cursor = "crosshair"
 
@@ -54,15 +46,6 @@
          }
 
          update(dt) {
-            if (this.mouseIsDown) {
-               this.player.startShooting()
-            }
-            else {
-               this.player.stopShooting()
-            }
-
-            this.player.setGoal(this.mousex, this.mousey)
-
             this.level.update(dt)
          }
 

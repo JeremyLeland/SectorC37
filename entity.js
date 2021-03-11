@@ -85,6 +85,18 @@ export class Entity {
    angleToPoint(x, y) {
       return Math.atan2(y - this.y, x - this.x) - this.angle
    }
+
+   getOffsetPosition(frontOffset, sideOffset) {
+      const sinAngFront = Math.sin(this.angle)
+      const cosAngFront = Math.cos(this.angle)
+      const sinAngSide = Math.sin(this.angle + Math.PI/2)
+      const cosAngSide = Math.cos(this.angle + Math.PI/2)
+
+      const x = this.x + cosAngFront * frontOffset + cosAngSide * sideOffset
+      const y = this.y + sinAngFront * frontOffset + sinAngSide * sideOffset
+
+      return [x, y]
+   }
    
 
    //
