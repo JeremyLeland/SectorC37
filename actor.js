@@ -2,9 +2,12 @@ import { Entity } from "./entity.js"
 import * as Particles from "./particles.js"
 
 export class Actor extends Entity {
-   constructor({x, y, radius, mass, health, damage, color}) {
+   constructor({x, y, radius, mass, health, damage, speed, turnSpeed, color}) {
       super({x: x, y: y, radius: radius, mass: mass, health: health, damage: damage})
       
+      this.speed = speed
+      this.turnSpeed = turnSpeed
+
       this.guns = []
       this.isShooting = false
 

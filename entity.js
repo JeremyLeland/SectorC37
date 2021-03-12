@@ -45,6 +45,10 @@ export class Entity {
       this.updatePosition(dt)
    }
 
+   drawEntity(ctx) {
+      // sub-classes should override this
+   }
+
    draw(ctx) {
       ctx.save()
 

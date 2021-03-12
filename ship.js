@@ -3,17 +3,14 @@ import * as Particles from "./particles.js"
 
 export class Ship extends Actor {
    constructor({x, y, radius, mass, health, damage, speed, turnSpeed, color}) {
-      super({x: x, y: y, radius: radius, mass: mass, health: health, damage: damage})
+      super({x: x, y: y, radius: radius, 
+             mass: mass, health: health, damage: damage,
+             speed: speed, turnSpeed: turnSpeed, color: color})
 
       this.goalX = x
       this.goalY = y
 
-      this.speed = speed
-      this.turnSpeed = turnSpeed
-
       this.engineTrailDelay = this.timeBetweenEngineTrails = 10
-
-      this.color = color
    }
 
    setGoal(goalX, goalY) {

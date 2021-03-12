@@ -1,8 +1,9 @@
+import { Actor } from "./actor.js"
 import { Ship } from "./ship.js"
 import { Player } from "./player.js"
 import { Gun } from "./gun.js"
 
-class EnemyGun extends Gun {
+class ScoutGun extends Gun {
    constructor(frontOffset, sideOffset, owner) {
       super({
          frontOffset: frontOffset,
@@ -10,13 +11,13 @@ class EnemyGun extends Gun {
          timeBetweenShots: 100,
          bulletSpeed: 0.3,
          bulletDamage: 5,
-         bulletColor: Enemy.COLOR,
+         bulletColor: Scout.COLOR,
          owner: owner
       })
    }
 }
 
-export class Enemy extends Ship {
+export class Scout extends Ship {
    static COLOR = "blue"
 
    constructor(x, y) {
@@ -28,10 +29,10 @@ export class Enemy extends Ship {
          damage: 50, 
          speed: 0.15, 
          turnSpeed: 0.003,
-         color: Enemy.COLOR
+         color: Scout.COLOR
       })
 
-      this.setGuns(new EnemyGun(this.radius * 2, 0, this))
+      this.setGuns(new ScoutGun(this.radius * 2, 0, this))
 
       this.targetActor = null
       this.avoidActor = null
@@ -115,4 +116,70 @@ export class Enemy extends Ship {
    //    //    ctx.stroke()
    //    // }
    // }
+}
+
+export class Turret extends Actor {
+   constructor(x, y) {
+      super({x: x, y: y, radius: 20, 
+         mass: 1, health: 20, damage: 10, 
+         turnSpeed: 0.01, color: "gray"
+      })
+
+      this.setGuns(new Gun({
+         frontOffset: 0,
+         sideOffset: 0,
+         timeBetweenShots: 100,
+         bulletSpeed: 0.3,
+         bulletDamage: 5,
+         bulletColor: "red",
+         owner: this
+      }))
+
+      this.SHOOT_DISTANCE = 300
+      this.SHOOT_ANGLE = 0.5
+
+      this.targetActor = null
+   }
+
+   think(level) {
+      const nearby = level.getActorsNear(this)
+      this.targetActor = this.getClosestTarget(nearby, e => e instanceof Player, this.TARGET_DIST)
+   }
+
+   update(dt) {
+      if (this.targetActor != null) {
+         this.turnToward(this.targetActor, dt)
+      }
+
+      if (this.targetActor != null && 
+          this.distanceFrom(this.targetActor) < this.SHOOT_DISTANCE && 
+          Math.abs(this.angleTo(this.targetActor)) < this.SHOOT_ANGLE) {
+         this.startShooting()
+      }
+      else {
+         this.stopShooting()
+      }
+
+      super.update(dt)
+   }
+
+   drawEntity(ctx) {
+      const BASE_PERCENT = 0.5, BARREL_PERCENT = 0.15
+      ctx.fillStyle = this.color
+      ctx.strokeStyle = "black"
+
+      ctx.beginPath()
+      ctx.arc(0, 0, this.radius * BASE_PERCENT, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.stroke()
+
+      const barrelSize = this.radius * BARREL_PERCENT
+      ctx.beginPath()
+      ctx.arc(0, 0, barrelSize, Math.PI/2, Math.PI * 3/2)
+      ctx.lineTo(this.radius, -barrelSize)
+      ctx.lineTo(this.radius, barrelSize)
+      ctx.closePath()
+      ctx.fill()
+      ctx.stroke()
+   }
 }

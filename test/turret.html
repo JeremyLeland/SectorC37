@@ -19,7 +19,7 @@
       import { Level } from "../level.js"
       import { Asteroid } from "../asteroid.js"
       import { Player } from "../player.js"
-      import { Turret } from "../turret.js"
+      import * as Enemies from "../enemies.js"
 
       class Test extends Game {
          constructor() {
@@ -33,11 +33,7 @@
             this.asteroid = new Asteroid(400, 100, 0, 0, 30, "brown")
             this.level.addEntity(this.asteroid)
 
-            this.turret = new Turret({
-               frontOffset: 0, sideOffset: 0, radius: 20, 
-               mass: 1, health: 20, damage: 10, 
-               turnSpeed: 0.01, color: "gray", owner: this.asteroid
-            })
+            this.turret = new Enemies.Turret(100, 200)
             this.level.addEntity(this.turret)
 
             this.canvas.style.cursor = "crosshair"

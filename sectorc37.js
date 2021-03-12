@@ -2,7 +2,7 @@ import { Game } from "./game.js"
 import { Level } from "./level.js"
 import { Starfield } from "./starfield.js"
 import { Player } from "./player.js"
-import { Enemy } from "./enemy.js"
+import * as Enemies from "./enemies.js"
 import { Asteroid } from "./asteroid.js"
 
 class GameLevel extends Level {
@@ -19,6 +19,10 @@ class GameLevel extends Level {
          this.addRandomEnemy(this.width / 4 + this.width * i / 5)
       }
 
+      for (let i = 0; i < 5; i++) {
+         this.addRandomTurret(this.width / 4 + this.width * i / 5)
+      }
+
       for (let i = 0; i < 40; i++) {
          this.addRandomAsteroid(this.width / 4 + this.width * i / 40)
       }
@@ -26,12 +30,17 @@ class GameLevel extends Level {
 
    addRandomEnemy(distFromCenter) {
       const [x, y] = this.getRandomSpawnLocation(distFromCenter)
-      this.addEntity(new Enemy(x, y, this))
+      this.addEntity(new Enemies.Scout(x, y))
+   }
+
+   addRandomTurret(distFromCenter) {
+      const [x, y] = this.getRandomSpawnLocation(distFromCenter)
+      this.addEntity(new Enemies.Turret(x, y))
    }
 
    addRandomAsteroid(distFromCenter) {
       const [x, y] = this.getRandomSpawnLocation(distFromCenter)
-      this.addEntity(Asteroid.randomAsteroid(x, y, this))
+      this.addEntity(Asteroid.randomAsteroid(x, y))
    }
 
    getRandomSpawnLocation(distFromCenter) {
