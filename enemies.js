@@ -34,9 +34,6 @@ export class Scout extends Ship {
 
       this.setGuns(new ScoutGun(this.radius * 2, 0, this))
 
-      this.targetActor = null
-      this.avoidActor = null
-
       this.SHOOT_DISTANCE = 300
       this.SHOOT_ANGLE = 0.5
 
@@ -118,23 +115,34 @@ export class Scout extends Ship {
    // }
 }
 
-export class Turret extends Actor {
-   constructor(x, y) {
-      super({x: x, y: y, radius: 20, 
-         mass: 1, health: 20, damage: 10, 
-         turnSpeed: 0.01, color: "gray"
-      })
-
-      this.setGuns(new Gun({
-         frontOffset: 0,
-         sideOffset: 0,
+class TurretGun extends Gun {
+   constructor(frontOffset, sideOffset, owner) {
+      super({
+         frontOffset: frontOffset,
+         sideOffset: sideOffset,
          timeBetweenShots: 100,
          bulletSpeed: 0.3,
          bulletDamage: 5,
          bulletColor: "red",
-         owner: this
-      }))
+         owner: owner
+      })
+   }
+}
 
+class Turret extends Actor {
+   constructor(frontOffset, sideOffset, owner) {
+      super({x: owner.x + frontOffset, y: owner.y + sideOffset, radius: 20, 
+         mass: 1, health: 20, damage: 10, turnSpeed: 0.003, color: "gray"
+      })
+
+      this.frontOffset = frontOffset
+      this.sideOffset = sideOffset
+      this.owner = owner
+
+      this.gun = new TurretGun(this.radius * 2, 0, this)
+      this.isShooting = false
+
+      this.TARGET_DIST = 1000
       this.SHOOT_DISTANCE = 300
       this.SHOOT_ANGLE = 0.5
 
@@ -147,25 +155,27 @@ export class Turret extends Actor {
    }
 
    update(dt) {
+      [this.x, this.y] = this.owner.getOffsetPosition(this.frontOffset, this.sideOffset)
+
       if (this.targetActor != null) {
          this.turnToward(this.targetActor, dt)
       }
 
-      if (this.targetActor != null && 
+      this.gun.update(dt)
+      
+      if (this.gun.isReadyToShoot() &&
+          this.targetActor != null && 
           this.distanceFrom(this.targetActor) < this.SHOOT_DISTANCE && 
           Math.abs(this.angleTo(this.targetActor)) < this.SHOOT_ANGLE) {
-         this.startShooting()
-      }
-      else {
-         this.stopShooting()
-      }
+         this.createEntity(this.gun.shoot())
+      }      
 
       super.update(dt)
    }
 
    drawEntity(ctx) {
       const BASE_PERCENT = 0.5, BARREL_PERCENT = 0.15
-      ctx.fillStyle = this.color
+      ctx.fillStyle = "gray"
       ctx.strokeStyle = "black"
 
       ctx.beginPath()
@@ -181,5 +191,37 @@ export class Turret extends Actor {
       ctx.closePath()
       ctx.fill()
       ctx.stroke()
+   }
+}
+
+export class TurretPlatform extends Actor {
+   constructor(x, y) {
+      super({
+         x: x, y: y, 
+         radius: 10, 
+         mass: 1,
+         health: 50, 
+         damage: 50,
+         color: "gray"
+      })
+
+      this.turret = new Turret(0, 0, this)
+   }
+
+   think(level) {
+      this.turret.think(level)
+   }
+
+   update(dt) {
+      this.turret.update(dt)
+
+      for (const e of this.turret.getCreatedEntities()) {
+         this.createEntity(e)
+      }
+   }
+
+   draw(ctx) {
+      super.draw(ctx)
+      this.turret.draw(ctx)
    }
 }

@@ -35,7 +35,7 @@ class GameLevel extends Level {
 
    addRandomTurret(distFromCenter) {
       const [x, y] = this.getRandomSpawnLocation(distFromCenter)
-      this.addEntity(new Enemies.Turret(x, y))
+      this.addEntity(new Enemies.TurretPlatform(x, y))
    }
 
    addRandomAsteroid(distFromCenter) {

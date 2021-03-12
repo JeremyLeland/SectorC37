@@ -1,10 +1,12 @@
 import { Bullet } from "./bullet.js"
 
 export class Gun {
-   constructor({frontOffset, sideOffset, angleOffset = 0, timeBetweenShots, bulletSpeed, bulletDamage, bulletColor, owner}) {
+   constructor({frontOffset, sideOffset, angleOffset = 0, 
+                timeBetweenShots, bulletSpeed, bulletDamage, bulletColor, owner}) {
       this.frontOffset = frontOffset
       this.sideOffset = sideOffset
       this.angleOffset = angleOffset
+
       this.shootDelay = this.timeBetweenShots = timeBetweenShots
       this.bulletSpeed = bulletSpeed
       this.bulletDamage = bulletDamage
@@ -18,10 +20,10 @@ export class Gun {
 
    shoot() {
       const [x, y] = this.owner.getOffsetPosition(this.frontOffset, this.sideOffset)
+      const angle = this.owner.angle + this.angleOffset
       
-      const ang = this.owner.angle + this.angleOffset
-      const dx = Math.cos(ang) * this.bulletSpeed
-      const dy = Math.sin(ang) * this.bulletSpeed
+      const dx = Math.cos(angle) * this.bulletSpeed
+      const dy = Math.sin(angle) * this.bulletSpeed
 
       this.shootDelay = this.timeBetweenShots
       return new Bullet(x, y, dx, dy, this.bulletDamage, this.bulletColor)

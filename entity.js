@@ -35,6 +35,10 @@ export class Entity {
       // sub-classes should override this
    }
 
+   //
+   // Update
+   //
+
    updatePosition(dt) {
       this.x += this.dx * dt
       this.y += this.dy * dt

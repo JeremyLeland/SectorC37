@@ -1,65 +1,13 @@
 import { Entity } from "./entity.js"
-import * as Particles from "./particles.js"
 
 export class Actor extends Entity {
    constructor({x, y, radius, mass, health, damage, speed, turnSpeed, color}) {
       super({x: x, y: y, radius: radius, mass: mass, health: health, damage: damage})
-      
+
       this.speed = speed
       this.turnSpeed = turnSpeed
 
-      this.guns = []
-      this.isShooting = false
-
       this.color = color
-   }
-
-   //
-   // Hit response
-   //
-
-   hitWith(actor) {
-      // "Bleed" some debris to make it clearer we were hit
-      for (let i = 0; i < 3; i ++) {
-         this.createEntity(new Particles.Debris(this))
-      }
-      super.hitWith(actor)
-   }
-
-   die() {
-      for (let i = 0; i < 50; i ++) {
-         this.createEntity(new Particles.Fire(this))
-      }
-      for (let i = 0; i < 50; i ++) {
-         this.createEntity(new Particles.Debris(this))
-      }
-   }
-
-
-   //
-   // Guns
-   //
-
-   setGuns(...guns) {
-      this.guns = guns
-   }
-
-   startShooting() {
-      this.isShooting = true
-   }
-
-   stopShooting() {
-      this.isShooting = false
-   }
-
-   handleGuns(dt) {
-      for (const g of this.guns) {
-         g.update(dt)
-
-         if (this.isShooting && g.isReadyToShoot()) {
-            this.createEntity(g.shoot())
-         }
-      }
    }
 
    //
@@ -110,9 +58,6 @@ export class Actor extends Entity {
       else if (avoidAngle > this.angle) {
          this.angle -= this.turnSpeed * dt
       }
-
-      this.dx = Math.cos(this.angle) * this.speed
-      this.dy = Math.sin(this.angle) * this.speed
    }
 
    //
@@ -159,8 +104,10 @@ export class Actor extends Entity {
    }
 
    update(dt) {
-      this.handleGuns(dt)
+      
 
       super.update(dt)
    }
+
+   
 }

@@ -4,13 +4,54 @@ import * as Particles from "./particles.js"
 export class Ship extends Actor {
    constructor({x, y, radius, mass, health, damage, speed, turnSpeed, color}) {
       super({x: x, y: y, radius: radius, 
-             mass: mass, health: health, damage: damage,
-             speed: speed, turnSpeed: turnSpeed, color: color})
+             mass: mass, health: health, damage: damage, 
+             speed: speed, turnSpeed: turnSpeed, color: color
+      })
 
       this.goalX = x
       this.goalY = y
 
+      this.guns = []
+      this.isShooting = false
+
       this.engineTrailDelay = this.timeBetweenEngineTrails = 10
+   }
+
+   //
+   // Guns
+   //
+
+   setGuns(...guns) {
+      this.guns = guns
+   }
+
+   startShooting() {
+      this.isShooting = true
+   }
+
+   stopShooting() {
+      this.isShooting = false
+   }
+
+   //
+   // Hit response
+   //
+
+   hitWith(actor) {
+      // "Bleed" some debris to make it clearer we were hit
+      for (let i = 0; i < 3; i ++) {
+         this.createEntity(new Particles.Debris(this))
+      }
+      super.hitWith(actor)
+   }
+
+   die() {
+      for (let i = 0; i < 50; i ++) {
+         this.createEntity(new Particles.Fire(this))
+      }
+      for (let i = 0; i < 50; i ++) {
+         this.createEntity(new Particles.Debris(this))
+      }
    }
 
    setGoal(goalX, goalY) {
@@ -27,6 +68,14 @@ export class Ship extends Actor {
    }
 
    update(dt) {
+      for (const g of this.guns) {
+         g.update(dt)
+
+         if (this.isShooting && g.isReadyToShoot()) {
+            this.createEntity(g.shoot())
+         }
+      }
+
       this.makeEngineTrail(dt)
 
       this.dx = Math.cos(this.angle) * this.speed
