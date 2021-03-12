@@ -12,6 +12,7 @@ export class Ship extends Actor {
       this.goalY = y
 
       this.guns = []
+      this.turrets = []
       this.isShooting = false
 
       this.engineTrailDelay = this.timeBetweenEngineTrails = 10
@@ -23,6 +24,10 @@ export class Ship extends Actor {
 
    setGuns(...guns) {
       this.guns = guns
+   }
+
+   setTurrets(...turrets) {
+      this.turrets = turrets
    }
 
    startShooting() {
@@ -59,6 +64,10 @@ export class Ship extends Actor {
       this.goalY = goalY
    }
 
+   think(level) {
+      this.turrets.forEach(t => t.think(level))
+   }
+
    makeEngineTrail(dt) {
       this.engineTrailDelay -= dt
       if (this.engineTrailDelay < 0) {
@@ -76,10 +85,20 @@ export class Ship extends Actor {
          }
       }
 
-      this.makeEngineTrail(dt)
+      for (const t of this.turrets) {
+         t.update(dt)
 
-      this.dx = Math.cos(this.angle) * this.speed
-      this.dy = Math.sin(this.angle) * this.speed
+         for (const e of t.getCreatedEntities()) {
+            this.createEntity(e)
+         }
+      }
+
+      if (this.speed > 0) {
+         this.makeEngineTrail(dt)
+
+         this.dx = Math.cos(this.angle) * this.speed
+         this.dy = Math.sin(this.angle) * this.speed
+      }
 
       super.update(dt)
    }
@@ -96,6 +115,11 @@ export class Ship extends Actor {
 
       ctx.fill()
       ctx.stroke()
+   }
+
+   draw(ctx) {
+      super.draw(ctx)
+      this.turrets.forEach(t => t.draw(ctx))
    }
 
       // // DEBUG

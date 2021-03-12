@@ -194,7 +194,7 @@ class Turret extends Actor {
    }
 }
 
-export class TurretPlatform extends Actor {
+export class TurretPlatform extends Ship {
    constructor(x, y) {
       super({
          x: x, y: y, 
@@ -205,23 +205,6 @@ export class TurretPlatform extends Actor {
          color: "gray"
       })
 
-      this.turret = new Turret(0, 0, this)
-   }
-
-   think(level) {
-      this.turret.think(level)
-   }
-
-   update(dt) {
-      this.turret.update(dt)
-
-      for (const e of this.turret.getCreatedEntities()) {
-         this.createEntity(e)
-      }
-   }
-
-   draw(ctx) {
-      super.draw(ctx)
-      this.turret.draw(ctx)
+      this.setTurrets(new Turret(0, 0, this))
    }
 }
