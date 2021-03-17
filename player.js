@@ -1,5 +1,5 @@
 import { Ship } from "./ship.js"
-import { Gun } from "./gun.js"
+import { Gun } from "./weapons.js"
 
 class PlayerGun extends Gun {
    constructor(frontOffset, sideOffset, angleOffset, owner) {
@@ -13,14 +13,6 @@ class PlayerGun extends Gun {
          bulletColor: Player.COLOR,
          owner: owner
       })
-   }
-
-   drawEntity(ctx) {
-      const BARREL_W = 1, BARREL_L = this.radius * 1.5
-      ctx.fillStyle = "gray"
-      ctx.strokeStyle = "black"
-      ctx.fillRect(0, -BARREL_W, BARREL_L, BARREL_W * 2)
-      ctx.strokeRect(0, -BARREL_W, BARREL_L, BARREL_W * 2)
    }
 }
 

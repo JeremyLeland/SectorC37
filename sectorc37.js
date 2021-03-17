@@ -1,9 +1,39 @@
 import { Game } from "./game.js"
 import { Level } from "./level.js"
-import { Starfield } from "./starfield.js"
 import { Player } from "./player.js"
 import * as Enemies from "./enemies.js"
-import { Asteroid } from "./asteroid.js"
+
+class Starfield {
+   constructor(width, height, density=2000) {
+      this.image = document.createElement('canvas')
+      this.image.width = width
+      this.image.height = height
+
+      const ctx = this.image.getContext('2d')
+
+      ctx.fillStyle = 'black'
+      ctx.fillRect(0, 0, width, height)
+
+      const numStars = width * height / density
+      
+      for (let i = 0; i < numStars; i ++) {
+         const x = Math.random() * width
+         const y = Math.random() * height
+         const r = Math.random() * 1
+         const col = Math.random() * 200
+
+         ctx.fillStyle = 'rgb(' + col + ', ' + col + ', ' + col + ')'
+
+         ctx.beginPath()
+         ctx.arc(x, y, r, 0, Math.PI * 2)
+         ctx.fill()
+      }
+   }
+
+   draw(ctx) {
+      ctx.drawImage(this.image, 0, 0)
+   }
+}
 
 class GameLevel extends Level {
    constructor(width, height) {
@@ -40,7 +70,7 @@ class GameLevel extends Level {
 
    addRandomAsteroid(distFromCenter) {
       const [x, y] = this.getRandomSpawnLocation(distFromCenter)
-      this.addEntity(Asteroid.randomAsteroid(x, y))
+      this.addEntity(Enemies.Asteroid.randomAsteroid(x, y))
    }
 
    getRandomSpawnLocation(distFromCenter) {

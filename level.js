@@ -1,6 +1,6 @@
 import { Entity } from "./entity.js"
+import { Bullet } from "./weapons.js"
 import { Actor } from "./actor.js"
-import { Bullet } from "./bullet.js"
 
 export class Level {
    constructor(width, height) {
