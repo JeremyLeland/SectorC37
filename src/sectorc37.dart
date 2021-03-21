@@ -1,0 +1,81 @@
+import 'dart:html';
+import 'dart:math';
+
+import 'Game.dart';
+import 'player.dart';
+import 'world.dart';
+
+class SectorC37 extends Game {
+  final levelWidth = 2000, levelHeight = 2000;
+
+  World world = new World();
+  late CanvasElement backgroundImage;
+  late Player player;
+
+  
+
+  SectorC37() {
+    backgroundImage = generateStarfieldImage(levelWidth, levelHeight);
+
+    spawnPlayer();
+
+    setCursor('crosshair');
+    animate();
+  }
+
+  num get scrollX => max(0, min(levelWidth - canvasWidth, player.x - canvasWidth / 2));
+  num get scrollY => max(0, min(levelWidth - canvasHeight, player.y - canvasHeight / 2));
+
+  CanvasElement generateStarfieldImage(width, height, {density = 2000}) {
+    final image = new CanvasElement(width: width, height: height);
+    final ctx = image.context2D;
+
+    ctx..fillStyle = 'black'..fillRect(0, 0, width, height);
+
+    final NUM_STARS = width * height / density;
+    var random = new Random();
+    for (var i = 0; i < NUM_STARS; i ++) {
+      final x = random.nextDouble() * width;
+      final y = random.nextDouble() * height;
+      final radius = random.nextDouble() * 1;
+      ctx..beginPath()..arc(x, y, radius, 0, pi*2);
+
+      final col = random.nextInt(200);
+      ctx..fillStyle = 'rgb(${col}, ${col}, ${col})'..fill();
+    }
+
+    return image;
+  }
+
+  void spawnPlayer() {
+    player = new Player(levelWidth / 2, levelHeight / 2, world);
+    world.addEntity(player);
+  }
+
+  void _controlPlayer() {
+    player.aimTowardPoint(mouse.x + scrollX, mouse.y + scrollY);
+  }
+
+  void update(num dt) {
+    if (player.isAlive()) {
+      _controlPlayer();
+    }
+
+    world.update(dt);
+  }
+
+  @override
+  void draw(CanvasRenderingContext2D ctx) {
+    ctx.save();
+    ctx.translate(-scrollX, -scrollY);
+
+    ctx.drawImage(backgroundImage, 0, 0);
+    world.draw(ctx);
+    
+    ctx.restore();
+  }
+}
+
+void main() {
+   new SectorC37();
+}
