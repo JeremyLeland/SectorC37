@@ -14,7 +14,7 @@ abstract class Entity {
     this.y = y;
   }
 
-  bool isAlive() => health > 0;
+  bool get isAlive => health > 0;
   
   void hitWith(Entity entity) {
     health -= entity.damage;

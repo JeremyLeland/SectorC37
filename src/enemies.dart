@@ -37,7 +37,7 @@ class Asteroid extends Entity {
   @override
   void drawEntity(CanvasRenderingContext2D ctx) {
     ctx..beginPath()..arc(0, 0, this.radius, 0, pi * 2);
-    ctx..fillStyle = this.color..strokeStyle = 'black'..fill()..stroke();
+    ctx..fillStyle = this.color..fill()..strokeStyle = 'black'..stroke();
   }
 }
 
@@ -55,7 +55,7 @@ class Scout extends Ship {
      mass: 1,
      health: 50,
      damage: 50,
-     speed: 0.05,
+     speed: 0.15,
      turnSpeed: 0.003,
      color: Scout.COLOR,
      world: world) {

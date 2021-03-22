@@ -3,7 +3,7 @@ import 'world.dart';
 
 class Player extends Ship {
   static const MAX_HEALTH = 100;
-  static const MAX_SPEED = 0.1;
+  static const MAX_SPEED = 0.2;
 
   Player({num x = 0, num y = 0, required World world})
    : super(x: x, y: y,

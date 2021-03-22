@@ -12,7 +12,7 @@ class World {
   Iterable<Entity> getEntitiesNear(Entity entity) {
     // TODO: only return actors close to given actor
     // Only return entities we can collide with
-    return _entities.where((e) => e != entity && e.isAlive() && e.damage > 0);
+    return _entities.where((e) => e != entity && e.isAlive && e.damage > 0);
   }
 
   void addEntity(Entity entity) => _entities.add(entity);
@@ -69,23 +69,13 @@ class World {
         }
       }
     }
-    _entities.removeWhere((e) => !e.isAlive());
+    _entities.removeWhere((e) => !e.isAlive);
 
-    for (var entity in _entities) {
-      entity.update(dt);
-
-      for (var other in getEntitiesNear(entity)) {
-        final hitTime = entity.timeUntilHit(other);
-
-        if (-dt < hitTime && hitTime < 0) {
-
-        }
-      }
-    }
-    _entities.removeWhere((e) => !e.isAlive());
+    _particles..forEach((p) => p.update(dt))..removeWhere((p) => !p.isAlive);
   }
 
   void draw(CanvasRenderingContext2D ctx) {
     _entities.forEach((e) => e.draw(ctx));
+    _particles.forEach((p) => p.draw(ctx));
   }
 }

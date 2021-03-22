@@ -70,7 +70,7 @@ class SectorC37 extends Game {
 
   @override
   void update(dt) {
-    if (player.isAlive()) {
+    if (player.isAlive) {
       _controlPlayer();
     }
 

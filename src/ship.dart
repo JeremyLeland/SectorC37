@@ -2,6 +2,7 @@ import 'dart:html';
 
 import 'actor.dart';
 import 'entity.dart';
+import 'particles.dart' as Particles;
 import 'world.dart';
 
 class Ship extends Actor {
@@ -12,26 +13,29 @@ class Ship extends Actor {
 
   @override
   void bleedFrom(Entity entity) {
-    // TODO: implement bleedFrom
+    for (var i = 0; i < 3; i ++) {
+      world.addParticle(new Particles.Debris(this));
+    }
   }
 
   @override
   void die() {
-    // TODO: implement die
+    for (var i = 0; i < 50; i ++) {
+      world.addParticle(new Particles.Fire(this));
+    }
+    for (var i = 0; i < 50; i ++) {
+      world.addParticle(new Particles.Debris(this));
+    }
   }
 
   @override
   void drawEntity(CanvasRenderingContext2D ctx) {
-    ctx.fillStyle = color;
-    ctx.strokeStyle = "black";
-
     ctx.beginPath();
     ctx.moveTo(-radius, -radius);
     ctx.lineTo( radius,  0);
     ctx.lineTo(-radius,  radius);
     ctx.closePath();
 
-    ctx.fill();
-    ctx.stroke();
+    ctx..fillStyle = color..fill()..strokeStyle = "black"..stroke();
   }
 }
