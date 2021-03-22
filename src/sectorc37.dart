@@ -68,7 +68,8 @@ class SectorC37 extends Game {
     }
   }
 
-  void update(num dt) {
+  @override
+  void update(dt) {
     if (player.isAlive()) {
       _controlPlayer();
     }
@@ -76,8 +77,23 @@ class SectorC37 extends Game {
     world.update(dt);
   }
 
+  _drawUIBar(CanvasRenderingContext2D ctx, num x, num y, num width, num height, num percent, String color) {
+    if (percent > 0) {
+      ctx..fillStyle = color..globalAlpha = 0.5;
+      ctx.fillRect(x, y, (width * percent).floor(), height);
+      ctx.globalAlpha = 1;
+    }
+
+    ctx..strokeStyle = 'white'..strokeRect(x, y, width, height);
+  }
+
+  _drawUI(ctx) {
+    final lifePerc = player.health / Player.MAX_HEALTH;
+    this._drawUIBar(ctx, 5.5, 5.5, 200, 12, lifePerc, 'red');
+  }
+
   @override
-  void draw(CanvasRenderingContext2D ctx) {
+  void draw(ctx) {
     ctx.save();
     ctx.translate(-scrollX, -scrollY);
 
@@ -85,6 +101,8 @@ class SectorC37 extends Game {
     world.draw(ctx);
     
     ctx.restore();
+
+    _drawUI(ctx);
   }
 }
 
