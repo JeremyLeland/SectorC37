@@ -28,7 +28,7 @@ abstract class Actor extends Entity {
     _goalAngle = angle;
   }
 
-  Entity? getClosestAvoid(List<Entity> entities, num avoidTime) {
+  Entity? getClosestAvoid(Iterable<Entity> entities, num avoidTime) {
     final AVOID_BUFFER = 10;
     final RECENT_PAST = -100;
 
@@ -48,7 +48,7 @@ abstract class Actor extends Entity {
     return closestAvoidTime < avoidTime ? closestAvoid : null;
   }
 
-  Entity? getClosestTarget(List<Entity> entities, bool Function(Entity) isTarget, 
+  Entity? getClosestTarget(Iterable<Entity> entities, bool Function(Entity) isTarget, 
                            {num maxDistance = double.infinity}) {
     Entity? closestTarget = null;
     num closestTargetDist = double.infinity;

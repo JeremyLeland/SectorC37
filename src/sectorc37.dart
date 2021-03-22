@@ -2,20 +2,20 @@ import 'dart:html';
 import 'dart:math';
 
 import 'Game.dart';
+import 'enemies.dart';
 import 'player.dart';
 import 'world.dart';
 
 class SectorC37 extends Game {
-  final levelWidth = 2000, levelHeight = 2000;
-
-  World world = new World();
+  World world = new World(width: 2000, height: 2000);
   late CanvasElement backgroundImage;
   late Player player;
 
-  
-
   SectorC37() {
-    backgroundImage = generateStarfieldImage(levelWidth, levelHeight);
+    backgroundImage = generateStarfieldImage(world.width, world.height);
+
+    final spawn = world.getEmptySpawnLocation(10);
+    world.addEntity(new Scout(spawn.x, spawn.y, world));
 
     spawnPlayer();
 
@@ -23,8 +23,8 @@ class SectorC37 extends Game {
     animate();
   }
 
-  num get scrollX => max(0, min(levelWidth - canvasWidth, player.x - canvasWidth / 2));
-  num get scrollY => max(0, min(levelWidth - canvasHeight, player.y - canvasHeight / 2));
+  num get scrollX => max(0, min(world.width - canvasWidth, player.x - canvasWidth / 2));
+  num get scrollY => max(0, min(world.height - canvasHeight, player.y - canvasHeight / 2));
 
   CanvasElement generateStarfieldImage(width, height, {density = 2000}) {
     final image = new CanvasElement(width: width, height: height);
@@ -33,7 +33,7 @@ class SectorC37 extends Game {
     ctx..fillStyle = 'black'..fillRect(0, 0, width, height);
 
     final NUM_STARS = width * height / density;
-    var random = new Random();
+    final random = new Random();
     for (var i = 0; i < NUM_STARS; i ++) {
       final x = random.nextDouble() * width;
       final y = random.nextDouble() * height;
@@ -48,12 +48,19 @@ class SectorC37 extends Game {
   }
 
   void spawnPlayer() {
-    player = new Player(levelWidth / 2, levelHeight / 2, world);
+    player = new Player(world.width / 2, world.height / 2, world);
     world.addEntity(player);
   }
 
   void _controlPlayer() {
     player.aimTowardPoint(mouse.x + scrollX, mouse.y + scrollY);
+
+    if (keyboard.isPressed(KeyCode.SHIFT)) {
+      player.speed = 0;
+    }
+    else {
+      player.speed = Player.MAX_SPEED;
+    }
   }
 
   void update(num dt) {

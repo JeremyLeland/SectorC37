@@ -1,9 +1,13 @@
 import 'dart:html';
+import 'dart:math';
 
 import 'entity.dart';
 
 class World {
+  num width, height;
   List<Entity> _entities = [], _particles = [];
+
+  World({this.width = 0, this.height = 0});
 
   Iterable<Entity> getEntitiesNear(Entity entity) {
     // TODO: only return actors close to given actor
@@ -13,6 +17,14 @@ class World {
 
   void addEntity(Entity entity) => _entities.add(entity);
   void addParticle(Entity particle) => _particles.add(particle);
+
+  Point getEmptySpawnLocation(num radius) {
+    Random random = new Random();
+
+    // TODO: actually make sure it's empty
+
+    return new Point(random.nextDouble() * width, random.nextDouble() * height);
+  }
 
   void update(num dt) {
     _entities.forEach((e) => e.update(dt));

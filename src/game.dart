@@ -39,7 +39,7 @@ class Game {
 
          _lastTime = now;
 
-         _ctx.clearRect(0, 0, _ctx.canvas.width!, _ctx.canvas.height!);
+         _ctx.clearRect(0, 0, canvasWidth, canvasHeight);
          draw(_ctx);
       }
    }
