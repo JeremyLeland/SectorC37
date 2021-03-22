@@ -9,6 +9,11 @@ abstract class Entity {
   Entity({this.x = 0, this.y = 0, this.dx = 0, this.dy = 0, this.angle = 0, this.dAngle = 0,
           this.radius = 0, this.mass = 0, this.health = 1, this.damage = 0});
   
+  void spawn(num x, num y) {
+    this.x = x;
+    this.y = y;
+  }
+
   bool isAlive() => health > 0;
   
   void hitWith(Entity entity) {

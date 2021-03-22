@@ -18,12 +18,29 @@ class World {
   void addEntity(Entity entity) => _entities.add(entity);
   void addParticle(Entity particle) => _particles.add(particle);
 
+  void spawnInBounds(Entity entity) {
+    var location = getEmptySpawnLocation(entity.radius);
+    entity.spawn(location.x, location.y);
+    addEntity(entity);
+  }
+
+  void spawnOutOfBounds(Entity entity) {
+    var location = getLocationOutside();
+    entity.spawn(location.x, location.y);
+    addEntity(entity);
+  }
+
   Point getEmptySpawnLocation(num radius) {
-    Random random = new Random();
+    var random = new Random();
 
     // TODO: actually make sure it's empty
 
     return new Point(random.nextDouble() * width, random.nextDouble() * height);
+  }
+
+  Point getLocationOutside() {
+    var angle = new Random().nextDouble() * pi * 2;
+    return new Point(width/2 + cos(angle) * width/2 * 1.5, height/2 + sin(angle) * height/2 * 1.5);
   }
 
   void update(num dt) {

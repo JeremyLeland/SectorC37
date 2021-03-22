@@ -16,16 +16,18 @@ abstract class Actor extends Entity {
 
   void aimToward(Entity entity) => aimTowardPoint(entity.x, entity.y);
   void aimTowardPoint(num x, num y) => setGoalAngle(atan2(y - this.y, x - this.x));
-  void setGoalAngle(num angle) {
-    // Adjust our angle so we can use goal angle
-    if (angle - this.angle > pi) {
-      this.angle += pi * 2;
+  void setGoalAngle(num angle) => _goalAngle = _adjustOurAngleSoWeCanUse(angle);
+
+  // Bring our angle into range of this other angle so we can use it for greater/less than calculations
+  num _adjustOurAngleSoWeCanUse(num otherAngle) {
+    if (otherAngle - angle > pi) {
+      angle += pi * 2;
     }
-    else if (this.angle - angle > pi) {
-      this.angle -= pi * 2;
+    else if (angle - otherAngle > pi) {
+      angle -= pi * 2;
     }
 
-    _goalAngle = angle;
+    return otherAngle;
   }
 
   Entity? getClosestAvoid(Iterable<Entity> entities, num avoidTime) {

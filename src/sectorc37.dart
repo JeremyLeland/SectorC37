@@ -14,8 +14,13 @@ class SectorC37 extends Game {
   SectorC37() {
     backgroundImage = generateStarfieldImage(world.width, world.height);
 
-    final spawn = world.getEmptySpawnLocation(10);
-    world.addEntity(new Scout(spawn.x, spawn.y, world));
+    for (int i = 0; i < 5; i ++) {
+      world.spawnInBounds(new Scout(world));
+    }
+
+    for (int i = 0; i < 5; i ++) {
+      world.spawnInBounds(Asteroid.random());
+    }
 
     spawnPlayer();
 
@@ -48,8 +53,8 @@ class SectorC37 extends Game {
   }
 
   void spawnPlayer() {
-    player = new Player(world.width / 2, world.height / 2, world);
-    world.addEntity(player);
+    player = new Player(world);
+    world.spawnInBounds(player);
   }
 
   void _controlPlayer() {
