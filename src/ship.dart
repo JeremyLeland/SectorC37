@@ -5,9 +5,9 @@ import 'entity.dart';
 import 'world.dart';
 
 class Ship extends Actor {
-  Ship({num radius = 0, num mass = 0, num health = 0, num damage = 0, 
+  Ship({num x = 0, num y = 0, num radius = 0, num mass = 0, num health = 0, num damage = 0, 
         num speed = 0, num turnSpeed = 0, required String color, required World world})
-   : super(radius: radius, mass: mass, health: health, damage: damage, 
+   : super(x: x, y: y, radius: radius, mass: mass, health: health, damage: damage, 
            speed: speed, turnSpeed: turnSpeed, color: color, world: world);
 
   @override

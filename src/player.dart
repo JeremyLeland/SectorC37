@@ -5,8 +5,8 @@ class Player extends Ship {
   static const MAX_HEALTH = 100;
   static const MAX_SPEED = 0.1;
 
-  Player(World world)
-   : super(
+  Player({num x = 0, num y = 0, required World world})
+   : super(x: x, y: y,
      radius: 10, 
      mass: 1,
      health: Player.MAX_HEALTH, 

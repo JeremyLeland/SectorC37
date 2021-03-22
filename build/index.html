@@ -3,9 +3,21 @@
   <head>
     <title>Sector C37</title>
     <style>
-      html, body { margin: 0; padding: 0; }
-   </style>
-    <script defer src="SectorC37.dart.js"></script>
+      body { background-color: #222; margin: 0; padding: 0; }
+    </style>
+    <script>
+      let head = document.getElementsByTagName('head')[0];
+      let js = document.createElement('script');
+      let test = new URLSearchParams(window.location.search).get('test');
+      if (test != null) {
+        js.src = `test/${test}.dart.js`;
+      }
+      else {
+        js.src = 'SectorC37.dart.js';
+      }
+      head.appendChild(js);
+    </script>
+    <!-- <script defer src="SectorC37.dart.js"></script> -->
   </head>
   <body>
   </body>

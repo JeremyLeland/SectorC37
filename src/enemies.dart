@@ -20,8 +20,8 @@ class Asteroid extends Entity {
     return new Asteroid(dx: dx, dy: dy, radius: radius, color: color);
   }
 
-  Asteroid({num dx = 0, num dy = 0, required num radius, required String this.color}) 
-   : super(dx: dx, dy: dy, radius: radius, 
+  Asteroid({num x = 0, num y = 0, num dx = 0, num dy = 0, required num radius, required String this.color}) 
+   : super(x: x, y: y, dx: dx, dy: dy, radius: radius, 
            mass: radius * 0.5, health: radius * 20, damage: radius * 10);
 
   @override
@@ -49,8 +49,8 @@ class Scout extends Ship {
   num goalX = 0, goalY = 0;
   Entity? avoid, target;
 
-  Scout(World world)
-   : super(
+  Scout({num x = 0, num y = 0, required World world})
+   : super(x: x, y: y, 
      radius: 10,
      mass: 1,
      health: 50,

@@ -67,9 +67,11 @@ class Keyboard {
 }
 
 class Mouse {
-  final _buttons = new HashSet<int>();
-  num x = 0, y = 0;
+  static const int LEFT_BUTTON = 0, MIDDLE_BUTTON = 1, RIGHT_BUTTON = 2;
 
+  num _x = 0, _y = 0;
+  final _buttons = new HashSet<int>();
+  
   Mouse() {
     window.onMouseDown.listen((MouseEvent event) {
       _buttons.add(event.button);
@@ -78,10 +80,12 @@ class Mouse {
       _buttons.remove(event.button);
     });
     window.onMouseMove.listen((event) {
-      x = event.offset.x;
-      y = event.offset.y;
+      _x = event.offset.x;
+      _y = event.offset.y;
     });
   }
 
+  num get x => _x;
+  num get y => _y;
   bool isPressed(int button) => _buttons.contains(button);
 }
