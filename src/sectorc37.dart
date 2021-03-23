@@ -9,7 +9,12 @@ import 'world.dart';
 class SectorC37 extends Game {
   World world = new World(width: 2000, height: 2000);
   late CanvasElement backgroundImage;
+  
   late Player player;
+  static const TIME_BEFORE_RESPAWN = 1000;
+  num respawnDelay = TIME_BEFORE_RESPAWN;
+
+  List<TimedEvent> events = [];
 
   SectorC37() {
     backgroundImage = generateStarfieldImage(world.width, world.height);
@@ -55,6 +60,7 @@ class SectorC37 extends Game {
   void spawnPlayer() {
     player = new Player(world: world);
     world.spawnInBounds(player);
+    respawnDelay = TIME_BEFORE_RESPAWN;
   }
 
   void _controlPlayer() {
@@ -70,10 +76,18 @@ class SectorC37 extends Game {
 
   @override
   void update(dt) {
+    events..forEach((e) => e.update(dt))..removeWhere((e) => e.timeLeft < 0);
+    
     if (player.isAlive) {
       _controlPlayer();
     }
-
+    else {
+      respawnDelay -= dt;
+      if (respawnDelay < 0 && mouse.isPressed(Mouse.LEFT_BUTTON)) {
+        spawnPlayer();
+      }
+    }
+    
     world.update(dt);
   }
 
@@ -87,9 +101,15 @@ class SectorC37 extends Game {
     ctx..strokeStyle = 'white'..strokeRect(x, y, width, height);
   }
 
-  _drawUI(ctx) {
+  _drawUI(CanvasRenderingContext2D ctx) {
     final lifePerc = player.health / Player.MAX_HEALTH;
     this._drawUIBar(ctx, 5.5, 5.5, 200, 12, lifePerc, 'red');
+
+    if (!player.isAlive && respawnDelay < 0) {
+      ctx..textAlign = 'center'..textBaseline = 'middle';
+      ctx..fillStyle = 'white'..font = '16px Arial';
+      ctx.fillText('Click to Respawn', canvasWidth / 2, canvasHeight / 2);
+    }
   }
 
   @override

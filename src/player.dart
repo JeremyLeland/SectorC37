@@ -9,9 +9,9 @@ class Player extends Ship {
    : super(x: x, y: y,
      radius: 10, 
      mass: 1,
-     health: Player.MAX_HEALTH, 
+     health: MAX_HEALTH, 
      damage: 50, 
-     speed: Player.MAX_SPEED, 
+     speed: MAX_SPEED, 
      turnSpeed: 0.005, 
      color: "green", 
      world: world) {

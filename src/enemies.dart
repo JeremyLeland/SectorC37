@@ -57,7 +57,7 @@ class Scout extends Ship {
      damage: 50,
      speed: 0.15,
      turnSpeed: 0.003,
-     color: Scout.COLOR,
+     color: COLOR,
      world: world) {
   }
 
@@ -80,8 +80,8 @@ class Scout extends Ship {
 
     // Look for actors to avoid or target
     final nearby = world.getEntitiesNear(this);
-    avoid = this.getClosestAvoid(nearby, Scout.AVOID_TIME);
-    target = this.getClosestTarget(nearby, (e) => e is Player, maxDistance: Scout.TARGET_DISTANCE);
+    avoid = this.getClosestAvoid(nearby, AVOID_TIME);
+    target = this.getClosestTarget(nearby, (e) => e is Player, maxDistance: TARGET_DISTANCE);
 
     if (avoid != null) {
       var angFrom = angleFrom(avoid!);

@@ -2,7 +2,7 @@ import 'dart:collection';
 import 'dart:html';
 import 'dart:math';
 
-class Game {
+abstract class Game {
   late CanvasRenderingContext2D _ctx;
   num _lastTime = 0;
   bool _running = true;
@@ -44,11 +44,8 @@ class Game {
     }
   }
 
-  void update(num dt) {
-  }
-
-  void draw(CanvasRenderingContext2D ctx) {
-  }
+  void update(num dt);
+  void draw(CanvasRenderingContext2D ctx);
 }
 
 class Keyboard {
@@ -88,4 +85,19 @@ class Mouse {
   num get x => _x;
   num get y => _y;
   bool isPressed(int button) => _buttons.contains(button);
+}
+
+class TimedEvent {
+   num timeLeft;
+   Function function;
+
+   TimedEvent({required this.timeLeft, required this.function});
+
+   void update(num dt) {
+      timeLeft -= dt;
+
+      if (timeLeft < 0) {
+         function();
+      }
+   }
 }

@@ -69,7 +69,7 @@ class EngineTrail extends Particle {
 
   EngineTrail(Entity entity)
    : super(startX: entity.x, startY: entity.y, maxSpeed: 0, 
-           minRadius: EngineTrail.RADIUS, maxRadius: EngineTrail.RADIUS, life: 300);
+           minRadius: RADIUS, maxRadius: RADIUS, life: 300);
 
   void drawEntity(ctx) {
     // TODO: Make this like the Snake for a smoother trail
