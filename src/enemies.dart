@@ -4,6 +4,7 @@ import 'dart:math';
 import 'entity.dart';
 import 'player.dart';
 import 'ship.dart';
+import 'particles.dart' as Particles;
 import 'world.dart';
 
 class Asteroid extends Entity {
@@ -31,7 +32,26 @@ class Asteroid extends Entity {
 
   @override
   void die() {
-    // TODO: implement die
+    for (var i = 0; i < this.radius * 2; i ++) {
+      this.createEntity(new Particles.Rock(this));
+    }
+
+    // TODO: This is similar to Particles constructor, can we combine these somehow?
+    const NUM_SMALLER = 3, SPEED = 0.01;
+    Random random = new Random();
+    final startAng = random.nextDouble() * pi * 2;
+    for (var i = 0; i < NUM_SMALLER; i ++) {
+      final ang = startAng + i * pi * 2 / NUM_SMALLER;
+
+      this.createEntity(new Asteroid(
+        x: x + cos(ang) * radius / 2, 
+        y: y + sin(ang) * radius / 2, 
+        dx: dx + cos(ang) * SPEED, 
+        dy: dy + sin(ang) * SPEED, 
+        radius: radius * (random.nextDouble() * 0.2 + 0.2), 
+        color: color
+      ));
+    }
   }
 
   @override
@@ -49,7 +69,7 @@ class Scout extends Ship {
   num goalX = 0, goalY = 0;
   Entity? avoid, target;
 
-  Scout({num x = 0, num y = 0, required World world})
+  Scout({num x = 0, num y = 0})
    : super(x: x, y: y, 
      radius: 10,
      mass: 1,
@@ -57,8 +77,7 @@ class Scout extends Ship {
      damage: 50,
      speed: 0.15,
      turnSpeed: 0.003,
-     color: COLOR,
-     world: world) {
+     color: COLOR) {
   }
 
   @override
@@ -69,7 +88,8 @@ class Scout extends Ship {
   }
 
   @override
-  void update(num dt) {
+  // TODO: Move this to Actor so we can share it with turret?
+  void think(World world) {
     // Head toward random location in level if nothing else is going on
     // TODO: also change this after time, in case the goal is somewhere we must avoid?
     if (distanceFromPoint(goalX, goalY) < radius * 2) {
@@ -93,7 +113,5 @@ class Scout extends Ship {
     else {
       aimTowardPoint(goalX, goalY);
     }
-
-    super.update(dt);
   }
 }

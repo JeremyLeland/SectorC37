@@ -1,6 +1,7 @@
 import 'dart:html';
 import 'dart:math';
 
+import 'actor.dart';
 import 'entity.dart';
 
 class World {
@@ -15,8 +16,8 @@ class World {
     return _entities.where((e) => e != entity && e.isAlive && e.damage > 0);
   }
 
-  void addEntity(Entity entity) => _entities.add(entity);
-  void addParticle(Entity particle) => _particles.add(particle);
+  void addEntity(Entity entity) => entity.damage == 0 ? _particles.add(entity) : _entities.add(entity);
+  void addCreatedEntities(Iterable<Entity> entities) => entities.forEach((e) => addEntity(e));
 
   void spawnInBounds(Entity entity) {
     var location = getEmptySpawnLocation(entity.radius);
@@ -44,7 +45,13 @@ class World {
   }
 
   void update(num dt) {
-    _entities.forEach((e) => e.update(dt));
+    _entities.forEach((e) {
+      if (e is Actor) {
+        e.think(this);
+      }
+
+      e.update(dt);
+    });
     
     // Perform each entity vs entity check only once
     var others = List<Entity>.from(_entities);
@@ -69,7 +76,10 @@ class World {
         }
       }
     }
-    _entities.removeWhere((e) => !e.isAlive);
+    _entities.removeWhere((e) {
+      addCreatedEntities(e.getCreatedEntities());
+      return !e.isAlive;
+    });
 
     _particles..forEach((p) => p.update(dt))..removeWhere((p) => !p.isAlive);
   }

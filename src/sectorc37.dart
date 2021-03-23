@@ -20,7 +20,7 @@ class SectorC37 extends Game {
     backgroundImage = generateStarfieldImage(world.width, world.height);
 
     for (int i = 0; i < 5; i ++) {
-      world.spawnInBounds(new Scout(world: world));
+      world.spawnInBounds(new Scout());
     }
 
     for (int i = 0; i < 5; i ++) {
@@ -58,7 +58,7 @@ class SectorC37 extends Game {
   }
 
   void spawnPlayer() {
-    player = new Player(world: world);
+    player = new Player();
     world.spawnInBounds(player);
     respawnDelay = TIME_BEFORE_RESPAWN;
   }

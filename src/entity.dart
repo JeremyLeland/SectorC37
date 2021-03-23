@@ -5,6 +5,7 @@ import 'dart:math';
 abstract class Entity {
   num x, y, dx, dy, angle, dAngle;
   num radius, mass, health, damage;
+  final List<Entity> _createdEntities = [];
 
   Entity({this.x = 0, this.y = 0, this.dx = 0, this.dy = 0, this.angle = 0, this.dAngle = 0,
           this.radius = 0, this.mass = 0, this.health = 1, this.damage = 0});
@@ -82,6 +83,14 @@ abstract class Entity {
 
   void update(num dt) {
     updatePosition(dt);
+  }
+
+  void createEntity(Entity entity) => _createdEntities.add(entity);
+  
+  Iterable<Entity> getCreatedEntities() {
+    var result = List<Entity>.from(_createdEntities);
+    _createdEntities.clear();
+    return result;
   }
 
   //

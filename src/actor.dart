@@ -6,12 +6,11 @@ import 'world.dart';
 abstract class Actor extends Entity {
   num speed, turnSpeed;
   String color;
-  World world;
 
   num _goalAngle = 0;
 
   Actor({num x = 0, num y = 0, num radius = 0, num mass = 0, num health = 0, num damage = 0, 
-         this.speed = 0, this.turnSpeed = 0, required this.color, required this.world})
+         this.speed = 0, this.turnSpeed = 0, required this.color})
    : super(x: x, y: y, radius: radius, mass: mass, health: health, damage: damage);
 
   void aimToward(Entity entity) => aimTowardPoint(entity.x, entity.y);
@@ -68,6 +67,8 @@ abstract class Actor extends Entity {
 
     return closestTargetDist < maxDistance ? closestTarget : null;
   }
+
+  void think(World world);
 
   @override
   void update(num dt) {
