@@ -3,28 +3,41 @@ import 'dart:html';
 import 'actor.dart';
 import 'entity.dart';
 import 'particles.dart' as Particles;
+import 'weapons.dart';
 
 abstract class Ship extends Actor {
+  List<Gun> guns = [];
+  bool isShooting = false;
+
   Ship({num x = 0, num y = 0, num radius = 0, num mass = 0, num health = 0, num damage = 0, 
-        num speed = 0, num turnSpeed = 0, required String color})
+        num speed = 0, num turnSpeed = 0, String color = 'black'})
    : super(x: x, y: y, radius: radius, mass: mass, health: health, damage: damage, 
            speed: speed, turnSpeed: turnSpeed, color: color);
 
   @override
-  void bleedFrom(Entity entity) {
+  void bleedFrom(entity, world) {
     for (var i = 0; i < 3; i ++) {
-      createEntity(new Particles.Debris(this));
+      world.addEntity(new Particles.Debris(this));
     }
   }
 
   @override
-  void die() {
+  void die(world) {
     for (var i = 0; i < 50; i ++) {
-      createEntity(new Particles.Fire(this));
+      world.addEntity(new Particles.Fire(this));
     }
     for (var i = 0; i < 50; i ++) {
-      createEntity(new Particles.Debris(this));
+      world.addEntity(new Particles.Debris(this));
     }
+  }
+
+  @override
+  void update(dt, world) {
+    for (var g in guns) {
+      g.update(dt, world);
+    }
+
+    super.update(dt, world);
   }
 
   @override

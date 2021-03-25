@@ -1,7 +1,6 @@
 import 'dart:html';
 import 'dart:math';
 
-import 'actor.dart';
 import 'entity.dart';
 
 class World {
@@ -17,17 +16,16 @@ class World {
   }
 
   void addEntity(Entity entity) => entity.damage == 0 ? _particles.add(entity) : _entities.add(entity);
-  void addCreatedEntities(Iterable<Entity> entities) => entities.forEach((e) => addEntity(e));
 
   void spawnInBounds(Entity entity) {
     var location = getEmptySpawnLocation(entity.radius);
-    entity.spawn(location.x, location.y);
+    entity.spawn(x: location.x, y: location.y);
     addEntity(entity);
   }
 
   void spawnOutOfBounds(Entity entity) {
     var location = getLocationOutside();
-    entity.spawn(location.x, location.y);
+    entity.spawn(x: location.x, y: location.y);
     addEntity(entity);
   }
 
@@ -45,18 +43,14 @@ class World {
   }
 
   void update(num dt) {
-    _entities.forEach((e) {
-      if (e is Actor) {
-        e.think(this);
-      }
-
-      e.update(dt);
-    });
+    // Use local list of entities in case more are added during update
+    var localEntities = List<Entity>.from(_entities);
+    localEntities.forEach((e) => e.update(dt, this));
     
     // Perform each entity vs entity check only once
-    var others = List<Entity>.from(_entities);
+    var others = List<Entity>.from(localEntities);
 
-    for (var e in _entities) {
+    for (var e in localEntities) {
       others.remove(e);
 
       // TODO: What if we hit multiple others? Figure out which we hit first?
@@ -68,20 +62,17 @@ class World {
           o.updatePosition(hitTime);
 
           // TODO: bounce?
-          e.hitWith(o);
-          o.hitWith(e);
+          e.hitWith(o, this);
+          o.hitWith(e, this);
 
           e.updatePosition(-hitTime);
           o.updatePosition(-hitTime);
         }
       }
     }
-    _entities.removeWhere((e) {
-      addCreatedEntities(e.getCreatedEntities());
-      return !e.isAlive;
-    });
+    _entities.removeWhere((e) => !e.isAlive);
 
-    _particles..forEach((p) => p.update(dt))..removeWhere((p) => !p.isAlive);
+    _particles..forEach((p) => p.update(dt, this))..removeWhere((p) => !p.isAlive);
   }
 
   void draw(CanvasRenderingContext2D ctx) {

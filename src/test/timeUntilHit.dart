@@ -4,15 +4,14 @@ import 'dart:math';
 import '../enemies.dart';
 import '../game.dart';
 import '../player.dart';
+import '../world.dart';
 
 class TimeUntilHitTest extends Game {
-  late Player player;
-  late Asteroid asteroid;
+  World world = new World(width: 0, height: 0);
+  Player player = new Player(x: 100, y: 100);
+  Asteroid asteroid = new Asteroid(x: 400, y: 100);
 
   TimeUntilHitTest() {
-    player = new Player(x: 100, y: 100);
-    asteroid = new Asteroid(x: 400, y: 100, radius: 30, color: 'brown');
-
     setCursor('crosshair');
     animate();
   }
@@ -25,7 +24,7 @@ class TimeUntilHitTest extends Game {
 
       player.aimTowardPoint(mouse.x, mouse.y);
 
-      player.update(dt);
+      player.update(dt, world);
       player.updatePosition(-dt);   // keep us still for this test
   }
 

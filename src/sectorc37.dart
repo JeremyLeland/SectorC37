@@ -66,6 +66,8 @@ class SectorC37 extends Game {
   void _controlPlayer() {
     player.aimTowardPoint(mouse.x + scrollX, mouse.y + scrollY);
 
+    player.isShooting = mouse.isPressed(Mouse.LEFT_BUTTON);
+
     if (keyboard.isPressed(KeyCode.SHIFT)) {
       player.speed = 0;
     }

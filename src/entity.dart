@@ -1,33 +1,42 @@
 import 'dart:html';
-
 import 'dart:math';
+
+import 'world.dart';
 
 abstract class Entity {
   num x, y, dx, dy, angle, dAngle;
-  num radius, mass, health, damage;
-  final List<Entity> _createdEntities = [];
+  num radius, mass, life = 1, decay, health, damage;
+  bool isSolid;
+  String color;
 
   Entity({this.x = 0, this.y = 0, this.dx = 0, this.dy = 0, this.angle = 0, this.dAngle = 0,
-          this.radius = 0, this.mass = 0, this.health = 1, this.damage = 0});
+          this.radius = 0, this.mass = 0, this.isSolid = false, this.decay = 0,
+          this.health = 1, this.damage = 0, this.color = 'black'});
   
-  void spawn(num x, num y) {
+  // TODO: Use this to separate positioning calls from setting mass/damage/etc?
+  void spawn({num x = 0, num y = 0, num dx = 0, num dy = 0, num angle = 0, num dAngle = 0}) {
     this.x = x;
     this.y = y;
+    this.dx = dx;
+    this.dy = dy;
+    this.angle = angle;
+    this.dAngle = dAngle;
   }
 
-  bool get isAlive => health > 0;
+  // NOTE: life decreases with time, health decreases when hit
+  bool get isAlive => life > 0 && health > 0;
   
-  void hitWith(Entity entity) {
+  void hitWith(Entity entity, World world) {
     health -= entity.damage;
 
-    bleedFrom(entity);
+    bleedFrom(entity, world);
     if (health <= 0) {
-      die();
+      die(world);
     }
   }
 
-  void bleedFrom(Entity entity);
-  void die();
+  void bleedFrom(Entity entity, World world) {}
+  void die(World world) {}
 
   //
   // Distances and angles
@@ -81,22 +90,16 @@ abstract class Entity {
     angle += dAngle * dt;
   }
 
-  void update(num dt) {
-    updatePosition(dt);
-  }
+  void update(num dt, World world) {
+    life -= decay * dt;
 
-  void createEntity(Entity entity) => _createdEntities.add(entity);
-  
-  Iterable<Entity> getCreatedEntities() {
-    var result = List<Entity>.from(_createdEntities);
-    _createdEntities.clear();
-    return result;
+    updatePosition(dt);
   }
 
   //
   // Draw
   //
-  void drawEntity(CanvasRenderingContext2D ctx);
+  void drawEntity(CanvasRenderingContext2D ctx) {}
 
   void draw(CanvasRenderingContext2D ctx) {
     ctx.save();

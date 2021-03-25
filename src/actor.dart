@@ -5,13 +5,12 @@ import 'world.dart';
 
 abstract class Actor extends Entity {
   num speed, turnSpeed;
-  String color;
 
   num _goalAngle = 0;
 
   Actor({num x = 0, num y = 0, num radius = 0, num mass = 0, num health = 0, num damage = 0, 
-         this.speed = 0, this.turnSpeed = 0, required this.color})
-   : super(x: x, y: y, radius: radius, mass: mass, health: health, damage: damage);
+         this.speed = 0, this.turnSpeed = 0, String color = 'black'})
+   : super(x: x, y: y, radius: radius, mass: mass, health: health, damage: damage, color: color);
 
   void aimToward(Entity entity) => aimTowardPoint(entity.x, entity.y);
   void aimTowardPoint(num x, num y) => setGoalAngle(atan2(y - this.y, x - this.x));
@@ -68,10 +67,8 @@ abstract class Actor extends Entity {
     return closestTargetDist < maxDistance ? closestTarget : null;
   }
 
-  void think(World world);
-
   @override
-  void update(num dt) {
+  void update(num dt, World world) {
     if (_goalAngle < angle) {
       angle = max(_goalAngle, angle - turnSpeed * dt);
     }
@@ -84,6 +81,6 @@ abstract class Actor extends Entity {
       dy = sin(angle) * speed;
     }
 
-    super.update(dt);
+    super.update(dt, world);
   }
 }
