@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'actor.dart';
 import 'entity.dart';
 import 'particles.dart' as Particles;
 import 'ship.dart';

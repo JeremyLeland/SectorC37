@@ -25,6 +25,27 @@ abstract class Entity {
     return this;
   }
 
+  Entity spawnParticle({required num startX, required num startY, num startSpread = 0, 
+            num startDX = 0, num startDY = 0, num dirAngle = 0, num dirSpread = pi * 2, 
+            num minSpeed = 0, required num maxSpeed, num maxSpin = 0,
+            num minRadius = 0, required num maxRadius}) {
+    Random random = new Random();
+    angle = dirAngle + random.nextDouble() * dirSpread - dirSpread/2;
+    dAngle = random.nextDouble() * (maxSpin / 2) - maxSpin;
+
+    final dist = random.nextDouble() * startSpread;
+    x = startX + cos(angle) * dist;
+    y = startY + sin(angle) * dist;
+
+    final speed = minSpeed + random.nextDouble() * (maxSpeed - minSpeed);
+    dx = startDX + cos(angle) * speed;
+    dy = startDY + sin(angle) * speed;
+
+    radius = minRadius + random.nextDouble() * (maxRadius - minRadius);
+
+    return this;
+  }
+
   // NOTE: life decreases with time, health decreases when hit
   bool get isAlive => life > 0 && health > 0;
   

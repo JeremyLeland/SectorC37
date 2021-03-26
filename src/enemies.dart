@@ -1,4 +1,3 @@
-import 'dart:html';
 import 'dart:math';
 
 import 'actor.dart';
@@ -63,13 +62,8 @@ class Asteroid extends Entity {
   }
 }
 
-class Scout extends Ship with TargetPlayer {
-  static const COLOR = 'blue';
-  static const AVOID_TIME = 2000;
-
-  num goalX = 0, goalY = 0, goalTimer = 0;
-  Entity? avoid;
-
+class Scout extends Ship with AvoidNearby, TargetNearby, Wander {
+  
   Scout({num x = 0, num y = 0})
    : super(x: x, y: y, 
      radius: 10,
@@ -78,45 +72,30 @@ class Scout extends Ship with TargetPlayer {
      damage: 50,
      speed: 0.15,
      turnSpeed: 0.003,
-     color: COLOR) {
+     color: 'blue') {
     guns.add(new Gun(
       frontOffset: radius * 2, 
       sideOffset: 0, 
       timeBetweenShots: 100, 
-      shoot: () => new Bullet(damage: 10, speed: 0.4, color: COLOR),  
+      shoot: () => new Bullet(damage: 10, speed: 0.4, color: this.color),  
       owner: this));
   }
 
   @override
   void update(dt, world) {
-    // Head toward random location in level if nothing else is going on
-    goalTimer -= dt;
-    if (goalTimer < 0 || distanceFromPoint(goalX, goalY) < radius * 2) {
-      final random = new Random();
-      goalX = random.nextDouble() * world.width;
-      goalY = random.nextDouble() * world.height;
-      goalTimer = random.nextDouble() * 5000;
-    }
-
-    // Look for actors to avoid or target
     final nearby = world.getEntitiesNear(this);
-    avoid = this.getClosestAvoid(nearby, AVOID_TIME);
     
-    if (avoid != null) {
-      var angFrom = angleFrom(avoid!);
-      setGoalAngle(angle + (angFrom < 0 ? pi/2 : -pi/2));
-      isShooting = false;
-    }
-    else if (!targetPlayer(nearby)) {
-      aimTowardPoint(goalX, goalY);
-      isShooting = false;
+    if (avoidNearby(nearby) == null) {
+      if (targetNearby(nearby.where((e) => e is Player)) == null) {
+        wander(dt, world);
+      }
     }
 
     super.update(dt, world);
   }
 }
 
-class Turret extends Ship with TargetPlayer {
+class Turret extends Ship with TargetNearby {
   Turret({num x = 0, num y = 0})
    : super(x: x, y: y,
     radius: 20,
@@ -134,7 +113,7 @@ class Turret extends Ship with TargetPlayer {
 
   @override
   void update(dt, world) {
-    targetPlayer(world.getEntitiesNear(this));
+    targetNearby(world.getEntitiesNear(this).where((e) => e is Player || e is Asteroid));
     super.update(dt, world);
   }
 

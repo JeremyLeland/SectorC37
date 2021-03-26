@@ -1,13 +1,12 @@
 import 'dart:math';
 
 import 'entity.dart';
-import 'player.dart';
+import 'ship.dart';
+import 'world.dart';
 
 mixin Aimable on Entity {
   num speed = 0, turnSpeed = 0;
   num _goalAngle = 0;
-
-  bool isShooting = false;  // TODO: Not sure this makes sense here
 
   void aimToward(Entity entity) => aimTowardPoint(entity.x, entity.y);
   void aimTowardPoint(num x, num y) => setGoalAngle(atan2(y - this.y, x - this.x));
@@ -25,45 +24,6 @@ mixin Aimable on Entity {
     return otherAngle;
   }
 
-  Entity? getClosestAvoid(Iterable<Entity> entities, num avoidTime) {
-    final AVOID_BUFFER = 10;
-    final RECENT_PAST = -100;
-
-    Entity? closestAvoid = null;
-    num closestAvoidTime = double.infinity;
-
-    for (var e in entities) {
-      final time = timeUntilHit(e, buffer: AVOID_BUFFER);
-
-      // Include hits in the near "past", since we may be in our buffer zone
-      if (RECENT_PAST < time && time < closestAvoidTime) {
-        closestAvoid = e;
-        closestAvoidTime = time;
-      }
-    }
-
-    return closestAvoidTime < avoidTime ? closestAvoid : null;
-  }
-
-  Entity? getClosestTarget(Iterable<Entity> entities, bool Function(Entity) isTarget, 
-                           {num maxDistance = double.infinity}) {
-    Entity? closestTarget = null;
-    num closestTargetDist = double.infinity;
-
-    for (var e in entities) {
-      if (isTarget(e)) {
-        final dist = distanceFrom(e);
-
-        if (dist < closestTargetDist) {
-            closestTarget = e;
-            closestTargetDist = dist;
-        }
-      }
-    }
-
-    return closestTargetDist < maxDistance ? closestTarget : null;
-  }
-
   void updateAim(num dt) {
     if (_goalAngle < angle) {
       angle = max(_goalAngle, angle - turnSpeed * dt);
@@ -79,21 +39,83 @@ mixin Aimable on Entity {
   }
 }
 
-mixin TargetPlayer on Aimable {
+mixin AvoidNearby on Ship {
+  static const AVOID_TIME = 2000;
+
+  Entity? avoidNearby(Iterable<Entity> nearby, {num avoidTime = AVOID_TIME}) {
+    final AVOID_BUFFER = 10;
+    final RECENT_PAST = -100;
+
+    Entity? closestAvoid = null;
+    num closestAvoidTime = double.infinity;
+
+    for (var e in nearby) {
+      final time = timeUntilHit(e, buffer: AVOID_BUFFER);
+
+      // Include hits in the near "past", since we may be in our buffer zone
+      if (RECENT_PAST < time && time < closestAvoidTime) {
+        closestAvoid = e;
+        closestAvoidTime = time;
+      }
+    }
+
+    if (closestAvoid != null && closestAvoidTime < avoidTime) {
+      var angFrom = angleFrom(closestAvoid);
+      setGoalAngle(angle + (angFrom < 0 ? pi/2 : -pi/2));
+      isShooting = false;
+      return closestAvoid;
+    }
+    else {
+      return null;
+    }
+  }
+}
+
+mixin TargetNearby on Ship {
   static const TARGET_DISTANCE = 1000;
   static const SHOOT_DISTANCE = 300;
   static const SHOOT_ANGLE = 0.5;
 
-  bool targetPlayer(Iterable<Entity> nearby) {
-    final target = this.getClosestTarget(nearby, (e) => e is Player, maxDistance: TARGET_DISTANCE);
+  bool _targetInRange(Entity target) {
+    return distanceFrom(target) < SHOOT_DISTANCE && angleFrom(target).abs() < SHOOT_ANGLE;
+  }
 
-    if (target != null) {
-      aimToward(target);
-      isShooting = distanceFrom(target) < SHOOT_DISTANCE && angleFrom(target).abs() < SHOOT_ANGLE;
-      return true;
+  Entity? targetNearby(Iterable<Entity> nearbyTargets, {num maxDistance = double.infinity}) {
+    Entity? closestTarget = null;
+    num closestTargetDist = double.infinity;
+
+    for (var e in nearbyTargets) {
+      final dist = distanceFrom(e);
+
+      if (dist < closestTargetDist) {
+        closestTarget = e;
+        closestTargetDist = dist;
+      }
     }
 
+    if (closestTarget != null && closestTargetDist < maxDistance) {
+      aimToward(closestTarget);
+      isShooting = _targetInRange(closestTarget);
+      return closestTarget;
+    }
+    else {
+      return null;
+    }
+  }
+}
+
+mixin Wander on Ship {
+  Point goal = new Point(0, 0);
+  num goalTimer = 0;
+
+  void wander(num dt, World world) {
+    goalTimer -= dt;
+    if (goalTimer < 0 || distanceFromPoint(goal.x, goal.y) < radius * 2) {
+      goal = world.getEmptySpawnLocation(radius);
+      goalTimer = new Random().nextDouble() * 5000;
+    }
+
+    aimTowardPoint(goal.x, goal.y);
     isShooting = false;
-    return false;
   }
 }

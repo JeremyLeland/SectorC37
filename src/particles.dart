@@ -1,39 +1,16 @@
-import 'dart:html';
 import 'dart:math';
 
 import 'enemies.dart';
 import 'entity.dart';
 
-abstract class Particle extends Entity {
-  Particle({required num startX, required num startY, num startSpread = 0, 
-            num startDX = 0, num startDY = 0, num dirAngle = 0, num dirSpread = pi * 2, 
-            num minSpeed = 0, required num maxSpeed, num maxSpin = 0,
-            num minRadius = 0, required num maxRadius, num decay = 0, String color = 'black'}) {
-    Random random = new Random();
-    angle = dirAngle + random.nextDouble() * dirSpread - dirSpread/2;
-    dAngle = random.nextDouble() * (maxSpin / 2) - maxSpin;
-
-    final dist = random.nextDouble() * startSpread;
-    x = startX + cos(angle) * dist;
-    y = startY + sin(angle) * dist;
-
-    final speed = minSpeed + random.nextDouble() * (maxSpeed - minSpeed);
-    dx = startDX + cos(angle) * speed;
-    dy = startDY + sin(angle) * speed;
-
-    radius = minRadius + random.nextDouble() * (maxRadius - minRadius);
-    this.decay = decay;
-    this.color = color;
+class Fire extends Entity {
+  Fire(Entity entity) : super(decay: 1/1000) {
+    spawnParticle(
+      startX: entity.x, startY: entity.y, startDX: entity.dx, startDY: entity.dy,
+      maxSpeed: 0.04, maxRadius: 16);
   }
 
-  void setSlowAlphaFade(CanvasRenderingContext2D ctx) => ctx.globalAlpha = sin(0.5 * pi * life);
-}
-
-class Fire extends Particle {
-  Fire(Entity entity)
-   : super(startX: entity.x, startY: entity.y, startDX: entity.dx, startDY: entity.dy,
-           maxSpeed: 0.04, maxRadius: 16, decay: 1/1000);
-
+  @override
   void drawEntity(ctx) {
     final size = sin(pi * life) * radius;
 
@@ -49,13 +26,14 @@ class Fire extends Particle {
   }
 }
 
-class EngineTrail extends Particle {
-   static const RADIUS = 4;
+class EngineTrail extends Entity {
+  static const RADIUS = 4;
 
-  EngineTrail(Entity entity)
-   : super(startX: entity.x, startY: entity.y, maxSpeed: 0, 
-           minRadius: RADIUS, maxRadius: RADIUS, decay: 1/300);
+  EngineTrail(Entity entity) : super(decay: 1/300) {
+    spawnParticle(startX: entity.x, startY: entity.y, maxSpeed: 0, minRadius: RADIUS, maxRadius: RADIUS);
+  }
 
+  @override
   void drawEntity(ctx) {
     // TODO: Make this like the Snake for a smoother trail
     final size = sin(pi * life) * radius;
@@ -72,13 +50,15 @@ class EngineTrail extends Particle {
   }
 }
 
-class Spark extends Particle {
+class Spark extends Entity {
   final num startX, startY;
 
-  Spark(this.startX, this.startY, num hitAng)
-   : super(startX: startX, startY: startY, 
-           dirAngle: hitAng, dirSpread: pi / 8, 
-           minSpeed: 0.1, maxSpeed: 0.1, maxRadius: 1, decay: 1/500);
+  Spark(this.startX, this.startY, num hitAng) : super(decay: 1/500) {
+    spawnParticle(
+      startX: startX, startY: startY, 
+      dirAngle: hitAng, dirSpread: pi / 8, 
+      minSpeed: 0.1, maxSpeed: 0.1, maxRadius: 1);
+  }
 
   @override
   void drawEntity(ctx) { /* we're overriding draw instead */ }
@@ -103,36 +83,37 @@ class Spark extends Particle {
   }
 }
 
-class Rock extends Particle {
-  late final String color;
-
-  Rock(Asteroid asteroid)
-   : super(startX: asteroid.x, startY: asteroid.y, startSpread: asteroid.radius,
-           maxSpeed: 0.06, maxSpin: 0.01, maxRadius: 5, decay: 1/1500) {
-    color = asteroid.color;
+class Rock extends Entity {
+  Rock(Asteroid asteroid) : super(color: asteroid.color, decay: 1/1500) {
+    spawnParticle(
+      startX: asteroid.x, startY: asteroid.y, startSpread: asteroid.radius,
+      maxSpeed: 0.06, maxSpin: 0.01, maxRadius: 5);
   }
 
+  @override
   void drawEntity(ctx) {
-    setSlowAlphaFade(ctx);
     ctx..beginPath()..arc(0, 0, this.radius, 0, pi * 2);
+    ctx.globalAlpha = sin(0.5 * pi * life);
     ctx..fillStyle = color..fill()..strokeStyle = 'black'..stroke();
    }
 }
 
-class Debris extends Particle {
-  Debris(Entity entity)
-   : super(startX: entity.x, startY: entity.y, startSpread: entity.radius,
+class Debris extends Entity {
+  Debris(Entity entity) : super(decay: 1/1000, color: entity.color) {
+   spawnParticle(startX: entity.x, startY: entity.y, startSpread: entity.radius,
            startDX: entity.dx, startDY: entity.dy, 
-           maxSpeed: 0.1, maxSpin: 0.01, maxRadius: 3, decay: 1/1000, color: entity.color);
+           maxSpeed: 0.1, maxSpin: 0.01, maxRadius: 3);
+  }
 
+  @override
   drawEntity(ctx) {
-    setSlowAlphaFade(ctx);
-
     ctx.beginPath();
     ctx.moveTo(-this.radius, -this.radius);
     ctx.lineTo( this.radius,  0);
     ctx.lineTo(-this.radius,  this.radius);
     ctx.closePath();
+
+    ctx.globalAlpha = sin(0.5 * pi * life);
     ctx..fillStyle = color..fill()..strokeStyle = "black"..stroke();
   }
 }
