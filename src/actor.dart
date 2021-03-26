@@ -1,16 +1,13 @@
 import 'dart:math';
 
 import 'entity.dart';
-import 'world.dart';
+import 'player.dart';
 
-abstract class Actor extends Entity {
-  num speed, turnSpeed;
-
+mixin Aimable on Entity {
+  num speed = 0, turnSpeed = 0;
   num _goalAngle = 0;
 
-  Actor({num x = 0, num y = 0, num radius = 0, num mass = 0, num health = 0, num damage = 0, 
-         this.speed = 0, this.turnSpeed = 0, String color = 'black'})
-   : super(x: x, y: y, radius: radius, mass: mass, health: health, damage: damage, color: color);
+  bool isShooting = false;  // TODO: Not sure this makes sense here
 
   void aimToward(Entity entity) => aimTowardPoint(entity.x, entity.y);
   void aimTowardPoint(num x, num y) => setGoalAngle(atan2(y - this.y, x - this.x));
@@ -67,8 +64,7 @@ abstract class Actor extends Entity {
     return closestTargetDist < maxDistance ? closestTarget : null;
   }
 
-  @override
-  void update(num dt, World world) {
+  void updateAim(num dt) {
     if (_goalAngle < angle) {
       angle = max(_goalAngle, angle - turnSpeed * dt);
     }
@@ -80,7 +76,24 @@ abstract class Actor extends Entity {
       dx = cos(angle) * speed;
       dy = sin(angle) * speed;
     }
+  }
+}
 
-    super.update(dt, world);
+mixin TargetPlayer on Aimable {
+  static const TARGET_DISTANCE = 1000;
+  static const SHOOT_DISTANCE = 300;
+  static const SHOOT_ANGLE = 0.5;
+
+  bool targetPlayer(Iterable<Entity> nearby) {
+    final target = this.getClosestTarget(nearby, (e) => e is Player, maxDistance: TARGET_DISTANCE);
+
+    if (target != null) {
+      aimToward(target);
+      isShooting = distanceFrom(target) < SHOOT_DISTANCE && angleFrom(target).abs() < SHOOT_ANGLE;
+      return true;
+    }
+
+    isShooting = false;
+    return false;
   }
 }

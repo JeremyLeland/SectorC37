@@ -1,18 +1,17 @@
-import 'dart:html';
-
 import 'actor.dart';
 import 'entity.dart';
 import 'particles.dart' as Particles;
 import 'weapons.dart';
 
-abstract class Ship extends Actor {
+abstract class Ship extends Entity with Aimable {
   List<Gun> guns = [];
-  bool isShooting = false;
 
   Ship({num x = 0, num y = 0, num radius = 0, num mass = 0, num health = 0, num damage = 0, 
         num speed = 0, num turnSpeed = 0, String color = 'black'})
-   : super(x: x, y: y, radius: radius, mass: mass, health: health, damage: damage, 
-           speed: speed, turnSpeed: turnSpeed, color: color);
+   : super(x: x, y: y, radius: radius, mass: mass, health: health, damage: damage, color: color) {
+    this.speed = speed;
+    this.turnSpeed = turnSpeed;
+  }
 
   @override
   void bleedFrom(entity, world) {
@@ -33,15 +32,13 @@ abstract class Ship extends Actor {
 
   @override
   void update(dt, world) {
-    for (var g in guns) {
-      g.update(dt, world);
-    }
-
+    guns.forEach((g) => g.update(dt, world));
+    updateAim(dt);
     super.update(dt, world);
   }
 
   @override
-  void drawEntity(CanvasRenderingContext2D ctx) {
+  void drawEntity(ctx) {
     ctx.beginPath();
     ctx.moveTo(-radius, -radius);
     ctx.lineTo( radius,  0);

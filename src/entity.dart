@@ -14,13 +14,15 @@ abstract class Entity {
           this.health = 1, this.damage = 0, this.color = 'black'});
   
   // TODO: Use this to separate positioning calls from setting mass/damage/etc?
-  void spawn({num x = 0, num y = 0, num dx = 0, num dy = 0, num angle = 0, num dAngle = 0}) {
+  Entity spawn({num x = 0, num y = 0, num dx = 0, num dy = 0, num angle = 0, num dAngle = 0}) {
     this.x = x;
     this.y = y;
     this.dx = dx;
     this.dy = dy;
     this.angle = angle;
     this.dAngle = dAngle;
+
+    return this;
   }
 
   // NOTE: life decreases with time, health decreases when hit

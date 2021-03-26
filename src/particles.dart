@@ -1,7 +1,6 @@
 import 'dart:html';
 import 'dart:math';
 
-import 'actor.dart';
 import 'enemies.dart';
 import 'entity.dart';
 
@@ -9,7 +8,7 @@ abstract class Particle extends Entity {
   Particle({required num startX, required num startY, num startSpread = 0, 
             num startDX = 0, num startDY = 0, num dirAngle = 0, num dirSpread = pi * 2, 
             num minSpeed = 0, required num maxSpeed, num maxSpin = 0,
-            num minRadius = 0, required num maxRadius, decay = 0}) {
+            num minRadius = 0, required num maxRadius, num decay = 0, String color = 'black'}) {
     Random random = new Random();
     angle = dirAngle + random.nextDouble() * dirSpread - dirSpread/2;
     dAngle = random.nextDouble() * (maxSpin / 2) - maxSpin;
@@ -24,6 +23,7 @@ abstract class Particle extends Entity {
 
     radius = minRadius + random.nextDouble() * (maxRadius - minRadius);
     this.decay = decay;
+    this.color = color;
   }
 
   void setSlowAlphaFade(CanvasRenderingContext2D ctx) => ctx.globalAlpha = sin(0.5 * pi * life);
@@ -120,14 +120,10 @@ class Rock extends Particle {
 }
 
 class Debris extends Particle {
-  late final String color;
-
-  Debris(Actor actor)
-   : super(startX: actor.x, startY: actor.y, startSpread: actor.radius,
-           startDX: actor.dx, startDY: actor.dy, 
-           maxSpeed: 0.1, maxSpin: 0.01, maxRadius: 3, decay: 1/1000) {
-    color = actor.color;
-  }
+  Debris(Entity entity)
+   : super(startX: entity.x, startY: entity.y, startSpread: entity.radius,
+           startDX: entity.dx, startDY: entity.dy, 
+           maxSpeed: 0.1, maxSpin: 0.01, maxRadius: 3, decay: 1/1000, color: entity.color);
 
   drawEntity(ctx) {
     setSlowAlphaFade(ctx);

@@ -1,6 +1,7 @@
 import 'dart:html';
 import 'dart:math';
 
+import 'actor.dart';
 import 'entity.dart';
 import 'player.dart';
 import 'ship.dart';
@@ -62,15 +63,12 @@ class Asteroid extends Entity {
   }
 }
 
-class Scout extends Ship {
+class Scout extends Ship with TargetPlayer {
   static const COLOR = 'blue';
   static const AVOID_TIME = 2000;
-  static const TARGET_DISTANCE = 1000;
-  static const SHOOT_DISTANCE = 300;
-  static const SHOOT_ANGLE = 0.5;
 
   num goalX = 0, goalY = 0, goalTimer = 0;
-  Entity? avoid, target;
+  Entity? avoid;
 
   Scout({num x = 0, num y = 0})
    : super(x: x, y: y, 
@@ -90,7 +88,6 @@ class Scout extends Ship {
   }
 
   @override
-  // TODO: Move this to Actor so we can share it with turret?
   void update(dt, world) {
     // Head toward random location in level if nothing else is going on
     goalTimer -= dt;
@@ -104,22 +101,58 @@ class Scout extends Ship {
     // Look for actors to avoid or target
     final nearby = world.getEntitiesNear(this);
     avoid = this.getClosestAvoid(nearby, AVOID_TIME);
-    target = this.getClosestTarget(nearby, (e) => e is Player, maxDistance: TARGET_DISTANCE);
-
+    
     if (avoid != null) {
       var angFrom = angleFrom(avoid!);
       setGoalAngle(angle + (angFrom < 0 ? pi/2 : -pi/2));
       isShooting = false;
     }
-    else if (target != null) {
-      aimToward(target!);
-      isShooting = distanceFrom(target!) < SHOOT_DISTANCE && angleFrom(target!).abs() < SHOOT_ANGLE;
-    }
-    else {
+    else if (!targetPlayer(nearby)) {
       aimTowardPoint(goalX, goalY);
       isShooting = false;
     }
 
     super.update(dt, world);
   }
+}
+
+class Turret extends Ship with TargetPlayer {
+  Turret({num x = 0, num y = 0})
+   : super(x: x, y: y,
+    radius: 20,
+    mass: 1,
+    health: 20,
+    damage: 50,
+    turnSpeed: 0.003,
+    color: 'gray'
+  ) {
+    guns.add(new Gun(
+      timeBetweenShots: 100, 
+      shoot: () => new Bullet(damage: 10, speed: 0.4, color: 'red'),  
+      owner: this));
+  }
+
+  @override
+  void update(dt, world) {
+    targetPlayer(world.getEntitiesNear(this));
+    super.update(dt, world);
+  }
+
+  @override
+  void drawEntity(ctx) {
+    const BASE_PERCENT = 0.5, BARREL_PERCENT = 0.15;
+    ctx..fillStyle = "gray"..strokeStyle = "black";
+
+    ctx.beginPath();
+    ctx.arc(0, 0, radius * BASE_PERCENT, 0, pi * 2);
+    ctx..fill()..stroke();
+
+    final barrelSize = radius * BARREL_PERCENT;
+    ctx.beginPath();
+    ctx.arc(0, 0, barrelSize, pi/2, pi * 3/2);
+    ctx.lineTo(radius, -barrelSize);
+    ctx.lineTo(radius, barrelSize);
+    ctx.closePath();
+    ctx..fill()..stroke();
+   }
 }

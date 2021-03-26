@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'actor.dart';
 import 'entity.dart';
 import 'particles.dart' as Particles;
 import 'ship.dart';
@@ -26,25 +27,22 @@ class Bullet extends Entity {
   } 
 }
 
-class Gun extends Entity {
+class Gun {
+  final num frontOffset, sideOffset, angleOffset;
   final Ship owner;
   final Bullet Function() shoot;
   num shootDelay = 0, timeBetweenShots;
 
-  // TODO: have GetBullet() from owner, then spawn that?
-  // Combine Gun/Turret so we just have an array of Entities that we update internally?
-
-  Gun({num frontOffset = 0, num sideOffset = 0, num angleOffset = 0, 
-       required this.timeBetweenShots, required Bullet Function() this.shoot, required this.owner})
-   : super(x: frontOffset, y: sideOffset, angle: angleOffset);
+  Gun({this.frontOffset = 0, this.sideOffset = 0, this.angleOffset = 0, 
+    required this.timeBetweenShots, required this.shoot, required this.owner});
 
   void update(dt, world) {
     shootDelay -= dt;
     if (shootDelay < 0 && owner.isShooting) {
       shootDelay = timeBetweenShots;
 
-      final pos = owner.getOffsetPosition(x, y);
-      final ang = owner.angle + angle;
+      final pos = owner.getOffsetPosition(frontOffset, sideOffset);
+      final ang = owner.angle + angleOffset;
 
       var bullet = shoot();
       bullet.spawn(x: pos.x, y: pos.y, dx: cos(ang) * bullet.speed, dy: sin(ang) * bullet.speed);
@@ -52,4 +50,3 @@ class Gun extends Entity {
     }
   }
 }
-

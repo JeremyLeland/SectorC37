@@ -24,6 +24,10 @@ class SectorC37 extends Game {
     }
 
     for (int i = 0; i < 5; i ++) {
+      world.spawnInBounds(new Turret());
+    }
+
+    for (int i = 0; i < 5; i ++) {
       world.spawnInBounds(Asteroid.random());
     }
 
