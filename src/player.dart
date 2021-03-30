@@ -2,7 +2,6 @@ import 'ship.dart';
 import 'weapons.dart';
 
 class Player extends Ship {
-  static const COLOR = 'green';
   static const MAX_HEALTH = 100;
   static const MAX_SPEED = 0.2;
 
@@ -14,16 +13,17 @@ class Player extends Ship {
      damage: 50, 
      speed: MAX_SPEED, 
      turnSpeed: 0.005, 
-     color: COLOR) {
+     color: 'green') {
 
     const GUN_ANGLE = 0.01;
-    var playerShoot = () => new Bullet(damage: 10, speed: 0.4, color: COLOR);
+    var playerShoot = () => new Bullet(damage: 10, color: color);
 
     // Left gun
     guns.add(new Gun(
       frontOffset: radius,
       sideOffset: -radius,
       angleOffset: GUN_ANGLE,
+      speed: 0.4,
       timeBetweenShots: 100, 
       shoot: playerShoot, 
       owner: this
@@ -34,8 +34,17 @@ class Player extends Ship {
       frontOffset: radius,
       sideOffset: radius,
       angleOffset: -GUN_ANGLE,
+      speed: 0.4,
       timeBetweenShots: 100, 
       shoot: playerShoot, 
+      owner: this
+    ));
+
+    // Missle launcher
+    guns.add(new Gun(
+      frontOffset: radius * 2,
+      timeBetweenShots: 1000, 
+      shoot: () => new Missle(damage: 50, speed: 0.3), 
       owner: this
     ));
   }

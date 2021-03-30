@@ -1,13 +1,13 @@
 import 'dart:math';
 
+import 'actor.dart';
+import 'enemies.dart';
 import 'entity.dart';
 import 'particles.dart' as Particles;
 import 'ship.dart';
 
 class Bullet extends Entity {
-  num speed;
-
-  Bullet({num damage = 0, this.speed = 0, String color = 'black'})
+  Bullet({num damage = 0, String color = 'black'})
    : super(radius: 1, mass: 0.01, decay: 1/10000, health: 1, damage: damage, color: color);
 
   @override
@@ -20,19 +20,47 @@ class Bullet extends Entity {
     }
   }
 
+  @override
   void drawEntity(ctx) {
     ctx..beginPath()..arc(0, 0, radius, 0, pi * 2);
     ctx..fillStyle = color..fill();
   } 
 }
 
+class Missle extends Entity with Aimable, TargetNearby {
+  Missle({num damage = 0, num speed = 0, String color = 'gray'})
+   : super(radius: 5, mass: 0.1, decay: 1/10000, health: 10, damage: damage, color: color) {
+    this.turnSpeed = 0.001;
+    this.speed = speed;
+  }
+
+  @override
+  void update(dt, world) {
+    updateTarget(world.getEntitiesNear(this).where((e) => e is Scout));
+    doTarget();
+    updateAim(dt);
+    super.update(dt, world);
+  }
+
+  @override
+  void drawEntity(ctx) {
+    ctx.beginPath();
+    ctx.moveTo(-radius, -radius);
+    ctx.lineTo( radius,  0);
+    ctx.lineTo(-radius,  radius);
+    ctx.closePath();
+
+    ctx..fillStyle = color..fill()..strokeStyle = "black"..stroke();
+  }
+}
+
 class Gun {
-  final num frontOffset, sideOffset, angleOffset;
+  final num frontOffset, sideOffset, angleOffset, speed;
   final Ship owner;
-  final Bullet Function() shoot;
+  final Entity Function() shoot;
   num shootDelay = 0, timeBetweenShots;
 
-  Gun({this.frontOffset = 0, this.sideOffset = 0, this.angleOffset = 0, 
+  Gun({this.frontOffset = 0, this.sideOffset = 0, this.angleOffset = 0, this.speed = 0,
     required this.timeBetweenShots, required this.shoot, required this.owner});
 
   void update(dt, world) {
@@ -44,7 +72,12 @@ class Gun {
       final ang = owner.angle + angleOffset;
 
       var bullet = shoot();
-      bullet.spawn(x: pos.x, y: pos.y, dx: cos(ang) * bullet.speed, dy: sin(ang) * bullet.speed);
+      bullet.spawn(
+        x: pos.x, 
+        y: pos.y, 
+        dx: owner.dx + cos(ang) * speed, 
+        dy: owner.dy + sin(ang) * speed,
+        angle: ang);
       world.addEntity(bullet);
     }
   }

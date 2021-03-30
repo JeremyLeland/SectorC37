@@ -76,18 +76,23 @@ class Scout extends Ship with AvoidNearby, TargetNearby, Wander {
     guns.add(new Gun(
       frontOffset: radius * 2, 
       sideOffset: 0, 
+      speed: 0.4,
       timeBetweenShots: 100, 
-      shoot: () => new Bullet(damage: 10, speed: 0.4, color: this.color),  
+      shoot: () => new Bullet(damage: 10, color: color),  
       owner: this));
   }
 
   @override
   void update(dt, world) {
     final nearby = world.getEntitiesNear(this);
+
+    updateAvoid(nearby);
+    updateTarget(nearby.where((e) => e is Player));
     
-    if (avoidNearby(nearby) == null) {
-      if (targetNearby(nearby.where((e) => e is Player)) == null) {
-        wander(dt, world);
+    isShooting = isShooting = targetInRange();
+    if (!doAvoid()) {
+      if (!doTarget()) {
+        doWander(dt, world);
       }
     }
 
@@ -106,14 +111,16 @@ class Turret extends Ship with TargetNearby {
     color: 'gray'
   ) {
     guns.add(new Gun(
+      speed: 0.4,
       timeBetweenShots: 100, 
-      shoot: () => new Bullet(damage: 10, speed: 0.4, color: 'red'),  
+      shoot: () => new Bullet(damage: 10, color: 'red'),  
       owner: this));
   }
 
   @override
   void update(dt, world) {
-    targetNearby(world.getEntitiesNear(this).where((e) => e is Player || e is Asteroid));
+    updateTarget(world.getEntitiesNear(this).where((e) => e is Player || e is Asteroid));
+    isShooting = targetInRange();
     super.update(dt, world);
   }
 

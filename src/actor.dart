@@ -11,10 +11,13 @@ mixin Aimable on Entity {
 
   void aimToward(Entity entity) => aimTowardPoint(entity.x, entity.y);
   void aimTowardPoint(num x, num y) => setGoalAngle(atan2(y - this.y, x - this.x));
-  void setGoalAngle(num angle) => _goalAngle = _adjustOurAngleSoWeCanUse(angle);
+  
+  void aimAwayFrom(Entity entity) => aimAwayFromPoint(entity.x, entity.y);
+  void aimAwayFromPoint(num x, num y) => setGoalAngle(angle + (angleFromPoint(x, y) < 0 ? pi/2 : -pi/2));
 
-  // Bring our angle into range of this other angle so we can use it for greater/less than calculations
+  void setGoalAngle(num angle) => _goalAngle = _adjustOurAngleSoWeCanUse(angle);
   num _adjustOurAngleSoWeCanUse(num otherAngle) {
+    // Bring our angle into range of this other angle so we can use it for greater/less than calculations
     if (otherAngle - angle > pi) {
       angle += pi * 2;
     }
@@ -83,7 +86,9 @@ mixin EngineTrail on Aimable {
 mixin AvoidNearby on Ship {
   static const AVOID_TIME = 2000;
 
-  Entity? avoidNearby(Iterable<Entity> nearby, {num avoidTime = AVOID_TIME}) {
+  Entity? avoid;
+
+  void updateAvoid(Iterable<Entity> nearby, {num avoidTime = AVOID_TIME}) {
     final AVOID_BUFFER = 10;
     final RECENT_PAST = -100;
 
@@ -100,28 +105,31 @@ mixin AvoidNearby on Ship {
       }
     }
 
-    if (closestAvoid != null && closestAvoidTime < avoidTime) {
-      var angFrom = angleFrom(closestAvoid);
-      setGoalAngle(angle + (angFrom < 0 ? pi/2 : -pi/2));
-      isShooting = false;
-      return closestAvoid;
+    avoid = closestAvoidTime < avoidTime ? closestAvoid : null;
+  }
+
+  bool doAvoid() {
+    if (avoid != null) {
+      aimAwayFrom(avoid!);
+      return true;
     }
-    else {
-      return null;
-    }
+
+    return false;
   }
 }
 
-mixin TargetNearby on Ship {
+mixin TargetNearby on Aimable {
   static const TARGET_DISTANCE = 1000;
   static const SHOOT_DISTANCE = 300;
   static const SHOOT_ANGLE = 0.5;
 
-  bool _targetInRange(Entity target) {
-    return distanceFrom(target) < SHOOT_DISTANCE && angleFrom(target).abs() < SHOOT_ANGLE;
+  Entity? target;
+
+  bool targetInRange() {
+    return target != null && distanceFrom(target!) < SHOOT_DISTANCE && angleFrom(target!).abs() < SHOOT_ANGLE;
   }
 
-  Entity? targetNearby(Iterable<Entity> nearbyTargets, {num maxDistance = double.infinity}) {
+  void updateTarget(Iterable<Entity> nearbyTargets, {num maxDistance = double.infinity}) {
     Entity? closestTarget = null;
     num closestTargetDist = double.infinity;
 
@@ -134,29 +142,29 @@ mixin TargetNearby on Ship {
       }
     }
 
-    if (closestTarget != null && closestTargetDist < maxDistance) {
-      aimToward(closestTarget);
-      isShooting = _targetInRange(closestTarget);
-      return closestTarget;
+    target = closestTargetDist < maxDistance ? closestTarget : null;
+  }
+
+  bool doTarget() {
+    if (target != null) {
+      aimToward(target!);
+      return true;
     }
-    else {
-      return null;
-    }
+
+    return false;
   }
 }
 
-mixin Wander on Ship {
+mixin Wander on Aimable {
   Point goal = new Point(0, 0);
   num goalTimer = 0;
 
-  void wander(num dt, World world) {
+  void doWander(num dt, World world) {
     goalTimer -= dt;
     if (goalTimer < 0 || distanceFromPoint(goal.x, goal.y) < radius * 2) {
       goal = world.getEmptySpawnLocation(radius);
       goalTimer = new Random().nextDouble() * 5000;
     }
-
     aimTowardPoint(goal.x, goal.y);
-    isShooting = false;
   }
 }
