@@ -2,6 +2,7 @@ import 'dart:html';
 import 'dart:math';
 
 import 'Game.dart';
+import 'asteroid.dart';
 import 'enemies.dart';
 import 'player.dart';
 import 'world.dart';

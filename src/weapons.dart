@@ -1,9 +1,7 @@
 import 'dart:math';
 
-import 'actor.dart';
 import 'enemies.dart';
 import 'entity.dart';
-import 'particles.dart' as Particles;
 import 'ship.dart';
 
 class Bullet extends Entity {
@@ -16,7 +14,7 @@ class Bullet extends Entity {
     final hitAng = atan2(dy, dx);
 
     for (var i = 0; i < 20; i ++) {
-      world.addEntity(new Particles.Spark(x, y, hitAng));
+      world.addEntity(new Spark(x, y, hitAng));
     }
   }
 
@@ -27,18 +25,17 @@ class Bullet extends Entity {
   } 
 }
 
-class Missle extends Entity with Aimable, TargetNearby {
+class Missle extends Ship {
   Missle({num damage = 0, num speed = 0, String color = 'gray'})
-   : super(radius: 5, mass: 0.1, decay: 1/10000, health: 10, damage: damage, color: color) {
+   : super(radius: 5, mass: 0.1, health: 10, damage: damage, color: color) {
     this.turnSpeed = 0.001;
     this.speed = speed;
+    decay = 1/10000;
   }
 
   @override
   void update(dt, world) {
-    updateTarget(world.getEntitiesNear(this).where((e) => e is Scout));
-    doTarget();
-    updateAim(dt);
+    updateTarget(world.getEntitiesNear(this).where((e) => e is Scout || e is Turret));
     super.update(dt, world);
   }
 
@@ -80,5 +77,38 @@ class Gun {
         angle: ang);
       world.addEntity(bullet);
     }
+  }
+}
+
+class Spark extends Entity {
+  final num startX, startY;
+
+  Spark(this.startX, this.startY, num hitAng) : super(decay: 1/500) {
+    spawnParticle(
+      startX: startX, startY: startY, 
+      dirAngle: hitAng, dirSpread: pi / 8, 
+      minSpeed: 0.1, maxSpeed: 0.1, maxRadius: 1);
+  }
+
+  @override
+  void drawEntity(ctx) { /* we're overriding draw instead */ }
+
+  @override
+  void draw(ctx) {
+    ctx.save();
+
+    const LENGTH = 100;
+    final grd = ctx.createLinearGradient(x - dx * LENGTH, y - dy * LENGTH, x, y);
+    grd.addColorStop(0.0, 'rgba(0, 0, 0, 0)');
+    grd.addColorStop(0.5, 'rgba(255, 255, 0, ${life * 0.5})');
+    grd.addColorStop(1.0, 'rgba(255, 255, 255, ${life})');
+    ctx.strokeStyle = grd;
+
+    ctx.beginPath();
+    ctx.moveTo(this.startX, this.startY);
+    ctx.lineTo(this.x, this.y);
+    ctx.stroke();
+
+    ctx.restore();
   }
 }
