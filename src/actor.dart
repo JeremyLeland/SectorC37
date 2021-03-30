@@ -1,3 +1,4 @@
+import 'dart:html';
 import 'dart:math';
 
 import 'entity.dart';
@@ -36,6 +37,46 @@ mixin Aimable on Entity {
       dx = cos(angle) * speed;
       dy = sin(angle) * speed;
     }
+  }
+}
+
+mixin EngineTrail on Aimable {
+  static const num MAX_LENGTH = 10, RADIUS = 3;
+  List<Point> _trail = [];
+
+  void updateEngineTrail(num dt) {
+    if (speed > 0) {
+      _trail.insert(0, new Point(x, y));
+      if (_trail.length > MAX_LENGTH) {
+        _trail.removeLast();
+      }
+    }
+  }
+
+  void drawEngineTrail(CanvasRenderingContext2D ctx) {
+    ctx.save();
+    
+    ctx.strokeStyle = color;
+
+    // TODO: Do this to a separate canvas for more compositing options?
+    // e.g. source-out so we can use alpha without doubling up
+
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+
+    var width = RADIUS * 2 + 0.5;    // the 0.5 gives us sharper borders
+    for (var t in _trail) {
+      ctx.lineWidth = max(width, 0);
+      width -= RADIUS * 2 / _trail.length;
+      ctx.lineCap = 'round';
+      ctx.lineTo(t.x, t.y);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(t.x, t.y);
+    }
+
+    ctx.restore();
   }
 }
 

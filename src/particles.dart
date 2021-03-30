@@ -26,30 +26,6 @@ class Fire extends Entity {
   }
 }
 
-class EngineTrail extends Entity {
-  static const RADIUS = 4;
-
-  EngineTrail(Entity entity) : super(decay: 1/300) {
-    spawnParticle(startX: entity.x, startY: entity.y, maxSpeed: 0, minRadius: RADIUS, maxRadius: RADIUS);
-  }
-
-  @override
-  void drawEntity(ctx) {
-    // TODO: Make this like the Snake for a smoother trail
-    final size = sin(pi * life) * radius;
-
-    // Inspired by http://codepen.io/davepvm/pen/Hhstl
-    final r = 140 + 120 * life;
-    final g = 170 - 120 * life;
-    final b = 120 - 120 * life;
-    final a = 0.4 * life;
-    
-    ctx.globalCompositeOperation = 'lighter';
-    ctx..beginPath()..arc(0, 0, size, 0, pi * 2);
-    ctx..fillStyle = 'rgba(${r}, ${g}, ${b}, ${a})'..fill();
-  }
-}
-
 class Spark extends Entity {
   final num startX, startY;
 

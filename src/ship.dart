@@ -3,7 +3,7 @@ import 'entity.dart';
 import 'particles.dart' as Particles;
 import 'weapons.dart';
 
-abstract class Ship extends Entity with Aimable {
+abstract class Ship extends Entity with Aimable, EngineTrail {
   List<Gun> guns = [];
   bool isShooting = false;
 
@@ -35,6 +35,7 @@ abstract class Ship extends Entity with Aimable {
   void update(dt, world) {
     guns.forEach((g) => g.update(dt, world));
     updateAim(dt);
+    updateEngineTrail(dt);
     super.update(dt, world);
   }
 
@@ -47,5 +48,11 @@ abstract class Ship extends Entity with Aimable {
     ctx.closePath();
 
     ctx..fillStyle = color..fill()..strokeStyle = "black"..stroke();
+  }
+
+  @override
+  void draw(ctx) {
+    drawEngineTrail(ctx);
+    super.draw(ctx);
   }
 }
