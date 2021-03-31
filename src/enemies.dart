@@ -37,6 +37,69 @@ class Scout extends Ship {
   }
 }
 
+class Gunship extends Ship {
+  Gunship()
+   : super(
+     radius: 15,
+     mass: 1.5,
+     health: 100,
+     damage: 100,
+     speed: 0.05,
+     turnSpeed: 0.001,
+     color: 'cyan'
+  ) {
+    const GUN_ANGLE = 0.02;
+    final shoot = () => new Bullet(damage: 10, color: color);
+
+    gunsPrimary.add(new Gun(
+      frontOffset: radius, 
+      sideOffset: -radius,
+      angleOffset: -GUN_ANGLE,
+      speed: 0.4,
+      timeBetweenShots: 100, 
+      shoot: shoot,
+      owner: this));
+
+    gunsPrimary.add(new Gun(
+      frontOffset: radius, 
+      sideOffset: -radius,
+      angleOffset: GUN_ANGLE,
+      speed: 0.4,
+      timeBetweenShots: 100, 
+      shoot: shoot,
+      owner: this));
+
+    gunsPrimary.add(new Gun(
+      frontOffset: radius, 
+      sideOffset: radius,
+      angleOffset: -GUN_ANGLE,
+      speed: 0.4,
+      timeBetweenShots: 100, 
+      shoot: shoot,
+      owner: this));
+
+    gunsPrimary.add(new Gun(
+      frontOffset: radius, 
+      sideOffset: radius,
+      angleOffset: GUN_ANGLE,
+      speed: 0.4,
+      timeBetweenShots: 100, 
+      shoot: shoot,
+      owner: this));
+  }
+
+  @override
+  void update(dt, world) {
+    final nearby = world.getEntitiesNear(this);
+
+    updateAvoid(nearby);
+    updateTarget(nearby.where((e) => e is Player));
+    updateWander(dt, world);
+
+    super.update(dt, world);
+  }
+}
+
 class Turret extends Ship {
   Turret()
    : super(

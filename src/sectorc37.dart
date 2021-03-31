@@ -22,6 +22,7 @@ class SectorC37 extends Game {
 
     for (int i = 0; i < 5; i ++) {
       world.spawnInBounds(new Scout());
+      world.spawnInBounds(new Gunship());
     }
 
     for (int i = 0; i < 5; i ++) {
