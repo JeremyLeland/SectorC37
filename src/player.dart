@@ -19,7 +19,7 @@ class Player extends Ship {
     var playerShoot = () => new Bullet(damage: 10, color: color);
 
     // Left gun
-    guns.add(new Gun(
+    gunsPrimary.add(new Gun(
       frontOffset: radius,
       sideOffset: -radius,
       angleOffset: GUN_ANGLE,
@@ -30,7 +30,7 @@ class Player extends Ship {
     ));
 
     // Right gun
-    guns.add(new Gun(
+    gunsPrimary.add(new Gun(
       frontOffset: radius,
       sideOffset: radius,
       angleOffset: -GUN_ANGLE,
@@ -41,7 +41,7 @@ class Player extends Ship {
     ));
 
     // Missle launcher
-    guns.add(new Gun(
+    gunsSecondary.add(new Gun(
       frontOffset: radius * 2,
       timeBetweenShots: 1000, 
       shoot: () => new Missle(damage: 50, speed: 0.3), 

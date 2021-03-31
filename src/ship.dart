@@ -8,8 +8,8 @@ abstract class Ship extends Entity {
   num speed = 0, turnSpeed = 0;
   num _goalAngle = 0;
 
-  List<Gun> guns = [];
-  bool isShooting = false;
+  List<Gun> gunsPrimary = [], gunsSecondary = [];
+  bool isShootingPrimary = false, isShootingSecondary = false;
 
   static const TARGET_DISTANCE = 1000, SHOOT_DISTANCE = 300, SHOOT_ANGLE = 0.5;
 
@@ -120,20 +120,22 @@ abstract class Ship extends Entity {
 
   @override
   void update(dt, world) {
-    guns.forEach((g) => g.update(dt, world));
-
-    isShooting = false;
     if (avoid != null) {
       aimAwayFrom(avoid!);
+      isShootingPrimary = false;
     }
     else if (target != null) {
       aimToward(target!);
-      isShooting = distanceFrom(target!) < SHOOT_DISTANCE && angleFrom(target!).abs() < SHOOT_ANGLE;
+      isShootingPrimary = distanceFrom(target!) < SHOOT_DISTANCE && angleFrom(target!).abs() < SHOOT_ANGLE;
     }
     else if (wander != null) {
       aimTowardPoint(wander!.x, wander!.y);
+      isShootingPrimary = false;
     }
     updateAim(dt);
+
+    gunsPrimary.forEach((g) => g.update(dt, world, isShootingPrimary));
+    gunsSecondary.forEach((g) => g.update(dt, world, isShootingSecondary));
     
     super.update(dt, world);
   }

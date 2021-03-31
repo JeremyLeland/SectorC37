@@ -13,6 +13,7 @@ abstract class Game {
   Game() {
     final canvas = new CanvasElement(width: window.innerWidth, height: window.innerHeight);
     canvas.style.display = 'block';
+    canvas.onContextMenu.listen((e) => e.preventDefault());   // suppress right click context menu
     document.body!.children.add(canvas);
 
     _ctx = canvas.context2D;

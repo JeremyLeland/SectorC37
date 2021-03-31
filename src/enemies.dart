@@ -16,7 +16,7 @@ class Scout extends Ship {
      turnSpeed: 0.003,
      color: 'blue'
   ) {
-    guns.add(new Gun(
+    gunsPrimary.add(new Gun(
       frontOffset: radius * 2, 
       sideOffset: 0, 
       speed: 0.4,
@@ -47,7 +47,7 @@ class Turret extends Ship {
     turnSpeed: 0.003,
     color: 'gray'
   ) {
-    guns.add(new Gun(
+    gunsPrimary.add(new Gun(
       speed: 0.4,
       timeBetweenShots: 100, 
       shoot: () => new Bullet(damage: 10, color: 'red'),  

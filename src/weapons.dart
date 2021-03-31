@@ -3,6 +3,7 @@ import 'dart:math';
 import 'enemies.dart';
 import 'entity.dart';
 import 'ship.dart';
+import 'world.dart';
 
 class Bullet extends Entity {
   Bullet({num damage = 0, String color = 'black'})
@@ -60,9 +61,9 @@ class Gun {
   Gun({this.frontOffset = 0, this.sideOffset = 0, this.angleOffset = 0, this.speed = 0,
     required this.timeBetweenShots, required this.shoot, required this.owner});
 
-  void update(dt, world) {
+  void update(num dt, World world, bool isShooting) {
     shootDelay -= dt;
-    if (shootDelay < 0 && owner.isShooting) {
+    if (shootDelay < 0 && isShooting) {
       shootDelay = timeBetweenShots;
 
       final pos = owner.getOffsetPosition(frontOffset, sideOffset);
