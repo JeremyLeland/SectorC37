@@ -16,7 +16,7 @@ class Player extends Ship {
      color: 'green'
   ) {
     const GUN_ANGLE = 0.01;
-    var playerShoot = () => new Bullet(damage: 10, color: color);
+    final playerShoot = () => new Bullet(damage: 10, color: color);
 
     // Left gun
     gunsPrimary.add(new Gun(
