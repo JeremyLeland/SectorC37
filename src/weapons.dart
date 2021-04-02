@@ -36,7 +36,7 @@ class Missle extends Ship {
 
   @override
   void update(dt, world) {
-    updateTarget(world.getEntitiesNear(this).where((e) => e is Scout || e is Turret));
+    updateTarget(world.getEntitiesNear(this).where((e) => e is Enemy));
     super.update(dt, world);
   }
 

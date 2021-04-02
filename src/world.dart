@@ -1,6 +1,7 @@
 import 'dart:html';
 import 'dart:math';
 
+import 'enemies.dart';
 import 'entity.dart';
 
 class World {
@@ -8,6 +9,8 @@ class World {
   List<Entity> _entities = [], _particles = [];
 
   World({this.width = 0, this.height = 0});
+
+  Iterable<Entity> getEnemies() => _entities.where((e) => e is Enemy);
 
   Iterable<Entity> getEntitiesNear(Entity entity) {
     // TODO: only return actors close to given actor
@@ -61,7 +64,7 @@ class World {
           e.updatePosition(hitTime);
           o.updatePosition(hitTime);
 
-          // TODO: bounce?
+          Entity.handleBounce(e, o);
           e.hitWith(o, this);
           o.hitWith(e, this);
 

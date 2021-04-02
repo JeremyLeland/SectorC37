@@ -5,7 +5,11 @@ import 'player.dart';
 import 'ship.dart';
 import 'weapons.dart';
 
-class Scout extends Ship {
+mixin Enemy {
+
+}
+
+class Scout extends Ship with Enemy {
   Scout()
    : super(
      radius: 10,
@@ -37,7 +41,7 @@ class Scout extends Ship {
   }
 }
 
-class Gunship extends Ship {
+class Gunship extends Ship with Enemy {
   Gunship()
    : super(
      radius: 15,
@@ -100,7 +104,7 @@ class Gunship extends Ship {
   }
 }
 
-class Turret extends Ship {
+class Turret extends Ship with Enemy {
   Turret()
    : super(
     radius: 20,
