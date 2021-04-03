@@ -29,7 +29,7 @@ class Bullet extends Entity {
 class Missle extends Ship {
   Missle({num damage = 0, num speed = 0, String color = 'gray'})
    : super(radius: 5, mass: 0.1, health: 10, damage: damage, color: color) {
-    this.turnSpeed = 0.001;
+    this.turnSpeed = 0.002;
     this.speed = speed;
     decay = 1/10000;
   }
