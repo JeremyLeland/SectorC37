@@ -92,24 +92,14 @@ class Spark extends Entity {
   }
 
   @override
-  void drawEntity(ctx) { /* we're overriding draw instead */ }
+  void drawEntity(ctx) {
+    final r = 255;
+    final g = 128 + 128 * life;
+    final b = 255 * life;
+    final a = 0.4 * life;
 
-  @override
-  void draw(ctx) {
-    ctx.save();
-
-    const LENGTH = 100;
-    final grd = ctx.createLinearGradient(x - dx * LENGTH, y - dy * LENGTH, x, y);
-    grd.addColorStop(0.0, 'rgba(0, 0, 0, 0)');
-    grd.addColorStop(0.5, 'rgba(255, 255, 0, ${life * 0.5})');
-    grd.addColorStop(1.0, 'rgba(255, 255, 255, ${life})');
-    ctx.strokeStyle = grd;
-
-    ctx.beginPath();
-    ctx.moveTo(this.startX, this.startY);
-    ctx.lineTo(this.x, this.y);
-    ctx.stroke();
-
-    ctx.restore();
+    ctx..beginPath()..arc(0, 0, this.radius, 0, pi * 2);
+    ctx.globalAlpha = sin(0.5 * pi * life);
+    ctx..fillStyle = 'rgba(${r}, ${g}, ${b}, ${a})'..fill();
   }
 }
