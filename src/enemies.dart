@@ -27,6 +27,14 @@ class Scout extends Ship with Enemy {
       timeBetweenShots: 100, 
       shoot: () => new Bullet(damage: 10, color: color),  
       owner: this));
+
+      // Engine
+    engines.add(new Gun(
+      frontOffset: -radius * 0.9,
+      ignoreOwnerVelocity: true,
+      shoot: () => new EngineTrail(this),
+      owner: this
+    ));
   }
 
   @override
@@ -55,6 +63,7 @@ class Gunship extends Ship with Enemy {
     const GUN_ANGLE = 0.02;
     final shoot = () => new Bullet(damage: 10, color: color);
 
+    // Guns
     gunsPrimary.add(new Gun(
       frontOffset: radius, 
       sideOffset: -radius,
@@ -90,6 +99,24 @@ class Gunship extends Ship with Enemy {
       timeBetweenShots: 100, 
       shoot: shoot,
       owner: this));
+
+    // Engines
+    engines.add(new Gun(
+      frontOffset: -radius,
+      sideOffset: -radius / 2,
+      ignoreOwnerVelocity: true,
+      shoot: () => new EngineTrail(this),
+      owner: this
+    ));
+
+    // Engine
+    engines.add(new Gun(
+      frontOffset: -radius,
+      sideOffset: radius / 2,
+      ignoreOwnerVelocity: true,
+      shoot: () => new EngineTrail(this),
+      owner: this
+    ));
   }
 
   @override

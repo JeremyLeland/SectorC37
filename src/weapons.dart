@@ -57,9 +57,10 @@ class Gun {
   final Ship owner;
   final Entity Function() shoot;
   num shootDelay = 0, timeBetweenShots;
+  bool ignoreOwnerVelocity;
 
-  Gun({this.frontOffset = 0, this.sideOffset = 0, this.angleOffset = 0, this.speed = 0,
-    required this.timeBetweenShots, required this.shoot, required this.owner});
+  Gun({this.frontOffset = 0, this.sideOffset = 0, this.angleOffset = 0, this.speed = 0, 
+    this.ignoreOwnerVelocity = false, this.timeBetweenShots = 0, required this.shoot, required this.owner});
 
   void update(num dt, World world, bool isShooting) {
     shootDelay -= dt;
@@ -73,8 +74,8 @@ class Gun {
       bullet.spawn(
         x: pos.x, 
         y: pos.y, 
-        dx: owner.dx + cos(ang) * speed, 
-        dy: owner.dy + sin(ang) * speed,
+        dx: (ignoreOwnerVelocity ? 0 : owner.dx) + cos(ang) * speed, 
+        dy: (ignoreOwnerVelocity ? 0 : owner.dy) + sin(ang) * speed,
         angle: ang);
       world.addEntity(bullet);
     }

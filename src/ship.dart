@@ -8,7 +8,7 @@ abstract class Ship extends Entity {
   num speed = 0, turnSpeed = 0;
   num _goalAngle = 0;
 
-  List<Gun> gunsPrimary = [], gunsSecondary = [];
+  List<Gun> gunsPrimary = [], gunsSecondary = [], engines = [];
   bool isShootingPrimary = false, isShootingSecondary = false;
 
   static const TARGET_DISTANCE = 1000, SHOOT_DISTANCE = 300, SHOOT_ANGLE = 0.5;
@@ -136,6 +136,8 @@ abstract class Ship extends Entity {
 
     gunsPrimary.forEach((g) => g.update(dt, world, isShootingPrimary));
     gunsSecondary.forEach((g) => g.update(dt, world, isShootingSecondary));
+
+    engines.forEach((e) => e.update(dt, world, speed > 0));
     
     super.update(dt, world);
   }
@@ -169,6 +171,30 @@ class Fire extends Entity {
     final b = 120 - 120 * life;
     final a = 0.4 * life;
     
+    ctx.globalCompositeOperation = 'lighter';
+    ctx..beginPath()..arc(0, 0, size, 0, pi * 2);
+    ctx..fillStyle = 'rgba(${r}, ${g}, ${b}, ${a})'..fill();
+  }
+}
+
+class EngineTrail extends Entity {
+  static const RADIUS = 4;
+
+  EngineTrail(Entity entity) : super(decay: 1/300) {
+    spawnParticle(startX: entity.x, startY: entity.y, maxSpeed: 0, minRadius: RADIUS, maxRadius: RADIUS);
+  }
+
+  @override
+  void drawEntity(ctx) {
+    // TODO: Make this like the Snake for a smoother trail
+    final size = sin(pi/2 * life) * radius;
+
+    // Inspired by http://codepen.io/davepvm/pen/Hhstl
+    final r = 140 + 120 * life;
+    final g = 170 - 120 * life;
+    final b = 120 - 120 * life;
+    final a = 0.4 * life;
+
     ctx.globalCompositeOperation = 'lighter';
     ctx..beginPath()..arc(0, 0, size, 0, pi * 2);
     ctx..fillStyle = 'rgba(${r}, ${g}, ${b}, ${a})'..fill();
