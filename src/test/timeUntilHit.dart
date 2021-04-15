@@ -1,4 +1,3 @@
-
 import 'dart:math';
 
 import '../asteroid.dart';
@@ -17,15 +16,15 @@ class TimeUntilHitTest extends Game {
   }
 
   update(dt) {
-      if (mouse.isPressed(Mouse.LEFT_BUTTON)) {
-        player.x = mouse.x;
-        player.y = mouse.y;
-      }
+    if (mouse.isPressed(Mouse.LEFT_BUTTON)) {
+      player.x = mouse.x;
+      player.y = mouse.y;
+    }
 
-      player.aimTowardPoint(mouse.x, mouse.y);
+    player.aimTowardPoint(mouse.x, mouse.y);
 
-      player.update(dt, world);
-      player.updatePosition(-dt);   // keep us still for this test
+    player.update(dt, world);
+    player.updatePosition(-dt);   // keep us still for this test
   }
 
   debugText(ctx, text) {
@@ -35,19 +34,19 @@ class TimeUntilHitTest extends Game {
   }
 
   draw(ctx) {
-      player.draw(ctx);
-      asteroid.draw(ctx);
+    player.draw(ctx);
+    asteroid.draw(ctx);
 
-      final time = player.timeUntilHit(asteroid, buffer: 10);
-      debugText(ctx, 'Time to hit: ${time}');
+    final time = player.timeUntilHit(asteroid, buffer: 10);
+    debugText(ctx, 'Time to hit: ${time}');
 
-      if (time != double.infinity) {
-        final hitX = player.x + player.dx * time;
-        final hitY = player.y + player.dy * time;
-        
-        ctx..beginPath()..arc(hitX, hitY, player.radius, 0, pi * 2);
-        ctx..fillStyle = "red"..fill();
-      }
+    if (time != double.infinity) {
+      final hitX = player.x + player.dx * time;
+      final hitY = player.y + player.dy * time;
+      
+      ctx..beginPath()..arc(hitX, hitY, player.radius, 0, pi * 2);
+      ctx..fillStyle = "red"..fill();
+    }
   }
 }
 

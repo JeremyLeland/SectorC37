@@ -47,5 +47,13 @@ class Player extends Ship {
       shoot: () => new Missle(damage: 50, speed: 0.3), 
       owner: this
     ));
+
+    // Engine
+    engines.add(new Gun(
+      frontOffset: -radius * 0.9,
+      ignoreOwnerVelocity: true,
+      shoot: () => new EngineTrail(this),
+      owner: this
+    ));
   }
 }

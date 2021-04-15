@@ -104,6 +104,23 @@ abstract class Entity {
     return disc < 0 ? double.infinity : (-b - sqrt(disc)) / (2*a);
   }
 
+  static void handleBounce(Entity e1, Entity e2) {
+    // See https://ericleong.me/research/circle-circle/#dynamic-circle-circle-collision
+    // someday: try something from this monster? http://www.euclideanspace.com/physics/dynamics/collision/twod/index.htm
+    final diffX = e2.x - e1.x;
+    final diffY = e2.y - e1.y;
+    final distBetween = sqrt(diffX * diffX + diffY * diffY);
+    final normX = diffX / distBetween;
+    final normY = diffY / distBetween;
+
+    final p = 2 * (e1.dx * normX + e1.dy * normY - e2.dx * normX - e2.dy * normY) / (e1.mass + e2.mass);
+
+    e1.dx -= p * e2.mass * normX;
+    e1.dy -= p * e2.mass * normY;
+    e2.dx += p * e1.mass * normX;
+    e2.dy += p * e1.mass * normY;
+   }
+
   //
   // Update
   //

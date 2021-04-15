@@ -29,14 +29,14 @@ class Bullet extends Entity {
 class Missle extends Ship {
   Missle({num damage = 0, num speed = 0, String color = 'gray'})
    : super(radius: 5, mass: 0.1, health: 10, damage: damage, color: color) {
-    this.turnSpeed = 0.001;
+    this.turnSpeed = 0.002;
     this.speed = speed;
     decay = 1/10000;
   }
 
   @override
   void update(dt, world) {
-    updateTarget(world.getEntitiesNear(this).where((e) => e is Scout || e is Turret));
+    updateTarget(world.getEntitiesNear(this).where((e) => e is Enemy));
     super.update(dt, world);
   }
 
@@ -57,9 +57,10 @@ class Gun {
   final Ship owner;
   final Entity Function() shoot;
   num shootDelay = 0, timeBetweenShots;
+  bool ignoreOwnerVelocity;
 
-  Gun({this.frontOffset = 0, this.sideOffset = 0, this.angleOffset = 0, this.speed = 0,
-    required this.timeBetweenShots, required this.shoot, required this.owner});
+  Gun({this.frontOffset = 0, this.sideOffset = 0, this.angleOffset = 0, this.speed = 0, 
+    this.ignoreOwnerVelocity = false, this.timeBetweenShots = 0, required this.shoot, required this.owner});
 
   void update(num dt, World world, bool isShooting) {
     shootDelay -= dt;
@@ -73,8 +74,8 @@ class Gun {
       bullet.spawn(
         x: pos.x, 
         y: pos.y, 
-        dx: owner.dx + cos(ang) * speed, 
-        dy: owner.dy + sin(ang) * speed,
+        dx: (ignoreOwnerVelocity ? 0 : owner.dx) + cos(ang) * speed, 
+        dy: (ignoreOwnerVelocity ? 0 : owner.dy) + sin(ang) * speed,
         angle: ang);
       world.addEntity(bullet);
     }
@@ -92,24 +93,14 @@ class Spark extends Entity {
   }
 
   @override
-  void drawEntity(ctx) { /* we're overriding draw instead */ }
+  void drawEntity(ctx) {
+    final r = 255;
+    final g = 128 + 128 * life;
+    final b = 255 * life;
+    final a = 0.4 * life;
 
-  @override
-  void draw(ctx) {
-    ctx.save();
-
-    const LENGTH = 100;
-    final grd = ctx.createLinearGradient(x - dx * LENGTH, y - dy * LENGTH, x, y);
-    grd.addColorStop(0.0, 'rgba(0, 0, 0, 0)');
-    grd.addColorStop(0.5, 'rgba(255, 255, 0, ${life * 0.5})');
-    grd.addColorStop(1.0, 'rgba(255, 255, 255, ${life})');
-    ctx.strokeStyle = grd;
-
-    ctx.beginPath();
-    ctx.moveTo(this.startX, this.startY);
-    ctx.lineTo(this.x, this.y);
-    ctx.stroke();
-
-    ctx.restore();
+    ctx..beginPath()..arc(0, 0, this.radius, 0, pi * 2);
+    ctx.globalAlpha = sin(0.5 * pi * life);
+    ctx..fillStyle = 'rgba(${r}, ${g}, ${b}, ${a})'..fill();
   }
 }

@@ -1,7 +1,9 @@
+// dart compile js src/sectorc37.dart -o build/SectorC37.dart.js
+
 import 'dart:html';
 import 'dart:math';
 
-import 'Game.dart';
+import 'game.dart';
 import 'asteroid.dart';
 import 'enemies.dart';
 import 'player.dart';
@@ -24,6 +26,13 @@ class SectorC37 extends Game {
       world.spawnInBounds(new Scout());
       world.spawnInBounds(new Gunship());
     }
+
+    events.add(new TimedEvent(timeLeft: 10000, function: () {
+      for (int i = 0; i < 5; i ++) {
+        world.spawnInBounds(new Scout());
+        world.spawnInBounds(new Gunship());
+      }
+    }));
 
     for (int i = 0; i < 5; i ++) {
       world.spawnInBounds(new Turret());
@@ -118,6 +127,12 @@ class SectorC37 extends Game {
       ctx..textAlign = 'center'..textBaseline = 'middle';
       ctx..fillStyle = 'white'..font = '16px Arial';
       ctx.fillText('Click to Respawn', canvasWidth / 2, canvasHeight / 2);
+    }
+
+    if (world.getEnemies().length == 0) {
+      ctx..textAlign = 'center'..textBaseline = 'middle';
+      ctx..fillStyle = 'white'..font = '20px Arial';
+      ctx.fillText('Sector Clear!', canvasWidth / 2, canvasHeight / 3);
     }
   }
 

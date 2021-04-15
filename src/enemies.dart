@@ -5,7 +5,11 @@ import 'player.dart';
 import 'ship.dart';
 import 'weapons.dart';
 
-class Scout extends Ship {
+mixin Enemy {
+
+}
+
+class Scout extends Ship with Enemy {
   Scout()
    : super(
      radius: 10,
@@ -23,6 +27,14 @@ class Scout extends Ship {
       timeBetweenShots: 100, 
       shoot: () => new Bullet(damage: 10, color: color),  
       owner: this));
+
+      // Engine
+    engines.add(new Gun(
+      frontOffset: -radius * 0.9,
+      ignoreOwnerVelocity: true,
+      shoot: () => new EngineTrail(this),
+      owner: this
+    ));
   }
 
   @override
@@ -37,7 +49,7 @@ class Scout extends Ship {
   }
 }
 
-class Gunship extends Ship {
+class Gunship extends Ship with Enemy {
   Gunship()
    : super(
      radius: 15,
@@ -51,6 +63,7 @@ class Gunship extends Ship {
     const GUN_ANGLE = 0.02;
     final shoot = () => new Bullet(damage: 10, color: color);
 
+    // Guns
     gunsPrimary.add(new Gun(
       frontOffset: radius, 
       sideOffset: -radius,
@@ -86,6 +99,24 @@ class Gunship extends Ship {
       timeBetweenShots: 100, 
       shoot: shoot,
       owner: this));
+
+    // Engines
+    engines.add(new Gun(
+      frontOffset: -radius,
+      sideOffset: -radius / 2,
+      ignoreOwnerVelocity: true,
+      shoot: () => new EngineTrail(this),
+      owner: this
+    ));
+
+    // Engine
+    engines.add(new Gun(
+      frontOffset: -radius,
+      sideOffset: radius / 2,
+      ignoreOwnerVelocity: true,
+      shoot: () => new EngineTrail(this),
+      owner: this
+    ));
   }
 
   @override
@@ -100,7 +131,7 @@ class Gunship extends Ship {
   }
 }
 
-class Turret extends Ship {
+class Turret extends Ship with Enemy {
   Turret()
    : super(
     radius: 20,
