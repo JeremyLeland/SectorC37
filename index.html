@@ -1,0 +1,59 @@
+<link rel="stylesheet" href="style.css">
+
+<body>
+  <svg>
+    <defs>
+      <path id="ship" d="M 1 0 L -1 1 L -1 -1 Z" fill="green" stroke="black" vector-effect="non-scaling-stroke"></path>
+    </defs>
+    <use id="player" xlink:href="#ship"></use>
+  </svg>
+</body>
+
+<script type="module">
+
+  let player = {
+    x: 200, y: 200, angle: 0,
+    size: 10,
+    svg: document.getElementById( 'player' ),
+  };
+
+  function update( dt ) {
+    player.svg.style.transform = `translate( ${ player.x }px, ${ player.y }px ) scale( ${ player.size } ) rotate( ${ player.angle }rad )`;
+  }
+
+
+  //
+  // Input and update loop
+  //
+
+  let mouseDown = false;
+  document.onmousemove = onInput;
+  document.ontouchmove = onInput;
+  document.onmousedown  = ( e ) => { mouseDown = true; onInput( e ); }
+  document.ontouchstart = ( e ) => { mouseDown = true; onInput( e ); }
+  document.onmouseup  = ( e ) => mouseDown = false;
+  document.ontouchend = ( e ) => mouseDown = false;
+  function onInput( e ) {
+    const event = e.touches ? e.touches[0] : e;
+
+    player.angle = Math.atan2( event.pageY - player.y, event.pageX - player.x );
+
+    // if ( gameState == State.Playing ) {
+    //   player.goalAngle = Math.atan2( event.pageY - player.y, event.pageX - player.x );
+    // }
+    // else if ( mouseDown ) {
+    //   newGame();
+    // }
+  }
+
+  let lastTime = null;
+  function animate( now ) {
+    lastTime ??= now;   // for first call only
+    update( now - lastTime );
+    lastTime = now;
+
+    requestAnimationFrame( animate );
+  }
+  requestAnimationFrame( animate );
+
+</script>
