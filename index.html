@@ -12,6 +12,8 @@
 
 <script type="module">
 
+  import { Ship } from './src/ship.js';
+
   const SVGNS = 'http://www.w3.org/2000/svg';
 
   // Create starfield
@@ -27,15 +29,11 @@
     stars.appendChild( star );
   }
 
-  let player = {
-    x: 200, y: 200, angle: 0,
-    size: 10,
-    svg: document.getElementById( 'player' ),
-  };
+  let player = new Ship( { x: 200, y: 200, angle: 0 } );
+  player.svg = document.getElementById( 'player' );
 
   function update( dt ) {
-    // TODO: Does order make a difference here?
-    player.svg.style.transform = `translate( ${ player.x }px, ${ player.y }px ) scale( ${ player.size } ) rotate( ${ player.angle }rad )`;
+    player.update( dt );
   }
 
 
@@ -53,7 +51,7 @@
   function onInput( e ) {
     const event = e.touches ? e.touches[0] : e;
 
-    player.angle = Math.atan2( event.pageY - player.y, event.pageX - player.x );
+    player.goalAngle = Math.atan2( event.pageY - player.y, event.pageX - player.x );
 
     // if ( gameState == State.Playing ) {
     //   player.goalAngle = Math.atan2( event.pageY - player.y, event.pageX - player.x );
