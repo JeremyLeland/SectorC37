@@ -5,11 +5,27 @@
     <defs>
       <path id="ship" d="M 1 0 L -1 1 L -1 -1 Z" fill="green" stroke="black" vector-effect="non-scaling-stroke"></path>
     </defs>
+    <g id="stars"></g>
     <use id="player" xlink:href="#ship"></use>
   </svg>
 </body>
 
 <script type="module">
+
+  const SVGNS = 'http://www.w3.org/2000/svg';
+
+  // Create starfield
+  const stars = document.getElementById( 'stars' );
+  for ( let i = 0; i < 100; i ++ ) {
+    const star = document.createElementNS( SVGNS, 'circle' );
+    star.setAttribute( 'cx', Math.floor( Math.random() * 1000 ) + 0.5 );
+    star.setAttribute( 'cy', Math.floor( Math.random() * 1000 ) + 0.5 );
+    star.setAttribute( 'r',  Math.random() * 1 );
+
+    const col = Math.random() * 50 + 200;
+    star.setAttribute( 'fill', `rgba( ${ col }, ${ col }, ${ col }, ${ Math.random() } )` );
+    stars.appendChild( star );
+  }
 
   let player = {
     x: 200, y: 200, angle: 0,
@@ -18,6 +34,7 @@
   };
 
   function update( dt ) {
+    // TODO: Does order make a difference here?
     player.svg.style.transform = `translate( ${ player.x }px, ${ player.y }px ) scale( ${ player.size } ) rotate( ${ player.angle }rad )`;
   }
 
