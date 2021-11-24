@@ -17,6 +17,11 @@ export class Ship {
     this.#angle = angle;
 
     this.goalAngle = angle;
+
+    this.svg = document.createElementNS( SVGNS, 'use' );
+    this.svg.setAttribute( 'href', '#ship' );
+
+    document.getElementById( 'svg' ).appendChild( this.svg );
   }
 
   getAvoidVectors( entities ) {

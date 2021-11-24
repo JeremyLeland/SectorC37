@@ -1,12 +1,11 @@
 <link rel="stylesheet" href="style.css">
 
 <body>
-  <svg>
+  <svg id='svg'>
     <defs>
       <path id="ship" d="M 1 0 L -1 1 L -1 -1 Z" fill="green" stroke="black" vector-effect="non-scaling-stroke"></path>
     </defs>
     <g id="stars"></g>
-    <use id="player" xlink:href="#ship"></use>
   </svg>
 </body>
 
@@ -30,7 +29,6 @@
   }
 
   let player = new Ship( { x: 200, y: 200, angle: 0 } );
-  player.svg = document.getElementById( 'player' );
 
   function update( dt ) {
     player.update( dt );
