@@ -1,0 +1,48 @@
+<link rel="stylesheet" href="../style.css">
+
+<body>
+  <svg id='svg'>
+    <g id="flames"></g>
+  </svg>
+</body>
+
+<script>
+
+  const flames = document.getElementById( 'flames' );
+
+  document.onmousemove = ( e ) => {
+    fire( e.pageX, e.pageY );
+  }
+
+  function burn( cx, cy ) {
+    for ( let i = 0; i < 10; i ++ ) {
+      fire( cx + Math.random() * 20 - 10, cy + Math.random() * 20 - 10 );
+    }
+  }
+
+  function fire( cx, cy ) {
+    const flame = document.createElementNS( 'http://www.w3.org/2000/svg', 'circle' );
+    flame.setAttribute( 'cx', cx );
+    flame.setAttribute( 'cy', cy );
+
+    let anim = flame.animate(
+      [
+        { opacity: '100%', r: '10', fill: 'white'  },
+        { opacity: '75%',  r: '7', fill: 'yellow' },
+        { opacity: '50%',  r: '5', fill: 'orange' },
+        { opacity: '25%',  r: '2', fill: 'red'    },
+        { opacity: '0%',   r: '0', fill: 'gray'   },
+      ],
+      {
+        duration: Math.random() * 500 + 500,
+        iterations: 1,
+        fill: 'forwards',
+      }
+    );
+
+    anim.onfinish = () => flame.remove();
+
+    flames.appendChild( flame );
+  }
+  
+</script>
