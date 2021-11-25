@@ -3,38 +3,35 @@
 <style>
   body { cursor: crosshair; }
   .flame {
-    animation: flame 1s linear 0s 1 forwards;
+    filter: blur( 10px );
+    mix-blend-mode: screen;
   }
-  @keyframes flame {
-    0%   { fill: white; }
-    50%  { fill: orange; }
-    100% { fill: gray; }
+  .debris {
+    fill: green;
+    stroke: black;
   }
 </style>
 
 <body>
   <svg id='svg'>
-    <g id="flames" style="mix-blend-mode: screen;"></g>
-    <g id="debris" fill="green" stroke="black"></g>
   </svg>
 </body>
 
 <script>
-  const flames = document.getElementById( 'flames' );
-  const debris = document.getElementById( 'debris' );
+  const svg = document.getElementById( 'svg' );
 
   document.onmousedown = ( e ) => {
     explode( e.pageX, e.pageY );
   }
 
   function explode( cx, cy ) {
-    for ( let i = 0; i < 50; i ++ ) {
+    for ( let i = 0; i < 25; i ++ ) {
       const flame = getParticle( { cx: cx, cy: cy, size: 25, spread: 5, speed: 20 } );
       
+      flame.setAttribute( 'class', 'flame' );
       flame.animate(
         {
           transform: [ 'scale( 0 )', 'scale( 1 )' ],
-          filter: [ 'blur( 1px )', 'blur( 10px )' ],
           fill: [ 'white', 'orange', 'gray' ],
         },
         {
@@ -45,8 +42,14 @@
         }
       )
 
-      flames.appendChild( flame );
-      debris.appendChild( getParticle( { cx: cx, cy: cy, size: 4, spread: 10, speed: 80 } ) );
+      svg.appendChild( flame );
+    }
+
+    for ( let i = 0; i < 40; i ++ ) {
+      const shard = getParticle( { cx: cx, cy: cy, size: 4, spread: 10, speed: 80 } );
+      shard.setAttribute( 'class', 'debris' );
+
+      svg.appendChild( shard );
     }
   }
 
