@@ -17,7 +17,12 @@
   function explode( cx, cy ) {
     for ( let i = 0; i < 50; i ++ ) {
       const shard = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
-      shard.setAttribute( 'd', `M ${ Math.random() * 4 + 1 } 0 L ${ Math.random() * -4 - 1} ${ Math.random() * 4 + 1 } L ${ Math.random() * -4 - 1 } ${ Math.random() * -4 - 1 } Z` );
+      const points = [ 
+        [ Math.random() *  4 + 1, 0 ],
+        [ Math.random() * -4 - 1, Math.random() *  4 + 1 ],
+        [ Math.random() * -4 - 1, Math.random() * -4 - 1 ],
+      ].join( ' L ' );
+      shard.setAttribute( 'd', `M ${ points } Z` );
       
       const offset = Math.random() * 20;
       const angle = Math.random() * Math.PI * 2;
@@ -27,8 +32,8 @@
 
       const x = cx + cos * offset;
       const y = cy + sin * offset;
-      const dx = Math.cos( angle ) * speed;
-      const dy = Math.sin( angle ) * speed;
+      const dx = cos * speed;
+      const dy = sin * speed;
 
       let anim = shard.animate(
         [
