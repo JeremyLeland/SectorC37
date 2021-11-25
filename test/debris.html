@@ -2,14 +2,13 @@
 
 <body>
   <svg id='svg'>
-    <defs>
-      <path id="debris" d="M 1 0 L -1 1 L -1 -1 Z" fill="green" stroke="black" vector-effect="non-scaling-stroke"></path>
-    </defs>
-    <!-- <use id="test" href="#debris" transform="translate( 100, 100 ) scale( 10, 5 )"></use> -->
+    <g id="debris" fill="green" stroke="black"></g>
   </svg>
 </body>
 
 <script>
+
+  const debris = document.getElementById( 'debris' );
 
   document.onmousedown = ( e ) => {
     explode( e.pageX, e.pageY );
@@ -17,8 +16,8 @@
 
   function explode( cx, cy ) {
     for ( let i = 0; i < 50; i ++ ) {
-      const debris = document.createElementNS( 'http://www.w3.org/2000/svg', 'use' );
-      debris.setAttribute( 'href', '#debris' );
+      const shard = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+      shard.setAttribute( 'd', `M ${ Math.random() * 4 + 1 } 0 L ${ Math.random() * -4 - 1} ${ Math.random() * 4 + 1 } L ${ Math.random() * -4 - 1 } ${ Math.random() * -4 - 1 } Z` );
       
       const offset = Math.random() * 20;
       const angle = Math.random() * Math.PI * 2;
@@ -31,16 +30,16 @@
       const dx = Math.cos( angle ) * speed;
       const dy = Math.sin( angle ) * speed;
 
-      let anim = debris.animate(
+      let anim = shard.animate(
         [
           // keyframes
           {
             opacity: '100%',
-            transform: `translate( ${ x }px, ${ y }px ) rotate( ${ Math.random() * 100 - 50 }deg ) scale( 5, 2 )`
+            transform: `translate( ${ x }px, ${ y }px ) rotate( ${ Math.random() * 100 - 50 }deg )`
           },
           {
             opacity: '0%',
-            transform: `translate( ${ x + dx }px, ${ y + dy }px ) rotate( ${ Math.random() * 800 - 400 }deg ) scale( 5, 2 )`
+            transform: `translate( ${ x + dx }px, ${ y + dy }px ) rotate( ${ Math.random() * 800 - 400 }deg )`
           },
         ],
         {
@@ -51,9 +50,9 @@
         }
       );
 
-      anim.onfinish = () => debris.remove();
+      anim.onfinish = () => shard.remove();
 
-      svg.appendChild( debris );
+      debris.appendChild( shard );
     }
   }
   
