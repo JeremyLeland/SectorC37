@@ -29,14 +29,14 @@
 
   function explode( cx, cy ) {
     for ( let i = 0; i < 50; i ++ ) {
-      const flame = getParticle( { cx: cx, cy: cy, size: 20, spread: 10, speed: 10 } );
+      const flame = getParticle( { cx: cx, cy: cy, size: 25, spread: 5, speed: 20 } );
       
       flame.animate(
-        [
-          { transform: "scale( 0.0 )", filter: "blur( 1px )", fill: "white" },
-          { transform: "scale( 0.5 )", filter: "blur( 5px )", fill: "orange" },
-          { transform: "scale( 1.0 )", filter: "blur( 10px )", fill: "gray" },
-        ],
+        {
+          transform: [ 'scale( 0 )', 'scale( 1 )' ],
+          filter: [ 'blur( 1px )', 'blur( 10px )' ],
+          fill: [ 'white', 'orange', 'gray' ],
+        },
         {
           duration: 1000,
           iterations: 1,
