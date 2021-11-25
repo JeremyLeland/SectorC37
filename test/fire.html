@@ -2,7 +2,7 @@
 
 <body>
   <svg id='svg'>
-    <g id="flames"></g>
+    <g id="flames" style="filter: blur( 5px ); mix-blend-mode: screen;"></g>
   </svg>
 </body>
 
@@ -10,15 +10,17 @@
 
   const flames = document.getElementById( 'flames' );
 
-  document.onmousemove = ( e ) => {
-    fire( e.pageX, e.pageY );
+  document.onmousedown = ( e ) => {
+    explode( e.pageX, e.pageY );
   }
 
-  function burn( cx, cy ) {
-    for ( let i = 0; i < 10; i ++ ) {
-      fire( cx + Math.random() * 20 - 10, cy + Math.random() * 20 - 10 );
+  function explode( cx, cy ) {
+    for ( let i = 0; i < 40; i ++ ) {
+      fire( cx + rand() * 40, cy + rand() * 40 );
     }
   }
+
+  function rand() { return Math.random() - 0.5; }
 
   function fire( cx, cy ) {
     const flame = document.createElementNS( 'http://www.w3.org/2000/svg', 'circle' );
@@ -27,14 +29,15 @@
 
     let anim = flame.animate(
       [
-        { opacity: '100%', r: '10', fill: 'white'  },
-        { opacity: '75%',  r: '7', fill: 'yellow' },
-        { opacity: '50%',  r: '5', fill: 'orange' },
-        { opacity: '25%',  r: '2', fill: 'red'    },
-        { opacity: '0%',   r: '0', fill: 'gray'   },
+        { opacity: '40%', r: '5',  fill: 'white'  },
+        { opacity: '30%', r: '10', fill: 'yellow' },
+        { opacity: '20%', r: '15', fill: 'orange' },
+        { opacity: '10%', r: '20', fill: 'gray'   },
+        { opacity: '0%',  r: '25', fill: 'black'  },
       ],
       {
         duration: Math.random() * 500 + 500,
+        delay: Math.random() * 200,
         iterations: 1,
         fill: 'forwards',
       }

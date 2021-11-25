@@ -1,13 +1,26 @@
 <link rel="stylesheet" href="../style.css">
 
+<style>
+  body { cursor: crosshair; }
+  .flame {
+    animation: flame 1s linear 0s 1 forwards;
+  }
+  @keyframes flame {
+    0%   { fill: white; }
+    50%  { fill: orange; }
+    100% { fill: gray; }
+  }
+</style>
+
 <body>
   <svg id='svg'>
+    <g id="flames" style="mix-blend-mode: screen;"></g>
     <g id="debris" fill="green" stroke="black"></g>
   </svg>
 </body>
 
 <script>
-
+  const flames = document.getElementById( 'flames' );
   const debris = document.getElementById( 'debris' );
 
   document.onmousedown = ( e ) => {
@@ -16,49 +29,72 @@
 
   function explode( cx, cy ) {
     for ( let i = 0; i < 50; i ++ ) {
-      const shard = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
-      const points = [ 
-        [ Math.random() *  4 + 1, 0 ],
-        [ Math.random() * -4 - 1, Math.random() *  4 + 1 ],
-        [ Math.random() * -4 - 1, Math.random() * -4 - 1 ],
-      ].join( ' L ' );
-      shard.setAttribute( 'd', `M ${ points } Z` );
+      const flame = getParticle( { cx: cx, cy: cy, size: 20, spread: 10, speed: 10 } );
       
-      const offset = Math.random() * 20;
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 100 + offset;
-      const cos = Math.cos( angle );
-      const sin = Math.sin( angle );
-
-      const x = cx + cos * offset;
-      const y = cy + sin * offset;
-      const dx = cos * speed;
-      const dy = sin * speed;
-
-      let anim = shard.animate(
+      flame.animate(
         [
-          // keyframes
-          {
-            opacity: '100%',
-            transform: `translate( ${ x }px, ${ y }px ) rotate( ${ Math.random() * 100 - 50 }deg )`
-          },
-          {
-            opacity: '0%',
-            transform: `translate( ${ x + dx }px, ${ y + dy }px ) rotate( ${ Math.random() * 800 - 400 }deg )`
-          },
+          { transform: "scale( 0.0 )", filter: "blur( 1px )", fill: "white" },
+          { transform: "scale( 0.5 )", filter: "blur( 5px )", fill: "orange" },
+          { transform: "scale( 1.0 )", filter: "blur( 10px )", fill: "gray" },
         ],
         {
-          // timing
           duration: 1000,
           iterations: 1,
           fill: 'forwards',
+          composite: 'add'
         }
-      );
+      )
 
-      anim.onfinish = () => shard.remove();
-
-      debris.appendChild( shard );
+      flames.appendChild( flame );
+      debris.appendChild( getParticle( { cx: cx, cy: cy, size: 4, spread: 10, speed: 80 } ) );
     }
   }
+
+  function getParticle( { cx, cy, size, spread, speed } ) {
+    const part = document.createElementNS( 'http://www.w3.org/2000/svg', 'path' );
+    const points = [ 
+      [ rand25() *  size, 0 ],
+      [ rand25() * -size, rand25() *  size ],
+      [ rand25() * -size, rand25() * -size ],
+    ].join( ' L ' );
+    part.setAttribute( 'd', `M ${ points } Z` );
+    
+    const rand = rand25();
+    const angle = Math.random() * Math.PI * 2;
+    
+    const cos = Math.cos( angle );
+    const sin = Math.sin( angle );
+
+    const x1 = cx + cos * spread * rand;
+    const y1 = cy + sin * spread * rand;
+    const x2 = x1 + cos * speed * rand;
+    const y2 = y1 + sin * speed * rand;
+
+    let anim = part.animate(
+      [
+        // keyframes
+        {
+          opacity: '100%',
+          transform: `translate( ${ x1 }px, ${ y1 }px ) rotate( ${ Math.random() * 100 - 50 }deg )`
+        },
+        {
+          opacity: '0%',
+          transform: `translate( ${ x2 }px, ${ y2 }px ) rotate( ${ Math.random() * 800 - 400 }deg )`
+        },
+      ],
+      {
+        // timing
+        duration: 1000,
+        iterations: 1,
+        fill: 'forwards',
+      }
+    );
+
+    anim.onfinish = () => part.remove();
+
+    return part;
+  }
+
+  function rand25() { return Math.random() + 0.25; }
   
 </script>
