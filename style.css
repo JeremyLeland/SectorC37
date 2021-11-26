@@ -2,9 +2,5 @@ body {
   margin: 0;
   overscroll-behavior: none; /* Disable Chrome two fingers back/forward swipe */
   user-select: none;  /* Prevent accidental selection while dragging mouse */
-}
-svg  {
-  width: 100%;
-  height: 100%;
-  background-color: #111;
+  overflow: hidden;
 }

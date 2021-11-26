@@ -1,7 +1,7 @@
 <link rel="stylesheet" href="style.css">
 
 <body>
-  <svg id='svg'>
+  <svg id="svg" width="2000px" height="2000px" style="background-color: #111;">
     <defs>
       <path id="ship" d="M 1 0 L -1 1 L -1 -1 Z" fill="green" stroke="black" vector-effect="non-scaling-stroke"></path>
     </defs>
@@ -17,10 +17,10 @@
 
   // Create starfield
   const stars = document.getElementById( 'stars' );
-  for ( let i = 0; i < 100; i ++ ) {
+  for ( let i = 0; i < 300; i ++ ) {
     const star = document.createElementNS( SVGNS, 'circle' );
-    star.setAttribute( 'cx', Math.floor( Math.random() * 1000 ) + 0.5 );
-    star.setAttribute( 'cy', Math.floor( Math.random() * 1000 ) + 0.5 );
+    star.setAttribute( 'cx', Math.floor( Math.random() * 2000 ) + 0.5 );
+    star.setAttribute( 'cy', Math.floor( Math.random() * 2000 ) + 0.5 );
     star.setAttribute( 'r',  Math.random() * 1 );
 
     const col = Math.random() * 50 + 200;
@@ -31,7 +31,14 @@
   let player = new Ship( { x: 200, y: 200, angle: 0 } );
 
   function update( dt ) {
+
+    player.goalAngle = Math.atan2( mouseY - player.y, mouseX - player.x );
     player.update( dt );
+
+    document.body.scrollTo( player.x - window.innerWidth / 2, player.y - window.innerHeight / 2 );
+
+    // document.body.scrollLeft = player.x;
+    // document.body.scrollTop = player.y;
   }
 
 
@@ -39,7 +46,7 @@
   // Input and update loop
   //
 
-  let mouseDown = false;
+  let mouseX = 0, mouseY = 0, mouseDown = false;
   document.onmousemove = onInput;
   document.ontouchmove = onInput;
   document.onmousedown  = ( e ) => { mouseDown = true; onInput( e ); }
@@ -48,15 +55,8 @@
   document.ontouchend = ( e ) => mouseDown = false;
   function onInput( e ) {
     const event = e.touches ? e.touches[0] : e;
-
-    player.goalAngle = Math.atan2( event.pageY - player.y, event.pageX - player.x );
-
-    // if ( gameState == State.Playing ) {
-    //   player.goalAngle = Math.atan2( event.pageY - player.y, event.pageX - player.x );
-    // }
-    // else if ( mouseDown ) {
-    //   newGame();
-    // }
+    mouseX = event.pageX;
+    mouseY = event.pageY;
   }
 
   let lastTime = null;
