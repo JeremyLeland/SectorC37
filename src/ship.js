@@ -50,6 +50,11 @@ export class Ship {
     document.getElementById( 'svg' ).appendChild( this.svg );
   }
 
+  explode() {
+    this.svg.remove();
+    // TODO: Particles!
+  }
+
   getAvoidVectors( entities ) {
     return entities.filter( e => e != this ).map( entity => {
       const cx = this.x - entity.x;

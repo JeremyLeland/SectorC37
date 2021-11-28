@@ -41,11 +41,9 @@
   }
 
   let player = new Ship( { shipInfoKey: 'player', x: 200, y: 200 } );
-  let enemies = [
-    new Ship( { shipInfoKey: 'enemy', x: 500, y: 500 } ),
-    new Ship( { shipInfoKey: 'enemy', x: 900, y: 900 } ),
-    new Ship( { shipInfoKey: 'enemy', x: 100, y: 100 } ),
-  ];
+  let enemies = Array.from( Array( 10 ), _ => 
+    new Ship( { shipInfoKey: 'enemy', x: Math.random() * 2000, y: Math.random() * 2000 } ) 
+  );
   let ships = [ player, ...enemies ];
 
   function update( dt ) {
@@ -56,6 +54,17 @@
     enemies.forEach( enemy => enemy.think( player, ships ) );
     
     ships.forEach( ship => ship.update( dt ) );
+
+    ships = ships.filter( ship => {
+      if ( ships.some( other => 
+        ship != other && Math.hypot( ship.x - other.x, ship.y - other.y ) < ship.size + other.size
+      ) ) {
+        ship.explode();
+        return false;
+      }
+
+      return true;
+    } );
 
     document.body.scrollTo( player.x - window.innerWidth / 2, player.y - window.innerHeight / 2 );
   }
