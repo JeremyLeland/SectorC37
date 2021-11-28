@@ -28,11 +28,11 @@
     stars.appendChild( star );
   }
 
-  let player = new Ship( { x: 200, y: 200, angle: 0 } );
+  let player = new Ship( { shipInfoKey: 'player', x: 200, y: 200, angle: 0 } );
   let enemies = [
-    new Ship( { x: 500, y: 500, angle: 0 } ),
-    new Ship( { x: 900, y: 900, angle: 0 } ),
-    new Ship( { x: 100, y: 100, angle: 0 } ),
+    new Ship( { shipInfoKey: 'enemy', x: 500, y: 500, angle: 0 } ),
+    new Ship( { shipInfoKey: 'enemy', x: 900, y: 900, angle: 0 } ),
+    new Ship( { shipInfoKey: 'enemy', x: 100, y: 100, angle: 0 } ),
   ];
   let ships = [ player, ...enemies ];
 

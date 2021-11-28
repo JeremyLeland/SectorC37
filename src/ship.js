@@ -7,6 +7,19 @@ export const Settings = {
   DrawForces: false,
 };
 
+const shipInfo = {
+  player: {
+    speed: 0.2,
+    turnSpeed: 0.005,
+    size: 10
+  },
+  enemy: {
+    speed: 0.15,
+    turnSpeed: 0.005,
+    size: 10
+  },
+}
+
 export class Ship {
   x;
   y;
@@ -16,17 +29,22 @@ export class Ship {
   wanderY = 0;
 
   #angle = 0;
-  #turnSpeed = 0.005;
 
-  speed = 0.2;
-  size = 10;
+  speed;
+  turnSpeed;
+  size;
 
-  constructor( { x, y, angle } ) {
+  constructor( { shipInfoKey, x, y, angle } ) {
     this.x = x;
     this.y = y;
     this.#angle = angle;
 
     this.goalAngle = angle;
+
+    const info = shipInfo[ shipInfoKey ];
+    this.speed = info.speed;
+    this.turnSpeed = info.turnSpeed;
+    this.size = info.size;
 
     this.svg = document.createElementNS( SVGNS, 'use' );
     this.svg.setAttribute( 'href', '#ship' );
@@ -80,10 +98,10 @@ export class Ship {
     // Turn toward goal angle
     this.#angle = fixAngleTo( this.#angle, this.goalAngle );
     if ( this.goalAngle < this.#angle ) {
-      this.#angle = Math.max( this.goalAngle, this.#angle - this.#turnSpeed * dt );
+      this.#angle = Math.max( this.goalAngle, this.#angle - this.turnSpeed * dt );
     }
     else if ( this.#angle < this.goalAngle ) {
-      this.#angle = Math.min( this.goalAngle, this.#angle + this.#turnSpeed * dt );
+      this.#angle = Math.min( this.goalAngle, this.#angle + this.turnSpeed * dt );
     }
 
     // Move forward
