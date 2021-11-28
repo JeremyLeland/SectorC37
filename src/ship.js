@@ -34,12 +34,10 @@ export class Ship {
   turnSpeed;
   size;
 
-  constructor( { shipInfoKey, x, y, angle } ) {
+  constructor( { shipInfoKey, x, y } ) {
     this.x = x;
     this.y = y;
-    this.#angle = angle;
-
-    this.goalAngle = angle;
+    this.goalAngle = this.#angle;
 
     const info = shipInfo[ shipInfoKey ];
     this.speed = info.speed;
@@ -47,7 +45,7 @@ export class Ship {
     this.size = info.size;
 
     this.svg = document.createElementNS( SVGNS, 'use' );
-    this.svg.setAttribute( 'href', '#ship' );
+    this.svg.setAttribute( 'href', `#${ shipInfoKey }` );
 
     document.getElementById( 'svg' ).appendChild( this.svg );
   }
@@ -111,7 +109,7 @@ export class Ship {
     this.y += Math.sin( this.#angle ) * moveDist;
 
     // Draw
-    this.svg.style.transform = `translate( ${ this.x }px, ${ this.y }px ) scale( ${ this.size } ) rotate( ${ this.#angle }rad )`;
+    this.svg.style.transform = `translate( ${ this.x }px, ${ this.y }px ) rotate( ${ this.#angle }rad )`;
   }
 }
 

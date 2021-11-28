@@ -1,9 +1,21 @@
 <link rel="stylesheet" href="style.css">
 
+<style>
+  #player {
+    fill: green;
+    stroke: black;
+  }
+  #enemy {
+    fill: darkcyan;
+    stroke: black;
+  }
+</style>
+
 <body>
   <svg id="svg" width="2000px" height="2000px" style="background-color: #111;">
     <defs>
-      <path id="ship" d="M 1 0 L -1 1 L -1 -1 Z" fill="green" stroke="black" vector-effect="non-scaling-stroke"></path>
+      <path id="player" d="M 10 0 L 5 3 L -2 4 L -6 9 L -10 10 L -10 -10 L -6 -9 L -2 -4 L 5 -3 Z"></path>
+      <path id="enemy"  d="M 10 0 L 5 3 L 0 4 L -6 9 L -10 10 L -10 -10 L -6 -9 L 0 -4 L 5 -3 Z"></path>
     </defs>
     <g id="stars"></g>
   </svg>
@@ -28,11 +40,11 @@
     stars.appendChild( star );
   }
 
-  let player = new Ship( { shipInfoKey: 'player', x: 200, y: 200, angle: 0 } );
+  let player = new Ship( { shipInfoKey: 'player', x: 200, y: 200 } );
   let enemies = [
-    new Ship( { shipInfoKey: 'enemy', x: 500, y: 500, angle: 0 } ),
-    new Ship( { shipInfoKey: 'enemy', x: 900, y: 900, angle: 0 } ),
-    new Ship( { shipInfoKey: 'enemy', x: 100, y: 100, angle: 0 } ),
+    new Ship( { shipInfoKey: 'enemy', x: 500, y: 500 } ),
+    new Ship( { shipInfoKey: 'enemy', x: 900, y: 900 } ),
+    new Ship( { shipInfoKey: 'enemy', x: 100, y: 100 } ),
   ];
   let ships = [ player, ...enemies ];
 
