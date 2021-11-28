@@ -4,18 +4,20 @@
   #player {
     fill: green;
     stroke: black;
+    vector-effect: non-scaling-stroke;
   }
   #enemy {
     fill: darkcyan;
     stroke: black;
+    vector-effect: non-scaling-stroke;
   }
 </style>
 
 <body>
   <svg id="svg" width="2000px" height="2000px" style="background-color: #111;">
     <defs>
-      <path id="player" d="M 10 0 L 5 3 L -2 4 L -6 9 L -10 10 L -10 -10 L -6 -9 L -2 -4 L 5 -3 Z"></path>
-      <path id="enemy"  d="M 10 0 L 5 3 L 0 4 L -6 9 L -10 10 L -10 -10 L -6 -9 L 0 -4 L 5 -3 Z"></path>
+      <path id="player" d="M 1.0 0 L 0.5 0.3 L -0.2 0.4 L -0.6 0.9 L -1.0 1.0 L -1.0 -1.0 L -0.6 -0.9 L -0.2 -0.4 L 0.5 -0.3 Z"></path>
+      <path id="enemy"  d="M 1.0 0 L 0.5 0.3 L  0.0 0.4 L -0.6 0.9 L -1.0 1.0 L -1.0 -1.0 L -0.6 -0.9 L  0.0 -0.4 L 0.5 -0.3 Z"></path>
     </defs>
     <g id="stars"></g>
   </svg>
@@ -56,14 +58,19 @@
     ships.forEach( ship => ship.update( dt ) );
 
     ships = ships.filter( ship => {
-      if ( ships.some( other => 
-        ship != other && Math.hypot( ship.x - other.x, ship.y - other.y ) < ship.size + other.size
-      ) ) {
-        ship.explode();
+      ships.forEach( other => {
+        if ( ship != other && Math.hypot( ship.x - other.x, ship.y - other.y ) < ship.size + other.size ) {
+          ship.life -= other.damage;
+        }
+      } );
+
+      if ( ship.life <= 0 ) {
+        ship.die();
         return false;
       }
-
-      return true;
+      else {
+        return true;
+      }
     } );
 
     document.body.scrollTo( player.x - window.innerWidth / 2, player.y - window.innerHeight / 2 );

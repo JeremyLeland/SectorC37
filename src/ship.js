@@ -11,12 +11,16 @@ const shipInfo = {
   player: {
     speed: 0.2,
     turnSpeed: 0.005,
-    size: 10
+    size: 10,
+    life: 100,
+    damage: 100,
   },
   enemy: {
     speed: 0.15,
     turnSpeed: 0.005,
-    size: 10
+    size: 10,
+    life: 50,
+    damage: 50,
   },
 }
 
@@ -33,6 +37,8 @@ export class Ship {
   speed;
   turnSpeed;
   size;
+  life;
+  damage;
 
   constructor( { shipInfoKey, x, y } ) {
     this.x = x;
@@ -43,6 +49,8 @@ export class Ship {
     this.speed = info.speed;
     this.turnSpeed = info.turnSpeed;
     this.size = info.size;
+    this.life = info.life;
+    this.damage = info.damage;
 
     this.svg = document.createElementNS( SVGNS, 'use' );
     this.svg.setAttribute( 'href', `#${ shipInfoKey }` );
@@ -50,7 +58,17 @@ export class Ship {
     document.getElementById( 'svg' ).appendChild( this.svg );
   }
 
-  explode() {
+  checkHitWith( other ) {
+    if ( this != other && Math.hypot( this.x - other.x, this.y - other.y ) < this.size + other.size ) {
+      this.life -= other.damage;
+
+      if ( this.life <= 0 ) {
+        this.die();
+      }
+    }
+  }
+
+  die() {
     this.svg.remove();
     // TODO: Particles!
   }
@@ -114,7 +132,7 @@ export class Ship {
     this.y += Math.sin( this.#angle ) * moveDist;
 
     // Draw
-    this.svg.style.transform = `translate( ${ this.x }px, ${ this.y }px ) rotate( ${ this.#angle }rad )`;
+    this.svg.style.transform = `translate( ${ this.x }px, ${ this.y }px ) rotate( ${ this.#angle }rad ) scale( ${ this.size } )`;
   }
 }
 
