@@ -29,16 +29,23 @@
   }
 
   let player = new Ship( { x: 200, y: 200, angle: 0 } );
+  let enemies = [
+    new Ship( { x: 500, y: 500, angle: 0 } ),
+    new Ship( { x: 900, y: 900, angle: 0 } ),
+    new Ship( { x: 100, y: 100, angle: 0 } ),
+  ];
+  let ships = [ player, ...enemies ];
 
   function update( dt ) {
-
-    player.goalAngle = Math.atan2( mouseY - player.y, mouseX - player.x );
-    player.update( dt );
+    player.goalAngle = Math.atan2( 
+      document.body.scrollTop + mouseY - player.y, 
+      document.body.scrollLeft + mouseX - player.x
+    );
+    enemies.forEach( enemy => enemy.think( player, ships ) );
+    
+    ships.forEach( ship => ship.update( dt ) );
 
     document.body.scrollTo( player.x - window.innerWidth / 2, player.y - window.innerHeight / 2 );
-
-    // document.body.scrollLeft = player.x;
-    // document.body.scrollTop = player.y;
   }
 
 
@@ -55,8 +62,8 @@
   document.ontouchend = ( e ) => mouseDown = false;
   function onInput( e ) {
     const event = e.touches ? e.touches[0] : e;
-    mouseX = event.pageX;
-    mouseY = event.pageY;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
   }
 
   let lastTime = null;

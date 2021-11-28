@@ -3,4 +3,5 @@ body {
   overscroll-behavior: none; /* Disable Chrome two fingers back/forward swipe */
   user-select: none;  /* Prevent accidental selection while dragging mouse */
   overflow: hidden;
+  cursor: crosshair;
 }

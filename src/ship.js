@@ -1,9 +1,19 @@
 const SVGNS = 'http://www.w3.org/2000/svg';
 
+export const Settings = {
+  GoalWeight: 0.5,
+  AvoidWeight: 100,
+  AvoidPower: 1,
+  DrawForces: false,
+};
+
 export class Ship {
   x;
   y;
   goalAngle;
+
+  wanderX = 0;
+  wanderY = 0;
 
   #angle = 0;
   #turnSpeed = 0.005;
@@ -26,8 +36,8 @@ export class Ship {
 
   getAvoidVectors( entities ) {
     return entities.filter( e => e != this ).map( entity => {
-      const cx = this.x - segment.x;
-      const cy = this.y - segment.y;
+      const cx = this.x - entity.x;
+      const cy = this.y - entity.y;
       const angle = Math.atan2( cy, cx );
       const dist = Math.hypot( cx, cy ) - entity.size - this.size;
       
@@ -37,6 +47,33 @@ export class Ship {
       };
     } );
     // TODO: Filter out items we can't crash into (e.g. behind us)?
+  }
+
+  think( target, avoid ) {
+    const goalX = target?.x ?? this.wanderX;
+    const goalY = target?.y ?? this.wanderY;
+
+    const avoidVectors = this.getAvoidVectors( avoid );
+    const weighted = avoidVectors.map( vector => {
+      const weightedDist = Math.abs( Settings.AvoidWeight / Math.pow( vector.dist, Settings.AvoidPower ) );
+      return { 
+        x: Math.cos( vector.angle ) * weightedDist / avoidVectors.length,
+        y: Math.sin( vector.angle ) * weightedDist / avoidVectors.length,
+      };
+    } );
+
+    const goalAngle = Math.atan2( goalY - this.y, goalX - this.x );
+    const goalForce = {
+      x: Settings.GoalWeight * Math.cos( goalAngle ), 
+      y: Settings.GoalWeight * Math.sin( goalAngle ),
+    }
+
+    const finalForce = weighted.reduce(
+      ( acc, wv ) => ( { x: acc.x + wv.x, y: acc.y + wv.y } ),
+      goalForce
+    );
+
+    this.goalAngle = Math.atan2( finalForce.y, finalForce.x );
   }
 
   update( dt ) {
