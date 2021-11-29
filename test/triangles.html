@@ -11,10 +11,19 @@
 </body>
 
 <script>
-  const tri = createTriangle( 10, 20, 30 );
+  const tri = createShard();
   document.body.appendChild( tri );
 
-  tri.animate( { transform: [ 'rotate( 0deg )', 'rotate( 360deg )' ] }, 1000 );
+  function createShard( cx, cy ) {
+    const shard = createTriangle( rand25() * 10, rand25() * 10, rand25() * 10 );
+    
+    const anim = shard.animate( { 
+      transform: [ 'rotate( 0deg )', 'rotate( 360deg )' ] 
+    }, 1000 );
+    anim.onfinish = () => shard.remove();
+
+    return shard;
+  }
 
   function createTriangle( baseLeft, baseRight, height ) {
     const tri = document.createElement( 'div' );
@@ -22,4 +31,7 @@
     tri.style.borderWidth = `${ baseLeft}px 0px ${ baseRight }px ${ height }px`;
     return tri;
   }
+
+  function rand25()  { return Math.random() + 0.25; }
+
 </script>
