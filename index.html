@@ -1,23 +1,31 @@
 <link rel="stylesheet" href="style.css">
 
 <style>
-  #player {
+  .player {
     fill: green;
     stroke: black;
     vector-effect: non-scaling-stroke;
   }
-  #enemy {
+  .enemy {
     fill: darkcyan;
     stroke: black;
     vector-effect: non-scaling-stroke;
+  }
+  .flame {
+    filter: blur( 10px );
+    mix-blend-mode: screen;
+  }
+  .debris {
+    fill: green;
+    stroke: black;
   }
 </style>
 
 <body>
   <svg id="svg" width="2000px" height="2000px" style="background-color: #111;">
     <defs>
-      <path id="player" d="M 1.0 0 L 0.5 0.3 L -0.2 0.4 L -0.6 0.9 L -1.0 1.0 L -1.0 -1.0 L -0.6 -0.9 L -0.2 -0.4 L 0.5 -0.3 Z"></path>
-      <path id="enemy"  d="M 1.0 0 L 0.5 0.3 L  0.0 0.4 L -0.6 0.9 L -1.0 1.0 L -1.0 -1.0 L -0.6 -0.9 L  0.0 -0.4 L 0.5 -0.3 Z"></path>
+      <path id="player" class="player" d="M 1.0 0 L 0.5 0.3 L -0.2 0.4 L -0.6 0.9 L -1.0 1.0 L -1.0 -1.0 L -0.6 -0.9 L -0.2 -0.4 L 0.5 -0.3 Z"></path>
+      <path id="enemy"  class="enemy"  d="M 1.0 0 L 0.5 0.3 L  0.0 0.4 L -0.6 0.9 L -1.0 1.0 L -1.0 -1.0 L -0.6 -0.9 L  0.0 -0.4 L 0.5 -0.3 Z"></path>
     </defs>
     <g id="stars"></g>
   </svg>
@@ -42,11 +50,18 @@
     stars.appendChild( star );
   }
 
-  let player = new Ship( { shipInfoKey: 'player', x: 200, y: 200 } );
-  let enemies = Array.from( Array( 10 ), _ => 
-    new Ship( { shipInfoKey: 'enemy', x: Math.random() * 2000, y: Math.random() * 2000 } ) 
-  );
+  let player = new Ship( 'player' );
+  let enemies = Array.from( Array( 10 ), _ => new Ship( 'enemy' ) );
   let ships = [ player, ...enemies ];
+
+  ships.forEach( ship => spawn( ship ) );
+
+  function spawn( entity ) {
+    // TODO: Avoid existing entities?
+    entity.x = Math.random() * 2000;
+    entity.y = Math.random() * 2000;
+    entity.angle = Math.random() * Math.PI * 2;
+  }
 
   function update( dt ) {
     player.goalAngle = Math.atan2( 
