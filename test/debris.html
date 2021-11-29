@@ -25,6 +25,8 @@
 <script>
   const svg = document.getElementById( 'svg' );
 
+  setInterval( () => explode( Math.random() * window.innerWidth, Math.random() * window.innerHeight ), 200 );
+
   document.onmousedown = ( e ) => {
     explode( e.pageX, e.pageY );
   }
