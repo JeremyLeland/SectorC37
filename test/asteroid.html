@@ -44,9 +44,16 @@
   function breakIntoPieces( points, numPieces = 3 ) {
     const numPerPiece = points.length / numPieces;
 
-    return Array.from( Array( numPieces ), ( _, ndx ) =>
-      [ ...points.slice( ndx * numPerPiece, ( ndx + 1 ) * numPerPiece + 1 ), [ 0, 0 ] ]
-    );
+    const startIndex = Math.floor( Math.random() * points.length );
+
+    return Array.from( Array( numPieces ), ( _, ndx ) => {
+      const newPoints = [];
+      for ( let i = 0 ; i <= numPerPiece; i ++ ) {
+        newPoints.push( points[ ( startIndex + ndx * numPerPiece + i ) % points.length ] );
+      }
+      newPoints.push( [ 0, 0 ] );
+      return newPoints;
+    } );
   }
 
   function getPathFromPoints( points ) {
