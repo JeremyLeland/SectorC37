@@ -1,5 +1,10 @@
+<link rel="stylesheet" href="../style.css">
 <style>
+  body {
+    background-color: #111;
+  }
   .tri {
+    position: absolute;
     width: 0;
     height: 0;
     border-style: solid;
@@ -11,14 +16,26 @@
 </body>
 
 <script>
-  const tri = createShard();
-  document.body.appendChild( tri );
 
+  setInterval( () => {
+    for ( let i = 0; i < 10; i ++ ) {
+      document.body.appendChild( createShard( mouseX, mouseY ) ) 
+    }
+  }, 20 );
+  
   function createShard( cx, cy ) {
     const shard = createTriangle( rand25() * 10, rand25() * 10, rand25() * 10 );
+
+    const dir = randMid() * Math.PI * 2;
+    const offset = rand25() * 20;
+    const dist = 50 + offset;
     
     const anim = shard.animate( { 
-      transform: [ 'rotate( 0deg )', 'rotate( 360deg )' ] 
+      transform: [
+        `translate( ${ cx + Math.cos( dir ) * offset }px, ${ cy + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg )`, 
+        `translate( ${ cx + Math.cos( dir ) * dist   }px, ${ cy + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg )`,
+      ],
+      opacity: [ '100%', '0%' ],
     }, 1000 );
     anim.onfinish = () => shard.remove();
 
@@ -33,5 +50,20 @@
   }
 
   function rand25()  { return Math.random() + 0.25; }
+  function randMid() { return Math.random() - 0.50; }
+
+
+  let mouseX = 0, mouseY = 0, mouseDown = false;
+  document.onmousemove = onInput;
+  document.ontouchmove = onInput;
+  document.onmousedown  = ( e ) => { mouseDown = true; onInput( e ); }
+  document.ontouchstart = ( e ) => { mouseDown = true; onInput( e ); }
+  document.onmouseup  = ( e ) => mouseDown = false;
+  document.ontouchend = ( e ) => mouseDown = false;
+  function onInput( e ) {
+    const event = e.touches ? e.touches[0] : e;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+  }
 
 </script>
