@@ -1,0 +1,25 @@
+<style>
+  .tri {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-color: transparent transparent transparent green;
+  }
+</style>
+
+<body>
+</body>
+
+<script>
+  const tri = createTriangle( 10, 20, 30 );
+  document.body.appendChild( tri );
+
+  tri.animate( { transform: [ 'rotate( 0deg )', 'rotate( 360deg )' ] }, 1000 );
+
+  function createTriangle( baseLeft, baseRight, height ) {
+    const tri = document.createElement( 'div' );
+    tri.className = 'tri';
+    tri.style.borderWidth = `${ baseLeft}px 0px ${ baseRight }px ${ height }px`;
+    return tri;
+  }
+</script>
