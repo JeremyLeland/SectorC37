@@ -15,6 +15,12 @@ export class World {
   update( dt ) {
     this.#entities.forEach( entity => entity.update( dt ) );
 
+    this.#entities.forEach( entity => {
+      this.#entities.forEach( other => {
+        entity.tryHitWith( other );
+      } );
+    } );
+
     this.#entities = this.#entities.filter( entity => entity.isAlive() );
   }
 }

@@ -26,9 +26,9 @@ export class Entity {
     return this.life > 0;
   }
 
-  checkHitWith( other ) {
+  tryHitWith( other ) {
     if ( this != other && Math.hypot( this.x - other.x, this.y - other.y ) < this.size + other.size ) {
-      this.life -= other.info.damage;
+      this.life -= other.damage;
 
       if ( this.life <= 0 ) {
         this.die();
@@ -53,9 +53,10 @@ export class Entity {
     }
     
     // Move forward
-    // const moveDist = this.speed * dt;
-    // this.x += Math.cos( this.angle ) * moveDist;
-    // this.y += Math.sin( this.angle ) * moveDist;
+    if ( this.speed ) {
+      this.dx = Math.cos( this.angle ) * this.speed;
+      this.dy = Math.sin( this.angle ) * this.speed;
+    }
 
     this.x += this.dx * dt;
     this.y += this.dy * dt;

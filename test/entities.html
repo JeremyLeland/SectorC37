@@ -4,6 +4,7 @@
   body { background-color: black;}
 
   .player {
+    position: absolute;
     width: 0;
     height: 0;
     border-style: solid;
@@ -12,6 +13,7 @@
   }
 
   .enemy {
+    position: absolute;
     width: 0;
     height: 0;
     border-style: solid;
@@ -20,6 +22,7 @@
   }
 
   .rock {
+    position: absolute;
     width: 0;
     height: 0;
     border-style: solid;
@@ -52,12 +55,31 @@
   world.spawn( enemy );
   world.spawn( rock );
 
-  player.dAngle = 0.001;
+  // player.dAngle = 0.001;
   enemy.dAngle = -0.002;
   rock.dAngle = 0.0005;
 
   function update( dt ) {
+
+    player.goalAngle = Math.atan2( 
+      document.body.scrollTop + mouseY - player.y, 
+      document.body.scrollLeft + mouseX - player.x
+    );
+
     world.update( dt );
+  }
+
+  let mouseX = 0, mouseY = 0, mouseDown = false;
+  document.onmousemove = onInput;
+  document.ontouchmove = onInput;
+  document.onmousedown  = ( e ) => { mouseDown = true; onInput( e ); }
+  document.ontouchstart = ( e ) => { mouseDown = true; onInput( e ); }
+  document.onmouseup  = ( e ) => mouseDown = false;
+  document.ontouchend = ( e ) => mouseDown = false;
+  function onInput( e ) {
+    const event = e.touches ? e.touches[0] : e;
+    mouseX = event.clientX;
+    mouseY = event.clientY;
   }
 
   let lastTime = null;

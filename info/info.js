@@ -1,6 +1,6 @@
 export const Info = {
   Player: {
-    speed: 0,//0.2,
+    speed: 0.2,
     turnSpeed: 0.005,
     size: 10,
     life: 100,
