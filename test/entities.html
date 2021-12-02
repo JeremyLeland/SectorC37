@@ -39,21 +39,22 @@
 
 <script type="module">
 
-  import { Entity } from '../src/entity.js';
-  import { Ship } from '../src/ship.js';
+  import { Ship, Rock } from '../src/entity.js';
   import { World } from '../src/world.js';
   import { Info } from '../info/info.js';
 
-  let player = new Ship( Info.Player );
-  player.div.className = 'player';
-
+  
   const world = new World();
+
   for ( let i = 0; i < 5; i ++ ) {
-    world.spawn( createRock() );
+    world.spawn( new Rock( Info.Rock ) );
   }
+
   for ( let i = 0; i < 5; i ++ ) {
-    world.spawn( createEnemy() );
+    world.spawn( new Ship( Info.Enemy ) );
   }
+
+  let player = new Ship( Info.Player );
   world.spawn( player );
 
   function update( dt ) {
@@ -69,18 +70,6 @@
     world.update( dt );
   }
 
-  function createEnemy() {
-    const enemy = new Ship( Info.Enemy );
-    enemy.div.className = 'enemy';
-    return enemy;
-  }
-
-  function createRock() {
-    const rock = new Entity( Info.Rock );
-    rock.div.className = 'rock';
-    // rock.dAngle = 0.0005;
-    return rock;
-  }
 
   let mouseX = 0, mouseY = 0, mouseDown = false;
   document.onmousemove = onInput;

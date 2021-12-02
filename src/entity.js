@@ -19,6 +19,7 @@ export class Entity {
   } ) {
     Object.assign( this, info );
 
+    this.div.className = this.className;
     document.body.appendChild( this.div );
   }
 
@@ -71,6 +72,84 @@ export class Entity {
   }
 }
 
+export const Settings = {
+  GoalWeight: 0.5,
+  AvoidWeight: 100,
+  AvoidPower: 1,
+  DrawForces: false,
+};
+
+export class Ship extends Entity {
+  wanderX = 0;
+  wanderY = 0;
+
+  constructor( shipInfo ) {
+    super( shipInfo );
+  }
+
+  // die() {
+  //   for ( let i = 0; i < 15; i ++ ) {
+  //     flame( this.x, this.y );
+  //   }
+
+  //   for ( let i = 0; i < 40; i ++ ) {
+  //     shard( this.x, this.y, this.shipInfoKey );
+  //   }
+  // }
+
+  #getAvoidVectors( entities ) {
+    return entities.filter( e => e != this ).map( entity => {
+      const cx = this.x - entity.x;
+      const cy = this.y - entity.y;
+      const angle = Math.atan2( cy, cx );
+      const dist = Math.hypot( cx, cy ) - entity.size - this.size;
+      
+      return { 
+        angle: angle,
+        dist: dist,
+      };
+    } );
+    // TODO: Filter out items we can't crash into (e.g. behind us)?
+  }
+
+  think( target, avoid ) {
+    const goalX = target?.x ?? this.wanderX;
+    const goalY = target?.y ?? this.wanderY;
+
+    const avoidVectors = this.#getAvoidVectors( avoid );
+    const weighted = avoidVectors.map( vector => {
+      const weightedDist = Math.abs( Settings.AvoidWeight / Math.pow( vector.dist, Settings.AvoidPower ) );
+      return { 
+        x: Math.cos( vector.angle ) * weightedDist / avoidVectors.length,
+        y: Math.sin( vector.angle ) * weightedDist / avoidVectors.length,
+      };
+    } );
+
+    const goalAngle = Math.atan2( goalY - this.y, goalX - this.x );
+    const goalForce = {
+      x: Settings.GoalWeight * Math.cos( goalAngle ), 
+      y: Settings.GoalWeight * Math.sin( goalAngle ),
+    }
+
+    const finalForce = weighted.reduce(
+      ( acc, wv ) => ( { x: acc.x + wv.x, y: acc.y + wv.y } ),
+      goalForce
+    );
+
+    this.goalAngle = Math.atan2( finalForce.y, finalForce.x );
+  }
+}
+
+export class Rock extends Entity {
+  constructor( info ) {
+    super( info );
+
+    this.dx = randMid() * 0.01;
+    this.dy = randMid() * 0.01;
+    this.dAngle = randMid() * 0.001;
+  }
+}
+
 function fixAngleTo( angle, otherAngle ) {
   if ( otherAngle - angle > Math.PI ) {
     return angle + Math.PI * 2;
@@ -81,3 +160,5 @@ function fixAngleTo( angle, otherAngle ) {
 
   return angle;
 }
+
+function randMid() { return Math.random() - 0.50; }

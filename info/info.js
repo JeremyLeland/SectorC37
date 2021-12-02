@@ -5,6 +5,7 @@ export const Info = {
     size: 10,
     life: 100,
     damage: 100,
+    className: 'player',
   },
   Enemy: {
     speed: 0.15,
@@ -12,6 +13,7 @@ export const Info = {
     size: 10,
     life: 50,
     damage: 50,
+    className: 'enemy',
   },
   Rock: {
     speed: 0, //0.15,
@@ -19,5 +21,6 @@ export const Info = {
     size: 50,
     life: 500,
     damage: 500,
+    className: 'rock',
   },
 }
