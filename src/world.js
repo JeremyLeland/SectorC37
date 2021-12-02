@@ -1,13 +1,17 @@
-const WIDTH = 200, HEIGHT = 200;
+const WIDTH = 400, HEIGHT = 400;
 
 export class World {
   #entities = [];
 
   spawn( entity ) {
-    // TODO: Avoid existing entities?
-    entity.x = Math.random() * WIDTH;
-    entity.y = Math.random() * HEIGHT;
-    entity.angle = Math.random() * Math.PI * 2;
+    do {
+      entity.x = Math.random() * WIDTH;
+      entity.y = Math.random() * HEIGHT;
+      entity.angle = Math.random() * Math.PI * 2;
+    }
+    while( this.#entities.some( other => entity.distanceTo( other ) < 10 ) );
+
+    // TODO: Make sure we don't run forever...bail after 10 tries or something
 
     this.#entities.push( entity );
   }

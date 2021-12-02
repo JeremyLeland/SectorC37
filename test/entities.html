@@ -26,6 +26,7 @@
     width: 0;
     height: 0;
     border-style: solid;
+    border-width: 1;
     border-radius: 50%;
     border-color: brown;
   }
@@ -43,21 +44,16 @@
   import { Info } from '../info/info.js';
 
   let player = new Entity( Info.Player );
-  let enemy = new Entity( Info.Enemy );
-  let rock = new Entity( Info.Rock );
-
   player.div.className = 'player';
-  enemy.div.className = 'enemy';
-  rock.div.className = 'rock';
 
   const world = new World();
-  world.spawn( player );
-  world.spawn( enemy );
-  world.spawn( rock );
-
-  // player.dAngle = 0.001;
-  enemy.dAngle = -0.002;
-  rock.dAngle = 0.0005;
+  for ( let i = 0; i < 10; i ++ ) {
+    world.spawn( createRock() );
+  }
+  for ( let i = 0; i < 10; i ++ ) {
+    world.spawn( createEnemy() );
+  }
+  //world.spawn( player );
 
   function update( dt ) {
 
@@ -67,6 +63,18 @@
     );
 
     world.update( dt );
+  }
+
+  function createEnemy() {
+    const enemy = new Entity( Info.Enemy );
+    enemy.div.className = 'enemy';
+    return enemy;
+  }
+
+  function createRock() {
+    const rock = new Entity( Info.Rock );
+    rock.div.className = 'rock';
+    return rock;
   }
 
   let mouseX = 0, mouseY = 0, mouseDown = false;

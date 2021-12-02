@@ -16,7 +16,7 @@ export const Info = {
   Rock: {
     speed: 0, //0.15,
     turnSpeed: 0,
-    size: 20,
+    size: 50,
     life: 500,
     damage: 500,
   },

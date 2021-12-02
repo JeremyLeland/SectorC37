@@ -26,8 +26,12 @@ export class Entity {
     return this.life > 0;
   }
 
+  distanceTo( other ) {
+    return Math.hypot( this.x - other.x, this.y - other.y ) - this.size - other.size;
+  }
+
   tryHitWith( other ) {
-    if ( this != other && Math.hypot( this.x - other.x, this.y - other.y ) < this.size + other.size ) {
+    if ( this != other && this.distanceTo( other ) < 0 ) {
       this.life -= other.damage;
 
       if ( this.life <= 0 ) {
