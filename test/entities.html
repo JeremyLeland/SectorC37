@@ -40,20 +40,21 @@
 <script type="module">
 
   import { Entity } from '../src/entity.js';
+  import { Ship } from '../src/ship.js';
   import { World } from '../src/world.js';
   import { Info } from '../info/info.js';
 
-  let player = new Entity( Info.Player );
+  let player = new Ship( Info.Player );
   player.div.className = 'player';
 
   const world = new World();
-  for ( let i = 0; i < 10; i ++ ) {
+  for ( let i = 0; i < 5; i ++ ) {
     world.spawn( createRock() );
   }
-  for ( let i = 0; i < 10; i ++ ) {
+  for ( let i = 0; i < 5; i ++ ) {
     world.spawn( createEnemy() );
   }
-  //world.spawn( player );
+  world.spawn( player );
 
   function update( dt ) {
 
@@ -61,12 +62,15 @@
       document.body.scrollTop + mouseY - player.y, 
       document.body.scrollLeft + mouseX - player.x
     );
+    
+    const enemies = world.entities.filter( e => e != player && e instanceof Ship );
+    enemies.forEach( enemy => enemy.think( player, world.entities ) );
 
     world.update( dt );
   }
 
   function createEnemy() {
-    const enemy = new Entity( Info.Enemy );
+    const enemy = new Ship( Info.Enemy );
     enemy.div.className = 'enemy';
     return enemy;
   }
@@ -74,6 +78,7 @@
   function createRock() {
     const rock = new Entity( Info.Rock );
     rock.div.className = 'rock';
+    // rock.dAngle = 0.0005;
     return rock;
   }
 

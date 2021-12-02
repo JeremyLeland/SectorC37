@@ -7,7 +7,7 @@ export const Info = {
     damage: 100,
   },
   Enemy: {
-    speed: 0, //0.15,
+    speed: 0.15,
     turnSpeed: 0.005,
     size: 10,
     life: 50,

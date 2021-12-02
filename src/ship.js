@@ -1,3 +1,5 @@
+import { Entity } from './entity.js';
+
 const SVGNS = 'http://www.w3.org/2000/svg';
 
 export const Settings = {
@@ -7,72 +9,25 @@ export const Settings = {
   DrawForces: false,
 };
 
-const shipInfo = {
-  player: {
-    speed: 0.2,
-    turnSpeed: 0.005,
-    size: 10,
-    life: 100,
-    damage: 100,
-  },
-  enemy: {
-    speed: 0.15,
-    turnSpeed: 0.005,
-    size: 10,
-    life: 50,
-    damage: 50,
-  },
-}
-
-export class Ship {
-  x;
-  y;
-  goalAngle = 0;
-
+export class Ship extends Entity {
   wanderX = 0;
   wanderY = 0;
 
-  speed;
-  turnSpeed;
-  size;
-  life;
-  damage;
-
-  constructor( shipInfoKey ) {
-    this.shipInfoKey = shipInfoKey;
-    
-    const info = shipInfo[ shipInfoKey ];
-    Object.assign( this, info );
-
-    this.svg = document.createElementNS( SVGNS, 'use' );
-    this.svg.setAttribute( 'href', `#${ shipInfoKey }` );
-
-    document.getElementById( 'svg' ).appendChild( this.svg );
+  constructor( shipInfo ) {
+    super( shipInfo );
   }
 
-  checkHitWith( other ) {
-    if ( this != other && Math.hypot( this.x - other.x, this.y - other.y ) < this.size + other.size ) {
-      this.life -= other.damage;
+  // die() {
+  //   for ( let i = 0; i < 15; i ++ ) {
+  //     flame( this.x, this.y );
+  //   }
 
-      if ( this.life <= 0 ) {
-        this.die();
-      }
-    }
-  }
+  //   for ( let i = 0; i < 40; i ++ ) {
+  //     shard( this.x, this.y, this.shipInfoKey );
+  //   }
+  // }
 
-  die() {
-    this.svg.remove();
-
-    for ( let i = 0; i < 15; i ++ ) {
-      flame( this.x, this.y );
-    }
-
-    for ( let i = 0; i < 40; i ++ ) {
-      shard( this.x, this.y, this.shipInfoKey );
-    }
-  }
-
-  getAvoidVectors( entities ) {
+  #getAvoidVectors( entities ) {
     return entities.filter( e => e != this ).map( entity => {
       const cx = this.x - entity.x;
       const cy = this.y - entity.y;
@@ -91,7 +46,7 @@ export class Ship {
     const goalX = target?.x ?? this.wanderX;
     const goalY = target?.y ?? this.wanderY;
 
-    const avoidVectors = this.getAvoidVectors( avoid );
+    const avoidVectors = this.#getAvoidVectors( avoid );
     const weighted = avoidVectors.map( vector => {
       const weightedDist = Math.abs( Settings.AvoidWeight / Math.pow( vector.dist, Settings.AvoidPower ) );
       return { 
@@ -113,37 +68,6 @@ export class Ship {
 
     this.goalAngle = Math.atan2( finalForce.y, finalForce.x );
   }
-
-  update( dt ) {
-    // Turn toward goal angle
-    this.angle = fixAngleTo( this.angle, this.goalAngle );
-    if ( this.goalAngle < this.angle ) {
-      this.angle = Math.max( this.goalAngle, this.angle - this.turnSpeed * dt );
-    }
-    else if ( this.angle < this.goalAngle ) {
-      this.angle = Math.min( this.goalAngle, this.angle + this.turnSpeed * dt );
-    }
-
-    // Move forward
-    const moveDist = this.speed * dt;
-
-    this.x += Math.cos( this.angle ) * moveDist;
-    this.y += Math.sin( this.angle ) * moveDist;
-
-    // Draw
-    this.svg.style.transform = `translate( ${ this.x }px, ${ this.y }px ) rotate( ${ this.angle }rad ) scale( ${ this.size } )`;
-  }
-}
-
-function fixAngleTo( angle, otherAngle ) {
-  if ( otherAngle - angle > Math.PI ) {
-    return angle + Math.PI * 2;
-  }
-  else if ( angle - otherAngle > Math.PI ) {
-    return angle - Math.PI * 2;
-  }
-
-  return angle;
 }
 
 function flame( cx, cy ) {
