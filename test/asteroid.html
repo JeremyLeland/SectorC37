@@ -25,11 +25,12 @@
   pieces.forEach( piece => {
     const path = getPathFromPoints( piece );
     path.setAttribute( 'class', 'rock' );
+    
     path.setAttribute( 'transform', 'translate( 200, 200 ) scale( 50 )' );
     svg.appendChild( path );
   } );
 
-  function getPoints( numPoints = 9 ) {
+  function getPoints( numPoints = 12 ) {
     const spacing = Math.PI * 2 / numPoints;
     const angles = Array.from( Array( numPoints ), ( _, ndx ) => 
       spacing * ( ndx + randMid() * 0.5 ) 
@@ -41,7 +42,7 @@
     );
   }
 
-  function breakIntoPieces( points, numPieces = 3 ) {
+  function breakIntoPieces( points, numPieces = 4 ) {
     const numPerPiece = points.length / numPieces;
 
     const startIndex = Math.floor( Math.random() * points.length );

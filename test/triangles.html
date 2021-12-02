@@ -17,9 +17,14 @@
 
 <script>
 
+  const canvas = document.createElement( 'canvas' );
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild( canvas );
+
   setInterval( () => {
     for ( let i = 0; i < 10; i ++ ) {
-      document.body.appendChild( createShard( mouseX, mouseY ) ) 
+      // document.body.appendChild( createShard( mouseX, mouseY ) ) 
     }
   }, 20 );
   

@@ -1,0 +1,74 @@
+<link rel="stylesheet" href="../style.css">
+
+<style>
+  body { background-color: black;}
+
+  .player {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 1px 0 1px 2px;
+    border-color: transparent transparent transparent green;
+  }
+
+  .enemy {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 1px 0 1px 2px;
+    border-color: transparent transparent transparent blue;
+  }
+
+  .rock {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-radius: 50%;
+    border-color: brown;
+  }
+  
+</style>
+
+<body>
+
+</body>
+
+<script type="module">
+
+  import { Entity } from '../src/entity.js';
+  import { World } from '../src/world.js';
+  import { Info } from '../info/info.js';
+
+  let player = new Entity( Info.Player );
+  let enemy = new Entity( Info.Enemy );
+  let rock = new Entity( Info.Rock );
+
+  player.div.className = 'player';
+  enemy.div.className = 'enemy';
+  rock.div.className = 'rock';
+
+  const world = new World();
+  world.spawn( player );
+  world.spawn( enemy );
+  world.spawn( rock );
+
+  player.dAngle = 0.001;
+  enemy.dAngle = -0.002;
+  rock.dAngle = 0.0005;
+
+  function update( dt ) {
+    world.update( dt );
+  }
+
+  let lastTime = null;
+  function animate( now ) {
+    lastTime ??= now;   // for first call only
+    update( now - lastTime );
+    lastTime = now;
+
+    requestAnimationFrame( animate );
+  }
+  requestAnimationFrame( animate );
+
+</script>
+
