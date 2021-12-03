@@ -33,12 +33,14 @@ export class Entity {
     return Math.hypot( this.x - other.x, this.y - other.y ) - this.size - other.size;
   }
 
-  hitWith( other, world ) {
-    this.life -= other.damage;
-
-    if ( this.life <= 0 ) {
-      this.div.remove();
-      this.die( world );
+  hitWith( other ) {
+    if ( this.isAlive() && other.isAlive() ) {
+      this.life -= other.damage;
+  
+      if ( this.life <= 0 ) {
+        this.div.remove();
+        this.die();
+      }
     }
   }
 
@@ -153,25 +155,23 @@ export class Rock extends Entity {
   }
 
   die() {
-    if ( this.size > 10 ) {   // NOTE: We had hangs when this was 5 instead of 10
-      const newRocks = Array.from( Array( 4 ), _ => new Rock( { 
-        size: this.size / 2, 
-        life: this.size / 2, 
-        damage: this.damage / 2
-      } ) );
-
-      let ndx = 0;
+    if ( this.size > 10 ) {
       [ -1, 1 ].forEach( xOffset => {
         [ -1, 1 ].forEach( yOffset => {
-          newRocks[ ndx ].x = this.x + xOffset * this.size / 2;
-          newRocks[ ndx ].y = this.y + yOffset * this.size / 2;
-          newRocks[ ndx ].dx += xOffset * 0.01;
-          newRocks[ ndx ].dy += yOffset * 0.01;
-          ndx ++;
+          const rock = new Rock( { 
+            size: this.size / 2, 
+            life: this.size / 2, 
+            damage: this.damage / 2
+          } );
+
+          rock.x = this.x + xOffset * this.size / 2;
+          rock.y = this.y + yOffset * this.size / 2;
+          rock.dx += xOffset * 0.01;
+          rock.dy += yOffset * 0.01;
+
+          this.createdEntities.push( rock );
         } );
       } );
-
-      this.createdEntities.push( ...newRocks );
     }
   }
 }

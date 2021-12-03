@@ -28,7 +28,7 @@ export class World {
 
       this.entities.forEach( other => {
         if ( entity != other && entity.distanceTo( other ) < 0 ) {
-          entity.hitWith( other, this );
+          entity.hitWith( other );
         }
       } );
 
