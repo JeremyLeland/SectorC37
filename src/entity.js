@@ -9,6 +9,8 @@ export class Entity {
   dAngle = 0;
 
   div = document.createElement( 'div' );
+
+  createdEntities = [];
   
   constructor( info = { 
     speed: 0,
@@ -40,7 +42,7 @@ export class Entity {
     }
   }
 
-  die( world ) {
+  die() {
     // children should override
   }
 
@@ -143,14 +145,14 @@ export class Rock extends Entity {
   constructor( info ) {
     super( info );
 
-    // this.dx = randMid() * 0.01;
-    // this.dy = randMid() * 0.01;
-    // this.dAngle = randMid() * 0.001;
+    this.dx = randMid() * 0.01;
+    this.dy = randMid() * 0.01;
+    this.dAngle = randMid() * 0.001;
 
     this.div.className = 'rock';
   }
 
-  die( world ) {
+  die() {
     if ( this.size > 5 ) {
       const newRocks = Array.from( Array( 4 ), _ => new Rock( { 
         size: this.size / 2, 
@@ -163,13 +165,13 @@ export class Rock extends Entity {
         [ -1, 1 ].forEach( yOffset => {
           newRocks[ ndx ].x = this.x + xOffset * this.size / 2;
           newRocks[ ndx ].y = this.y + yOffset * this.size / 2;
-          newRocks[ ndx ].dx = xOffset * 0.01;
-          newRocks[ ndx ].dy = yOffset * 0.01;
+          newRocks[ ndx ].dx += xOffset * 0.01;
+          newRocks[ ndx ].dy += yOffset * 0.01;
           ndx ++;
         } );
       } );
 
-      newRocks.forEach( rock => world.add( rock ) );
+      this.createdEntities.push( ...newRocks );
     }
   }
 }
