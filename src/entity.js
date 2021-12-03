@@ -31,18 +31,17 @@ export class Entity {
     return Math.hypot( this.x - other.x, this.y - other.y ) - this.size - other.size;
   }
 
-  tryHitWith( other ) {
-    if ( this != other && this.distanceTo( other ) < 0 ) {
-      this.life -= other.damage;
+  hitWith( other, world ) {
+    this.life -= other.damage;
 
-      if ( this.life <= 0 ) {
-        this.die();
-      }
+    if ( this.life <= 0 ) {
+      this.div.remove();
+      this.die( world );
     }
   }
 
-  die() {
-    this.div.remove();
+  die( world ) {
+    // children should override
   }
 
   update( dt ) {
@@ -144,9 +143,34 @@ export class Rock extends Entity {
   constructor( info ) {
     super( info );
 
-    this.dx = randMid() * 0.01;
-    this.dy = randMid() * 0.01;
-    this.dAngle = randMid() * 0.001;
+    // this.dx = randMid() * 0.01;
+    // this.dy = randMid() * 0.01;
+    // this.dAngle = randMid() * 0.001;
+
+    this.div.className = 'rock';
+  }
+
+  die( world ) {
+    if ( this.size > 5 ) {
+      const newRocks = Array.from( Array( 4 ), _ => new Rock( { 
+        size: this.size / 2, 
+        life: this.size / 2, 
+        damage: this.damage / 2
+      } ) );
+
+      let ndx = 0;
+      [ -1, 1 ].forEach( xOffset => {
+        [ -1, 1 ].forEach( yOffset => {
+          newRocks[ ndx ].x = this.x + xOffset * this.size / 2;
+          newRocks[ ndx ].y = this.y + yOffset * this.size / 2;
+          newRocks[ ndx ].dx = xOffset * 0.01;
+          newRocks[ ndx ].dy = yOffset * 0.01;
+          ndx ++;
+        } );
+      } );
+
+      newRocks.forEach( rock => world.add( rock ) );
+    }
   }
 }
 

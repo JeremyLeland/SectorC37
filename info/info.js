@@ -16,11 +16,8 @@ export const Info = {
     className: 'enemy',
   },
   Rock: {
-    speed: 0, //0.15,
-    turnSpeed: 0,
     size: 50,
-    life: 500,
-    damage: 500,
-    className: 'rock',
+    life: 5,
+    damage: 10,
   },
 }

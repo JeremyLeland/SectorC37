@@ -12,7 +12,10 @@ export class World {
     while( this.entities.some( other => entity.distanceTo( other ) < 10 ) );
 
     // TODO: Make sure we don't run forever...bail after 10 tries or something
+    this.add( entity );
+  }
 
+  add( entity ) {
     this.entities.push( entity );
   }
 
@@ -21,7 +24,9 @@ export class World {
 
     this.entities.forEach( entity => {
       this.entities.forEach( other => {
-        entity.tryHitWith( other );
+        if ( entity != other && other.isAlive() && entity.distanceTo( other ) < 0 ) {
+          entity.hitWith( other, this );
+        }
       } );
     } );
 
