@@ -153,7 +153,7 @@ export class Rock extends Entity {
   }
 
   die() {
-    if ( this.size > 5 ) {
+    if ( this.size > 10 ) {   // NOTE: We had hangs when this was 5 instead of 10
       const newRocks = Array.from( Array( 4 ), _ => new Rock( { 
         size: this.size / 2, 
         life: this.size / 2, 
