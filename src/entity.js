@@ -34,7 +34,7 @@ export class Entity {
   }
 
   hitWith( other ) {
-    if ( this.isAlive() && other.isAlive() ) {
+    if ( this.isAlive() && other.isAlive() ) {  // TODO: Maybe only check if we're alive?
       this.life -= other.damage;
   
       if ( this.life <= 0 ) {
@@ -155,6 +155,7 @@ export class Rock extends Entity {
   }
 
   die() {
+    // Make smaller rocks
     if ( this.size > 10 ) {
       [ -1, 1 ].forEach( xOffset => {
         [ -1, 1 ].forEach( yOffset => {
@@ -173,6 +174,26 @@ export class Rock extends Entity {
         } );
       } );
     }
+
+    // Make particles
+    for ( let i = 0; i < this.size / 4; i ++ ) {
+      const shard = this.div.cloneNode();
+  
+      const dir = randMid() * Math.PI * 2;
+      const offset = rand25() * 20;
+      const dist = 50 + offset;
+      
+      const anim = shard.animate( { 
+        transform: [
+          `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 2 )`, 
+          `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 2 )`,
+        ],
+        opacity: [ '100%', '0%' ],
+      }, 1000 );
+      anim.onfinish = () => shard.remove();
+  
+      document.body.appendChild( shard );
+    }
   }
 }
 
@@ -187,4 +208,5 @@ function fixAngleTo( angle, otherAngle ) {
   return angle;
 }
 
+function rand25()  { return Math.random() + 0.25; }
 function randMid() { return Math.random() - 0.50; }
