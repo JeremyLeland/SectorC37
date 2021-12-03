@@ -3,32 +3,27 @@
 <style>
   body { background-color: black;}
 
-  .player {
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 1px 0 1px 2px;
-    border-color: transparent transparent transparent green;
-  }
-
-  .enemy {
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 1px 0 1px 2px;
-    border-color: transparent transparent transparent blue;
-  }
-
-  .rock {
+  .shape {
     position: absolute;
     width: 0;
     height: 0;
     border-style: solid;
     border-width: 1;
-    border-radius: 50%;
+  }
+
+  .player {
+    border-color: green;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  }
+
+  .enemy {
+    border-color: blue;
+    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
+  }
+
+  .rock {
     border-color: brown;
+    clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
   }
   
 </style>

@@ -21,7 +21,7 @@ export class Entity {
   } ) {
     Object.assign( this, info );
 
-    this.div.className = this.className;
+    this.div.className = `shape ${ this.className }`;
     document.body.appendChild( this.div );
   }
 
@@ -149,7 +149,7 @@ export class Rock extends Entity {
     this.dy = randMid() * 0.01;
     this.dAngle = randMid() * 0.001;
 
-    this.div.className = 'rock';
+    this.div.className = 'shape rock';
   }
 
   die() {
