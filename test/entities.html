@@ -2,7 +2,7 @@
 
 <style>
   body {
-    background-color: white;
+    background-color: #111;
     /* filter: drop-shadow( -1px 0px ) drop-shadow( 0px 1px ) drop-shadow( 0px -1px ) drop-shadow( 1px 0px); */
   }
 
@@ -49,42 +49,12 @@
   
   const world = new World();
 
-  for ( let i = 0; i < 15; i ++ ) {
+  for ( let i = 0; i < 25; i ++ ) {
     world.spawn( new Rock( Info.Rock ) );
   }
 
-  for ( let i = 0; i < 5; i ++ ) {
-    world.spawn( new Ship( Info.Enemy ) );
-  }
-
-  let player = new Ship( Info.Player );
-  world.spawn( player );
-
   function update( dt ) {
-
-    player.goalAngle = Math.atan2( 
-      document.body.scrollTop + mouseY - player.y, 
-      document.body.scrollLeft + mouseX - player.x
-    );
-    
-    const enemies = world.entities.filter( e => e != player && e instanceof Ship );
-    enemies.forEach( enemy => enemy.think( player, world.entities ) );
-
     world.update( dt );
-  }
-
-
-  let mouseX = 0, mouseY = 0, mouseDown = false;
-  document.onmousemove = onInput;
-  document.ontouchmove = onInput;
-  document.onmousedown  = ( e ) => { mouseDown = true; onInput( e ); }
-  document.ontouchstart = ( e ) => { mouseDown = true; onInput( e ); }
-  document.onmouseup  = ( e ) => mouseDown = false;
-  document.ontouchend = ( e ) => mouseDown = false;
-  function onInput( e ) {
-    const event = e.touches ? e.touches[0] : e;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
   }
 
   let lastTime = null;
