@@ -8,7 +8,7 @@ export class Entity {
   dy = 0;
   dAngle = 0;
 
-  div = document.createElement( 'div' );
+  //div = document.createElement( 'div' );
 
   createdEntities = [];
   
@@ -21,8 +21,8 @@ export class Entity {
   } ) {
     Object.assign( this, info );
 
-    this.div.className = `shape ${ this.className }`;
-    document.body.appendChild( this.div );
+    //this.div.className = `shape ${ this.className }`;
+    //document.body.appendChild( this.div );
   }
 
   isAlive() {
@@ -38,7 +38,7 @@ export class Entity {
       this.life -= other.damage;
   
       if ( this.life <= 0 ) {
-        this.div.remove();
+        //this.div.remove();
         this.die();
       }
     }
@@ -71,7 +71,23 @@ export class Entity {
     this.angle += this.dAngle * dt;
 
     // Draw
-    this.div.style.transform = `translate( ${ this.x }px, ${ this.y }px ) rotate( ${ this.angle }rad ) scale( ${ this.size } )`;
+    //this.div.style.transform = `translate( ${ this.x }px, ${ this.y }px ) rotate( ${ this.angle }rad ) scale( ${ this.size } )`;
+  }
+
+  draw( ctx ) {
+    ctx.save();
+
+    ctx.translate( this.x, this.y );
+    ctx.rotate( this.angle );
+    ctx.scale( this.size, this.size );
+
+    ctx.fillStyle = this.bodyFill;
+    ctx.strokeStyle = 'black';
+    ctx.lineWidth = 1 / this.size;
+    ctx.fill( this.bodyPath );
+    ctx.stroke( this.bodyPath );
+
+    ctx.restore();
   }
 }
 
@@ -103,7 +119,7 @@ export class Ship extends Entity {
   die() {
     // Make flame
     for ( let i = 0; i < 10; i ++ ) {
-      const shard = this.div.cloneNode();
+      //const shard = this.div.cloneNode();
       shard.className = 'shape flame';
 
       const dir = randMid() * Math.PI * 2;
@@ -125,7 +141,7 @@ export class Ship extends Entity {
 
     // Make particles
     for ( let i = 0; i < 40; i ++ ) {
-      const shard = this.div.cloneNode();
+      //const shard = this.div.cloneNode();
   
       const dir = randMid() * Math.PI * 2;
       const offset = rand25() * 20;
@@ -195,7 +211,10 @@ export class Rock extends Entity {
     this.dy = randMid() * 0.01;
     this.dAngle = randMid() * 0.001;
 
-    this.div.className = 'shape rock';
+    this.bodyFill = 'brown';
+    this.bodyPath = new Path2D( `M ${ getPoints().join( ' L ' ) } Z` );
+
+    //this.div.className = 'shape rock';
   }
 
   die() {
@@ -220,24 +239,24 @@ export class Rock extends Entity {
     }
 
     // Make particles
-    for ( let i = 0; i < this.size / 4; i ++ ) {
-      const shard = this.div.cloneNode();
+    // for ( let i = 0; i < this.size / 4; i ++ ) {
+    //   //const shard = this.div.cloneNode();
   
-      const dir = randMid() * Math.PI * 2;
-      const offset = rand25() * 20;
-      const dist = rand25() * 50 + offset;
+    //   const dir = randMid() * Math.PI * 2;
+    //   const offset = rand25() * 20;
+    //   const dist = rand25() * 50 + offset;
       
-      const anim = shard.animate( { 
-        transform: [
-          `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 2 )`, 
-          `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 2 )`,
-        ],
-        opacity: [ '100%', '0%' ],
-      }, 1000 );
-      anim.onfinish = () => shard.remove();
+    //   const anim = shard.animate( { 
+    //     transform: [
+    //       `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 2 )`, 
+    //       `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 2 )`,
+    //     ],
+    //     opacity: [ '100%', '0%' ],
+    //   }, 1000 );
+    //   anim.onfinish = () => shard.remove();
   
-      document.body.appendChild( shard );
-    }
+    //   document.body.appendChild( shard );
+    // }
   }
 }
 
@@ -250,6 +269,18 @@ function fixAngleTo( angle, otherAngle ) {
   }
 
   return angle;
+}
+
+function getPoints( numPoints = 12 ) {
+  const spacing = Math.PI * 2 / numPoints;
+  const angles = Array.from( Array( numPoints ), ( _, ndx ) => 
+    spacing * ( ndx + randMid() * 0.5 ) 
+  );
+  return angles.map( angle => 
+    [ Math.cos( angle ), Math.sin( angle ) ].map( e => 
+      e + randMid() * 0.2 
+    )
+  );
 }
 
 function rand25()  { return Math.random() + 0.25; }
