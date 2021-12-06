@@ -20,9 +20,10 @@ export class World {
   update( dt ) {
     const createdEntities = [], createdParticles = [];
 
+    this.entities.forEach( entity => entity.update( dt ) );
+    
+    // TODO: Not everything checks against everything else...do these by category?
     this.entities.forEach( entity => {
-      entity.update( dt );
-
       this.entities.forEach( other => {
         if ( entity != other && entity.distanceTo( other ) < 0 ) {
           entity.hitWith( other );

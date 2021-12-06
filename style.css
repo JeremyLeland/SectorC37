@@ -4,4 +4,6 @@ body {
   user-select: none;  /* Prevent accidental selection while dragging mouse */
   overflow: hidden;
   cursor: crosshair;
+
+  background-color: #111;
 }

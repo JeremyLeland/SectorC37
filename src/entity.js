@@ -32,22 +32,48 @@ export class Entity {
   }
 
   hitWith( other ) {
-    if ( this.isAlive() && other.isAlive() ) {  // TODO: Maybe only check if we're alive?
+    if ( this.isAlive() ) {
       this.life -= other.damage;
+
+      this.bleed();
   
       if ( this.life <= 0 ) {
-        //this.div.remove();
         this.die();
       }
     }
+  }
+
+  bleed() {
+    // children should override
   }
 
   die() {
     // children should override
   }
 
+  createDebris() {
+    const dir = randMid() * Math.PI * 2;
+    const cos = Math.cos( dir );
+    const sin = Math.sin( dir );
+
+    const shard = new Entity( { 
+      x: this.x + cos * this.size / 2,
+      y: this.y + sin * this.size / 2,
+      dx: this.dx + cos * rand25() * 0.1,
+      dy: this.dy + sin * rand25() * 0.1,
+      dAngle: randMid() * 0.01,
+      size: 3,
+      life: 1,
+      decay: 1 / 1000,
+      bodyFill: this.bodyFill, 
+      bodyPath: this.bodyPath
+    } );
+
+    this.createdParticles.push( shard );
+  }
+
   update( dt ) {
-    this.life -= this.decay * dt;
+    this.life -= this.decay * dt;   // TODO: Track life and decay separately?
 
     // Turn toward goal angle
     if ( this.goalAngle ) {
@@ -114,15 +140,11 @@ export class Ship extends Entity {
     super( shipInfo );
   }
 
-  // die() {
-  //   for ( let i = 0; i < 15; i ++ ) {
-  //     flame( this.x, this.y );
-  //   }
-
-  //   for ( let i = 0; i < 40; i ++ ) {
-  //     shard( this.x, this.y, this.shipInfoKey );
-  //   }
-  // }
+  bleed() {
+    for ( let i = 0; i < 3; i ++ ) {
+      this.createDebris();
+    }
+  }
 
   die() {
     // // Make flame
@@ -149,25 +171,7 @@ export class Ship extends Entity {
 
     // Make particles
     for ( let i = 0; i < 30; i ++ ) {
-
-      const dir = randMid() * Math.PI * 2;
-      const cos = Math.cos( dir );
-      const sin = Math.sin( dir );
-
-      const shard = new Entity( { 
-        x: this.x + cos * this.size / 2,
-        y: this.y + sin * this.size / 2,
-        dx: this.dx + cos * rand25() * 0.1,
-        dy: this.dy + sin * rand25() * 0.1,
-        dAngle: randMid() * 0.01,
-        size: 3,
-        life: 1,
-        decay: 1 / 1000,
-        bodyFill: this.bodyFill, 
-        bodyPath: this.bodyPath
-      } );
-
-      this.createdParticles.push( shard );
+      this.createDebris();
     }
   }
 
@@ -245,6 +249,12 @@ export class Rock extends Entity {
     //this.div.className = 'shape rock';
   }
 
+  bleed() {
+    for ( let i = 0; i < 3; i ++ ) {
+      this.createDebris();
+    }
+  }
+
   die() {
     // Make smaller rocks
     if ( this.size > 20 ) {
@@ -268,24 +278,9 @@ export class Rock extends Entity {
     }
 
     // Make particles
-    // for ( let i = 0; i < this.size / 4; i ++ ) {
-    //   //const shard = this.div.cloneNode();
-  
-    //   const dir = randMid() * Math.PI * 2;
-    //   const offset = rand25() * 20;
-    //   const dist = rand25() * 50 + offset;
-      
-    //   const anim = shard.animate( { 
-    //     transform: [
-    //       `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 2 )`, 
-    //       `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 2 )`,
-    //     ],
-    //     opacity: [ '100%', '0%' ],
-    //   }, 1000 );
-    //   anim.onfinish = () => shard.remove();
-  
-    //   document.body.appendChild( shard );
-    // }
+    for ( let i = 0; i < this.size / 4; i ++ ) {
+      this.createDebris();
+    }
   }
 }
 

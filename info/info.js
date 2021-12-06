@@ -19,7 +19,7 @@ export const Info = {
   },
   Rock: {
     size: 50,
-    life: 5,
+    life: 150,
     damage: 10,
     bodyFill: 'brown',
   },
