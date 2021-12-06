@@ -5,7 +5,7 @@ export const Info = {
     size: 10,
     life: 100,
     damage: 100,
-    className: 'player',
+    color: 'green',
   },
   Enemy: {
     speed: 0.15,
@@ -13,7 +13,7 @@ export const Info = {
     size: 10,
     life: 50,
     damage: 50,
-    className: 'enemy',
+    color: 'blue',
   },
   Rock: {
     size: 50,

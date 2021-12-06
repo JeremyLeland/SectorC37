@@ -81,11 +81,11 @@ export class Entity {
     ctx.rotate( this.angle );
     ctx.scale( this.size, this.size );
 
-    ctx.fillStyle = this.bodyFill;
-    ctx.strokeStyle = 'black';
-    ctx.lineWidth = 1 / this.size;
+     ctx.fillStyle = this.bodyFill;
+    // ctx.strokeStyle = 'black';
+    // ctx.lineWidth = 1 / this.size;
     ctx.fill( this.bodyPath );
-    ctx.stroke( this.bodyPath );
+    // ctx.stroke( this.bodyPath );
 
     ctx.restore();
   }
@@ -104,6 +104,9 @@ export class Ship extends Entity {
 
   constructor( shipInfo ) {
     super( shipInfo );
+
+    this.bodyFill = shipInfo.color;
+    this.bodyPath = new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' );
   }
 
   // die() {
@@ -117,47 +120,47 @@ export class Ship extends Entity {
   // }
 
   die() {
-    // Make flame
-    for ( let i = 0; i < 10; i ++ ) {
-      //const shard = this.div.cloneNode();
-      shard.className = 'shape flame';
+    // // Make flame
+    // for ( let i = 0; i < 10; i ++ ) {
+    //   //const shard = this.div.cloneNode();
+    //   shard.className = 'shape flame';
 
-      const dir = randMid() * Math.PI * 2;
-      const offset = rand25() * 5;
-      const dist = rand25() * 20 + offset;
+    //   const dir = randMid() * Math.PI * 2;
+    //   const offset = rand25() * 5;
+    //   const dist = rand25() * 20 + offset;
       
-      const anim = shard.animate( { 
-        transform: [
-          `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 0 )`, 
-          `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 20 )`,
-        ],
-        opacity: [ '100%', '0%' ],
-        borderColor: [ 'white', 'orange', 'gray' ],
-      }, 1000 );
-      anim.onfinish = () => shard.remove();
+    //   const anim = shard.animate( { 
+    //     transform: [
+    //       `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 0 )`, 
+    //       `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 20 )`,
+    //     ],
+    //     opacity: [ '100%', '0%' ],
+    //     borderColor: [ 'white', 'orange', 'gray' ],
+    //   }, 1000 );
+    //   anim.onfinish = () => shard.remove();
 
-      document.body.appendChild( shard );
-    }
+    //   document.body.appendChild( shard );
+    // }
 
-    // Make particles
-    for ( let i = 0; i < 40; i ++ ) {
-      //const shard = this.div.cloneNode();
+    // // Make particles
+    // for ( let i = 0; i < 40; i ++ ) {
+    //   //const shard = this.div.cloneNode();
   
-      const dir = randMid() * Math.PI * 2;
-      const offset = rand25() * 20;
-      const dist = rand25() * 50 + offset;
+    //   const dir = randMid() * Math.PI * 2;
+    //   const offset = rand25() * 20;
+    //   const dist = rand25() * 50 + offset;
       
-      const anim = shard.animate( { 
-        transform: [
-          `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 2 )`, 
-          `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 2 )`,
-        ],
-        opacity: [ '100%', '0%' ],
-      }, 1000 );
-      anim.onfinish = () => shard.remove();
+    //   const anim = shard.animate( { 
+    //     transform: [
+    //       `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 2 )`, 
+    //       `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 2 )`,
+    //     ],
+    //     opacity: [ '100%', '0%' ],
+    //   }, 1000 );
+    //   anim.onfinish = () => shard.remove();
   
-      document.body.appendChild( shard );
-    }
+    //   document.body.appendChild( shard );
+    // }
   }
 
   #getAvoidVectors( entities ) {

@@ -1,3 +1,5 @@
+import { Ship, Rock } from "./entity.js";
+
 const WIDTH = 800, HEIGHT = 600;
 const SPAWN_DIST = 20;
 
