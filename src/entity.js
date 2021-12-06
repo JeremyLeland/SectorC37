@@ -8,6 +8,7 @@ export class Entity {
   dx = 0;
   dy = 0;
   dAngle = 0;
+  dSize = 0;
 
   speed = 0;
   turnSpeed = 0;
@@ -108,9 +109,7 @@ export class Entity {
     this.x += this.dx * dt;
     this.y += this.dy * dt;
     this.angle += this.dAngle * dt;
-
-    // Draw
-    //this.div.style.transform = `translate( ${ this.x }px, ${ this.y }px ) rotate( ${ this.angle }rad ) scale( ${ this.size } )`;
+    this.size += this.dSize * dt;
   }
 
   draw( ctx ) {
@@ -289,8 +288,14 @@ export class Flame extends Entity {
   draw( ctx ) {
     ctx.save();
 
-    ctx.filter = 'blur( 7px )';
-    ctx.globalCompsiteOperation = 'lighter';
+    ctx.filter = 'blur( 5px )';
+    ctx.globalCompsiteOperation = 'screen';  // or 'screen'?
+
+    // Inspired by http://codepen.io/davepvm/pen/Hhstl
+    const r = 140 + 120 * this.life;
+    const g = 170 - 120 * this.life;
+    const b = 120 - 120 * this.life;
+    this.bodyFill = `rgb( ${ r }, ${ g }, ${ b } )`;
     
     super.draw( ctx );
 

@@ -33,7 +33,8 @@ export const Info = {
     bodyPath: new Path2D( `M 1,0 L 0,1 L -5,0 L 0,-1 Z` ),
   },
   Flame: {
-    size: 10,
+    size: 0,
+    dSize: 20 / 1000,
     life: 1,
     decay: 1 / 1000,
     damage: 10,
