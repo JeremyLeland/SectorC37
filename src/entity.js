@@ -1,3 +1,4 @@
+import { Info } from '../info/info.js';
 
 export class Entity {
   x = 0;
@@ -8,21 +9,17 @@ export class Entity {
   dy = 0;
   dAngle = 0;
 
-  //div = document.createElement( 'div' );
+  speed = 0;
+  turnSpeed = 0;
+  size = 0;
+  life = 0;
+  decay = 0;
+  damage = 0;
 
   createdEntities = [];
   
-  constructor( info = { 
-    speed: 0,
-    turnSpeed: 0,
-    size: 0,
-    life: 0,
-    damage: 0 
-  } ) {
+  constructor( info ) {
     Object.assign( this, info );
-
-    //this.div.className = `shape ${ this.className }`;
-    //document.body.appendChild( this.div );
   }
 
   isAlive() {
@@ -49,6 +46,8 @@ export class Entity {
   }
 
   update( dt ) {
+    this.life -= this.decay * dt;
+
     // Turn toward goal angle
     if ( this.goalAngle ) {
       this.angle = fixAngleTo( this.angle, this.goalAngle );
@@ -98,7 +97,11 @@ export const Settings = {
   DrawForces: false,
 };
 
+const TIME_BETWEEN_SHOTS = 200;
+
 export class Ship extends Entity {
+  shootDelay = 0;
+
   wanderX = 0;
   wanderY = 0;
 
@@ -202,7 +205,25 @@ export class Ship extends Entity {
       goalForce
     );
 
-    this.goalAngle = Math.atan2( finalForce.y, finalForce.x );
+    this.goalAngle = Math.atan2( finalForce.y, finalForce.x );    
+  }
+
+  update( dt ) {
+    super.update( dt );
+
+    this.shootDelay -= dt;
+    if ( this.shootDelay < 0 ) {
+      const bullet = new Bullet( Info.Bullet );
+      const cos = Math.cos( this.angle );
+      const sin = Math.sin( this.angle );
+      bullet.angle = this.angle;
+      bullet.x = this.x + cos * this.size * 2;
+      bullet.y = this.y + sin * this.size * 2;
+  
+      this.createdEntities.push( bullet );
+
+      this.shootDelay = TIME_BETWEEN_SHOTS;
+    }
   }
 }
 
@@ -222,7 +243,7 @@ export class Rock extends Entity {
 
   die() {
     // Make smaller rocks
-    if ( this.size > 10 ) {
+    if ( this.size > 20 ) {
       [ -1, 1 ].forEach( xOffset => {
         [ -1, 1 ].forEach( yOffset => {
           const rock = new Rock( { 
@@ -233,8 +254,9 @@ export class Rock extends Entity {
 
           rock.x = this.x + xOffset * this.size / 2;
           rock.y = this.y + yOffset * this.size / 2;
-          rock.dx += xOffset * 0.01;
-          rock.dy += yOffset * 0.01;
+          rock.dx += this.dx + xOffset * 0.01;
+          rock.dy += this.dy + yOffset * 0.01;
+          rock.dAngle += this.dAngle;
 
           this.createdEntities.push( rock );
         } );
@@ -260,6 +282,15 @@ export class Rock extends Entity {
   
     //   document.body.appendChild( shard );
     // }
+  }
+}
+
+export class Bullet extends Entity {
+  constructor( info ) {
+    super( info );
+
+    this.bodyFill = 'yellow';
+    this.bodyPath = new Path2D( `M 1,0 L 0,1 L -5,0 L 0,-1 Z` );
   }
 }
 

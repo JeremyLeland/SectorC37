@@ -1,4 +1,4 @@
-const WIDTH = 800, HEIGHT = 600;
+const WIDTH = 2000, HEIGHT = 2000;
 const SPAWN_DIST = 20;
 
 export class World {
