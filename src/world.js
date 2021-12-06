@@ -1,14 +1,5 @@
-import { Ship, Rock } from "./entity.js";
-
 const WIDTH = 800, HEIGHT = 600;
 const SPAWN_DIST = 20;
-
-const canvas = document.createElement( 'canvas' );
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-document.body.appendChild( canvas );
-
-const ctx = canvas.getContext( '2d' );
 
 export class World {
   entities = [];
@@ -32,8 +23,6 @@ export class World {
   update( dt ) {
     const createdEntities = [];
 
-    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
-
     this.entities.forEach( entity => {
       entity.update( dt );
 
@@ -44,12 +33,14 @@ export class World {
       } );
 
       createdEntities.push( ...entity.createdEntities.splice( 0 ) );
-
-      entity.draw( ctx );
     } );
 
     this.entities.push( ...createdEntities );
 
     this.entities = this.entities.filter( entity => entity.isAlive() );
+  }
+
+  draw( ctx ) {
+    this.entities.forEach( entity => entity.draw( ctx ) );
   }
 }

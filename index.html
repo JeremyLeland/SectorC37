@@ -46,6 +46,13 @@
   import { World } from '../src/world.js';
   import { Info } from '../info/info.js';
 
+  const canvas = document.createElement( 'canvas' );
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild( canvas );
+
+  const ctx = canvas.getContext( '2d' );
+
   
   const world = new World();
 
@@ -60,17 +67,34 @@
   let player = new Ship( Info.Player );
   world.spawn( player );
 
+  let scrollX = 0, scrollY = 0;
+
   function update( dt ) {
 
+    scrollX = ctx.canvas.width / 2 - player.x;
+    scrollY = ctx.canvas.height / 2 - player.y;
+
     player.goalAngle = Math.atan2( 
-      document.body.scrollTop + mouseY - player.y, 
-      document.body.scrollLeft + mouseX - player.x
+      mouseY - scrollY - player.y, 
+      mouseX - scrollX - player.x
     );
     
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
     enemies.forEach( enemy => enemy.think( player, world.entities ) );
 
     world.update( dt );
+  }
+
+  function draw( ctx ) {
+    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
+
+    ctx.save();
+
+    ctx.translate( scrollX, scrollY );
+
+    world.draw( ctx );
+
+    ctx.restore();
   }
 
 
@@ -82,7 +106,7 @@
   document.onmouseup  = ( e ) => mouseDown = false;
   document.ontouchend = ( e ) => mouseDown = false;
   function onInput( e ) {
-    const event = e.touches ? e.touches[0] : e;
+    const event = e.touches ? e.touches[ 0 ] : e;
     mouseX = event.clientX;
     mouseY = event.clientY;
   }
@@ -92,6 +116,8 @@
     lastTime ??= now;   // for first call only
     update( now - lastTime );
     lastTime = now;
+
+    draw( ctx );
 
     requestAnimationFrame( animate );
   }
