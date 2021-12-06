@@ -17,6 +17,7 @@ export class Entity {
   damage = 0;
 
   createdEntities = [];
+  createdParticles = [];
   
   constructor( info ) {
     Object.assign( this, info );
@@ -80,7 +81,11 @@ export class Entity {
     ctx.rotate( this.angle );
     ctx.scale( this.size, this.size );
 
-     ctx.fillStyle = this.bodyFill;
+    if ( this.decay > 0 ) {
+      ctx.globalAlpha = this.life;
+    }
+
+    ctx.fillStyle = this.bodyFill;
     // ctx.strokeStyle = 'black';
     // ctx.lineWidth = 1 / this.size;
     ctx.fill( this.bodyPath );
@@ -142,25 +147,28 @@ export class Ship extends Entity {
     //   document.body.appendChild( shard );
     // }
 
-    // // Make particles
-    // for ( let i = 0; i < 40; i ++ ) {
-    //   //const shard = this.div.cloneNode();
-  
-    //   const dir = randMid() * Math.PI * 2;
-    //   const offset = rand25() * 20;
-    //   const dist = rand25() * 50 + offset;
-      
-    //   const anim = shard.animate( { 
-    //     transform: [
-    //       `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 2 )`, 
-    //       `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 2 )`,
-    //     ],
-    //     opacity: [ '100%', '0%' ],
-    //   }, 1000 );
-    //   anim.onfinish = () => shard.remove();
-  
-    //   document.body.appendChild( shard );
-    // }
+    // Make particles
+    for ( let i = 0; i < 30; i ++ ) {
+
+      const dir = randMid() * Math.PI * 2;
+      const cos = Math.cos( dir );
+      const sin = Math.sin( dir );
+
+      const shard = new Entity( { 
+        x: this.x + cos * this.size / 2,
+        y: this.y + sin * this.size / 2,
+        dx: this.dx + cos * rand25() * 0.1,
+        dy: this.dy + sin * rand25() * 0.1,
+        dAngle: randMid() * 0.01,
+        size: 3,
+        life: 1,
+        decay: 1 / 1000,
+        bodyFill: this.bodyFill, 
+        bodyPath: this.bodyPath
+      } );
+
+      this.createdParticles.push( shard );
+    }
   }
 
   #getAvoidVectors( entities ) {
