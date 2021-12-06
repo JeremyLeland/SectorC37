@@ -5,7 +5,8 @@ export const Info = {
     size: 10,
     life: 100,
     damage: 100,
-    color: 'green',
+    bodyFill: 'green',
+    bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
   },
   Enemy: {
     speed: 0.15,
@@ -13,12 +14,14 @@ export const Info = {
     size: 10,
     life: 50,
     damage: 50,
-    color: 'blue',
+    bodyFill: 'blue',
+    bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
   },
   Rock: {
     size: 50,
     life: 5,
     damage: 10,
+    bodyFill: 'brown',
   },
   Bullet: {
     speed: 0.6,
@@ -26,5 +29,7 @@ export const Info = {
     life: 1,
     decay: 1 / 5000,
     damage: 10,
+    bodyFill: 'yellow',
+    bodyPath: new Path2D( `M 1,0 L 0,1 L -5,0 L 0,-1 Z` ),
   }
 }

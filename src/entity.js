@@ -107,9 +107,6 @@ export class Ship extends Entity {
 
   constructor( shipInfo ) {
     super( shipInfo );
-
-    this.bodyFill = shipInfo.color;
-    this.bodyPath = new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' );
   }
 
   // die() {
@@ -235,7 +232,6 @@ export class Rock extends Entity {
     this.dy = randMid() * 0.01;
     this.dAngle = randMid() * 0.001;
 
-    this.bodyFill = 'brown';
     this.bodyPath = new Path2D( `M ${ getPoints().join( ' L ' ) } Z` );
 
     //this.div.className = 'shape rock';
@@ -246,11 +242,11 @@ export class Rock extends Entity {
     if ( this.size > 20 ) {
       [ -1, 1 ].forEach( xOffset => {
         [ -1, 1 ].forEach( yOffset => {
-          const rock = new Rock( { 
-            size: this.size / 2, 
-            life: this.size / 2, 
-            damage: this.damage / 2
-          } );
+          const rock = new Rock( Info.Rock );
+          
+          rock.size = this.size / 2;
+          rock.life = this.size / 2;
+          rock.damage = this.damage / 2;
 
           rock.x = this.x + xOffset * this.size / 2;
           rock.y = this.y + yOffset * this.size / 2;
@@ -288,9 +284,6 @@ export class Rock extends Entity {
 export class Bullet extends Entity {
   constructor( info ) {
     super( info );
-
-    this.bodyFill = 'yellow';
-    this.bodyPath = new Path2D( `M 1,0 L 0,1 L -5,0 L 0,-1 Z` );
   }
 }
 
