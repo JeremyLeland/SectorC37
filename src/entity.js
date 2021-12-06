@@ -51,23 +51,36 @@ export class Entity {
     // children should override
   }
 
-  createDebris() {
+  getDebrisCoords( moveSpeed = 0.1, turnSpeed = 0.01) {
     const dir = randMid() * Math.PI * 2;
     const cos = Math.cos( dir );
     const sin = Math.sin( dir );
 
-    const shard = new Entity( { 
+    return { 
       x: this.x + cos * this.size / 2,
       y: this.y + sin * this.size / 2,
-      dx: this.dx + cos * rand25() * 0.1,
-      dy: this.dy + sin * rand25() * 0.1,
-      dAngle: randMid() * 0.01,
-      size: 3,
-      life: 1,
-      decay: 1 / 1000,
-      bodyFill: this.bodyFill, 
-      bodyPath: this.bodyPath
-    } );
+      dx: this.dx + cos * rand25() * moveSpeed,
+      dy: this.dy + sin * rand25() * moveSpeed,
+      dAngle: randMid() * turnSpeed,
+    };
+  }
+
+  createFire() {
+    const flame = new Flame( Object.assign( this.getDebrisCoords( 0.01, 0.01 ), Info.Flame ) );
+    this.createdParticles.push( flame );
+  }
+
+  createDebris() {
+    const shard = new Entity( Object.assign( 
+      this.getDebrisCoords(), 
+      {
+        size: 3,
+        life: 1,
+        decay: 1 / 1000,
+        bodyFill: this.bodyFill, 
+        bodyPath: this.bodyPath
+      }
+    ) );
 
     this.createdParticles.push( shard );
   }
@@ -147,29 +160,9 @@ export class Ship extends Entity {
   }
 
   die() {
-    // // Make flame
-    // for ( let i = 0; i < 10; i ++ ) {
-    //   //const shard = this.div.cloneNode();
-    //   shard.className = 'shape flame';
-
-    //   const dir = randMid() * Math.PI * 2;
-    //   const offset = rand25() * 5;
-    //   const dist = rand25() * 20 + offset;
-      
-    //   const anim = shard.animate( { 
-    //     transform: [
-    //       `translate( ${ this.x + Math.cos( dir ) * offset }px, ${ this.y + Math.sin( dir ) * offset }px ) rotate( ${ randMid() * 360 }deg ) scale( 0 )`, 
-    //       `translate( ${ this.x + Math.cos( dir ) * dist   }px, ${ this.y + Math.sin( dir ) * dist   }px ) rotate( ${ randMid() * 720 }deg ) scale( 20 )`,
-    //     ],
-    //     opacity: [ '100%', '0%' ],
-    //     borderColor: [ 'white', 'orange', 'gray' ],
-    //   }, 1000 );
-    //   anim.onfinish = () => shard.remove();
-
-    //   document.body.appendChild( shard );
-    // }
-
-    // Make particles
+    for ( let i = 0; i < 10; i ++ ) {
+      this.createFire();
+    }
     for ( let i = 0; i < 30; i ++ ) {
       this.createDebris();
     }
@@ -287,6 +280,21 @@ export class Rock extends Entity {
 export class Bullet extends Entity {
   constructor( info ) {
     super( info );
+  }
+
+  // TODO: die() with sparks
+}
+
+export class Flame extends Entity {
+  draw( ctx ) {
+    ctx.save();
+
+    ctx.filter = 'blur( 7px )';
+    ctx.globalCompsiteOperation = 'lighter';
+    
+    super.draw( ctx );
+
+    ctx.restore();
   }
 }
 
