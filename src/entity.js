@@ -143,6 +143,7 @@ const TIME_BETWEEN_SHOTS = 200;
 
 export class Ship extends Entity {
   shootDelay = 0;
+  isShooting = false;
 
   wanderX = 0;
   wanderY = 0;
@@ -206,13 +207,21 @@ export class Ship extends Entity {
     );
 
     this.goalAngle = Math.atan2( finalForce.y, finalForce.x );    
+
+    if ( target ) {
+      const angleToTarget = Math.atan2( target.y - this.y, target.x - this.x );
+      this.isShooting = Math.abs( angleToTarget - this.angle ) < 0.5 && this.distanceTo( target ) < 150;
+    }
+    else {
+      this.isShooting = false;
+    }
   }
 
   update( dt ) {
     super.update( dt );
 
     this.shootDelay -= dt;
-    if ( this.shootDelay < 0 ) {
+    if ( this.shootDelay < 0 && this.isShooting ) {
       const bullet = new Bullet( Info.Bullet );
       const cos = Math.cos( this.angle );
       const sin = Math.sin( this.angle );

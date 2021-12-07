@@ -43,7 +43,7 @@
     );
     
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
-    enemies.forEach( enemy => enemy.think( player, world.entities ) );
+    enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world.entities ) );
 
     world.update( dt );
   }
