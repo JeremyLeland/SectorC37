@@ -52,37 +52,36 @@ export class Entity {
     // children should override
   }
 
-  getDebrisCoords( moveSpeed = 0.1, turnSpeed = 0.01) {
+  spawnFromCenter( entity, moveSpeed = 0.1, turnSpeed = 0.01 ) {
     const dir = randMid() * Math.PI * 2;
     const cos = Math.cos( dir );
     const sin = Math.sin( dir );
-
-    return { 
+ 
+    Object.assign( entity, { 
       x: this.x + cos * this.size / 2,
       y: this.y + sin * this.size / 2,
-      dx: this.dx + cos * rand25() * moveSpeed,
-      dy: this.dy + sin * rand25() * moveSpeed,
-      dAngle: randMid() * turnSpeed,
-    };
+      dx: cos * rand25() * moveSpeed,
+      dy: sin * rand25() * moveSpeed,
+      dAngle: randMid() * turnSpeed
+    } );
   }
 
   createFire() {
-    const flame = new Flame( Object.assign( this.getDebrisCoords( 0.01, 0.01 ), Info.Flame ) );
+    const flame = new Flame( Info.Flame );
+    this.spawnFromCenter( flame, 0.01, 0.01 );
     this.createdParticles.push( flame );
   }
 
   createDebris() {
-    const shard = new Entity( Object.assign( 
-      this.getDebrisCoords(), 
-      {
-        size: 3,
-        life: 1,
-        decay: 1 / 1000,
-        bodyFill: this.bodyFill, 
-        bodyPath: this.bodyPath
-      }
-    ) );
+    const shard = new Entity( { 
+      size: 3,
+      life: 1,
+      decay: 1 / 1000,
+      bodyFill: this.bodyFill, 
+      bodyPath: this.bodyPath
+    } );
 
+    this.spawnFromCenter( shard );
     this.createdParticles.push( shard );
   }
 
@@ -289,7 +288,7 @@ export class Flame extends Entity {
     ctx.save();
 
     ctx.filter = 'blur( 5px )';
-    ctx.globalCompsiteOperation = 'screen';  // or 'screen'?
+    ctx.globalCompsiteOperation = 'screen';
 
     // Inspired by http://codepen.io/davepvm/pen/Hhstl
     const r = 140 + 120 * this.life;
