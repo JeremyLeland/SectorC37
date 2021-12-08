@@ -17,7 +17,7 @@
   const ctx = canvas.getContext( '2d' );
 
   
-  const world = new World();
+  const world = new World( 2000, 2000 );
 
   for ( let i = 0; i < 15; i ++ ) {
     world.spawn( new Rock( Info.Rock ) );

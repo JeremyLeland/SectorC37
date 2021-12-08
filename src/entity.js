@@ -309,7 +309,7 @@ export class Flame extends Entity {
   draw( ctx ) {
     ctx.save();
 
-    ctx.filter = 'blur( 5px )';
+    ctx.filter = 'blur( 8px )'; // NOTE: 8px is faster than other values?!?
     ctx.globalCompsiteOperation = 'screen';
 
     // Inspired by http://codepen.io/davepvm/pen/Hhstl

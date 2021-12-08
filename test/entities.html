@@ -46,15 +46,28 @@
   import { World } from '../src/world.js';
   import { Info } from '../info/info.js';
 
+  const canvas = document.createElement( 'canvas' );
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  document.body.appendChild( canvas );
+
+  const ctx = canvas.getContext( '2d' );
   
   const world = new World();
 
-  for ( let i = 0; i < 25; i ++ ) {
-    world.spawn( new Rock( Info.Rock ) );
-  }
+  setInterval( () => {
+    const ship = new Ship( Info.Enemy );
+    world.spawn( ship );
+    ship.hitWith( ship );
+  }, 1000 );
 
   function update( dt ) {
     world.update( dt );
+    world.draw( ctx );
+  }
+
+  function draw( ctx ) {
+    world.draw( ctx );
   }
 
   let lastTime = null;
@@ -62,6 +75,9 @@
     lastTime ??= now;   // for first call only
     update( now - lastTime );
     lastTime = now;
+
+    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
+    draw( ctx );
 
     requestAnimationFrame( animate );
   }

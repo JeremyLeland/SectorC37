@@ -1,9 +1,13 @@
-const WIDTH = 2000, HEIGHT = 2000;
 const SPAWN_DIST = 20;
 
 export class World {
   entities = [];
   particles = [];
+
+  constructor( width = 500, height = 400 ) {
+    this.width = width;
+    this.height = height;
+  }
 
   spawn( entity ) {
     [ entity.x, entity.y ] = this.getEmptyLocation( entity.size );
@@ -15,8 +19,8 @@ export class World {
   getEmptyLocation( size ) {
     let x, y, tries = 0;
     do {
-      x = Math.random() * WIDTH;
-      y = Math.random() * HEIGHT;
+      x = Math.random() * this.width;
+      y = Math.random() * this.height;
       tries ++;
     }
     while( tries < 10 && this.entities.some( e => Math.hypot( e.x - x, e.y - y ) < size + SPAWN_DIST ) );
