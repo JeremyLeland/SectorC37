@@ -1,57 +1,14 @@
 <link rel="stylesheet" href="../style.css">
 
-<style>
-  body {
-    background-color: #111;
-    /* filter: drop-shadow( -1px 0px ) drop-shadow( 0px 1px ) drop-shadow( 0px -1px ) drop-shadow( 1px 0px); */
-  }
-
-  .shape {
-    position: absolute;
-    width: 0;
-    height: 0;
-    border-style: solid;
-    border-width: 1;
-  }
-
-  .player {
-    border-color: green;
-    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
-  }
-
-  .enemy {
-    border-color: blue;
-    clip-path: polygon(0% 0%, 100% 50%, 0% 100%);
-  }
-
-  .rock {
-    border-color: brown;
-    clip-path: polygon(50% 0%, 90% 20%, 100% 60%, 75% 100%, 25% 100%, 0% 60%, 10% 20%);
-  }
-
-  .flame {
-    filter: blur( 1px );
-    mix-blend-mode: screen;
-  }
-  
-</style>
-
 <body>
-
 </body>
 
 <script type="module">
 
+  import { Game } from '../src/game.js';
   import { Ship, Rock } from '../src/entity.js';
   import { World } from '../src/world.js';
   import { Info } from '../info/info.js';
-
-  const canvas = document.createElement( 'canvas' );
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  document.body.appendChild( canvas );
-
-  const ctx = canvas.getContext( '2d' );
   
   const world = new World();
 
@@ -61,27 +18,14 @@
     ship.hitWith( ship );
   }, 500 );
 
-  function update( dt ) {
+  const game = new Game();
+  game.update = ( dt ) => {
     world.update( dt );
+  }
+
+  game.draw = ( ctx ) => {
     world.draw( ctx );
   }
-
-  function draw( ctx ) {
-    world.draw( ctx );
-  }
-
-  let lastTime = null;
-  function animate( now ) {
-    lastTime ??= now;   // for first call only
-    update( now - lastTime );
-    lastTime = now;
-
-    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
-    draw( ctx );
-
-    requestAnimationFrame( animate );
-  }
-  requestAnimationFrame( animate );
 
 </script>
 

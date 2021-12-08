@@ -5,16 +5,10 @@
 
 <script type="module">
 
+  import { Game } from '../src/game.js';
   import { Ship, Rock } from '../src/entity.js';
   import { World } from '../src/world.js';
   import { Info } from '../info/info.js';
-
-  const canvas = document.createElement( 'canvas' );
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-  document.body.appendChild( canvas );
-
-  const ctx = canvas.getContext( '2d' );
 
   
   const world = new World( 2000, 2000 );
@@ -34,22 +28,23 @@
 
   let scrollX = 0, scrollY = 0;
 
-  function update( dt ) {
+  const game = new Game();
+  game.update = ( dt ) => {
 
     if ( player.isAlive() ) {  
-      scrollX = ctx.canvas.width / 2 - player.x;
-      scrollY = ctx.canvas.height / 2 - player.y;
+      scrollX = window.innerWidth / 2 - player.x;
+      scrollY = window.innerHeight / 2 - player.y;
       
       player.goalAngle = Math.atan2( 
-        mouseY - scrollY - player.y, 
-        mouseX - scrollX - player.x
+        game.mouseY - scrollY - player.y, 
+        game.mouseX - scrollX - player.x
       );
-      player.isShooting = mouseDown;  
+      player.isShooting = game.mouseDown;  
     }
     else {
       playerSpawnTimer -= dt;
 
-      if ( playerSpawnTimer < 0 && mouseDown ) {
+      if ( playerSpawnTimer < 0 && game.mouseDown ) {
         playerSpawnTimer = PLAYER_RESPAWN_DELAY;
 
         player = new Ship( Info.Player );
@@ -61,11 +56,9 @@
     enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world ) );
 
     world.update( dt );
-  }
+  };
 
-  function draw( ctx ) {
-    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
-
+  game.draw = ( ctx ) => {
     ctx.save();
 
     ctx.translate( scrollX, scrollY );
@@ -73,33 +66,7 @@
     world.draw( ctx );
 
     ctx.restore();
-  }
-
-
-  let mouseX = 0, mouseY = 0, mouseDown = false;
-  document.onmousemove = onInput;
-  document.ontouchmove = onInput;
-  document.onmousedown  = ( e ) => { mouseDown = true; onInput( e ); }
-  document.ontouchstart = ( e ) => { mouseDown = true; onInput( e ); }
-  document.onmouseup  = ( e ) => mouseDown = false;
-  document.ontouchend = ( e ) => mouseDown = false;
-  function onInput( e ) {
-    const event = e.touches ? e.touches[ 0 ] : e;
-    mouseX = event.clientX;
-    mouseY = event.clientY;
-  }
-
-  let lastTime = null;
-  function animate( now ) {
-    lastTime ??= now;   // for first call only
-    update( now - lastTime );
-    lastTime = now;
-
-    draw( ctx );
-
-    requestAnimationFrame( animate );
-  }
-  requestAnimationFrame( animate );
+  };
 
 </script>
 
