@@ -54,17 +54,18 @@ export class Entity {
     // children should override
   }
 
-  spawnFromCenter( entity, moveSpeed = 0.1, turnSpeed = 0.01 ) {
+  spawnFromCenter( entity, moveSpeed = 0.075, turnSpeed = 0.04 ) {
     const dir = randMid() * Math.PI * 2;
     const cos = Math.cos( dir );
     const sin = Math.sin( dir );
  
     Object.assign( entity, { 
-      x: this.x + cos * this.size / 2,
-      y: this.y + sin * this.size / 2,
+      x: this.x + cos * Math.random() * this.size / 2,
+      y: this.y + sin * Math.random() * this.size / 2,
       dx: cos * rand25() * moveSpeed,
       dy: sin * rand25() * moveSpeed,
-      dAngle: randMid() * turnSpeed
+      dAngle: randMid() * turnSpeed,
+      dSize: entity.dSize * rand25(),
     } );
   }
 
@@ -168,7 +169,7 @@ export class Ship extends Entity {
   }
 
   die() {
-    for ( let i = 0; i < 10; i ++ ) {
+    for ( let i = 0; i < 20; i ++ ) {
       this.createFire();
     }
     for ( let i = 0; i < 30; i ++ ) {
@@ -309,14 +310,20 @@ export class Flame extends Entity {
   draw( ctx ) {
     ctx.save();
 
-    ctx.filter = 'blur( 8px )'; // NOTE: 8px is faster than other values?!?
-    ctx.globalCompsiteOperation = 'screen';
+    // ctx.filter = 'blur( 8px )'; // NOTE: 8px is faster than other values?!?
+    ctx.globalCompositeOperation = 'screen';
 
     // Inspired by http://codepen.io/davepvm/pen/Hhstl
     const r = 140 + 120 * this.life;
     const g = 170 - 120 * this.life;
     const b = 120 - 120 * this.life;
-    this.bodyFill = `rgb( ${ r }, ${ g }, ${ b } )`;
+    // this.bodyFill = `rgb( ${ r }, ${ g }, ${ b } )`;
+
+    const grad = ctx.createRadialGradient( 0, 0, 0.5, 0, 0, 1 );
+    grad.addColorStop( 0, `rgba( ${ r }, ${ g }, ${ b }, 1 )` );
+    grad.addColorStop( 1, `rgba( ${ r }, ${ g }, ${ b }, 0 )` );
+
+    this.bodyFill = grad;
     
     super.draw( ctx );
 

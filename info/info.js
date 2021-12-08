@@ -39,6 +39,6 @@ export const Info = {
     decay: 1 / 1000,
     damage: 10,
     bodyFill: 'orange',
-    bodyPath: new Path2D( `M 1,0 L -1,1 L -1,-1 Z` ),
+    bodyPath: new Path2D( `M -1,-1 L 1,-1 L 1,1 L -1,1 Z` ),
   }
 }
