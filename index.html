@@ -27,6 +27,8 @@
     world.spawn( new Ship( Info.Enemy ) );
   }
 
+  const PLAYER_RESPAWN_DELAY = 2000;
+  let playerSpawnTimer = PLAYER_RESPAWN_DELAY;
   let player = new Ship( Info.Player );
   world.spawn( player );
 
@@ -34,13 +36,26 @@
 
   function update( dt ) {
 
-    scrollX = ctx.canvas.width / 2 - player.x;
-    scrollY = ctx.canvas.height / 2 - player.y;
+    if ( player.isAlive() ) {  
+      scrollX = ctx.canvas.width / 2 - player.x;
+      scrollY = ctx.canvas.height / 2 - player.y;
+      
+      player.goalAngle = Math.atan2( 
+        mouseY - scrollY - player.y, 
+        mouseX - scrollX - player.x
+      );
+      player.isShooting = mouseDown;  
+    }
+    else {
+      playerSpawnTimer -= dt;
 
-    player.goalAngle = Math.atan2( 
-      mouseY - scrollY - player.y, 
-      mouseX - scrollX - player.x
-    );
+      if ( playerSpawnTimer < 0 && mouseDown ) {
+        playerSpawnTimer = PLAYER_RESPAWN_DELAY;
+
+        player = new Ship( Info.Player );
+        world.spawn( player );
+      }
+    }
     
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
     enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world.entities ) );
