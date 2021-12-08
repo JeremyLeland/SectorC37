@@ -19,6 +19,8 @@ export class Entity {
 
   createdEntities = [];
   createdParticles = [];
+
+  timers = [];
   
   constructor( info ) {
     Object.assign( this, info );
@@ -86,7 +88,11 @@ export class Entity {
   }
 
   update( dt ) {
-    this.life -= this.decay * dt;   // TODO: Track life and decay separately?
+    this.life -= this.decay * dt;   // TODO: Track life and decay separately? Maybe use a timer for decay?
+
+    for ( const timer in this.timers ) {
+      this.timers[ timer ] -= dt;
+    }
 
     // Turn toward goal angle
     if ( this.goalAngle ) {
@@ -140,9 +146,9 @@ export const Settings = {
 };
 
 const TIME_BETWEEN_SHOTS = 200;
+const TIME_BETWEEN_WANDERS = 5000;
 
 export class Ship extends Entity {
-  shootDelay = 0;
   isShooting = false;
 
   wanderX = 0;
@@ -150,6 +156,9 @@ export class Ship extends Entity {
 
   constructor( shipInfo ) {
     super( shipInfo );
+
+    this.timers.shoot = 0;
+    this.timers.wander = 0;
   }
 
   bleed() {
@@ -182,11 +191,18 @@ export class Ship extends Entity {
     // TODO: Filter out items we can't crash into (e.g. behind us)?
   }
 
-  think( target, avoid ) {
+  think( target, world ) {
+    // TODO: Or if we get close
+    if ( this.timers.wander < 0 ) {
+      this.timers.wander = TIME_BETWEEN_WANDERS;
+      [ this.wanderX, this.wanderY ] = world.getEmptyLocation( this.size );
+    }
+
+    // TODO: Only if we are close to target
     const goalX = target?.x ?? this.wanderX;
     const goalY = target?.y ?? this.wanderY;
 
-    const avoidVectors = this.#getAvoidVectors( avoid );
+    const avoidVectors = this.#getAvoidVectors( world.entities );
     const weighted = avoidVectors.map( vector => {
       const weightedDist = Math.abs( Settings.AvoidWeight / Math.pow( vector.dist, Settings.AvoidPower ) );
       return { 
@@ -220,8 +236,7 @@ export class Ship extends Entity {
   update( dt ) {
     super.update( dt );
 
-    this.shootDelay -= dt;
-    if ( this.shootDelay < 0 && this.isShooting ) {
+    if ( this.timers.shoot < 0 && this.isShooting ) {
       const bullet = new Bullet( Info.Bullet );
       const cos = Math.cos( this.angle );
       const sin = Math.sin( this.angle );
@@ -231,7 +246,7 @@ export class Ship extends Entity {
   
       this.createdEntities.push( bullet );
 
-      this.shootDelay = TIME_BETWEEN_SHOTS;
+      this.timers.shoot = TIME_BETWEEN_SHOTS;
     }
   }
 }
@@ -245,8 +260,6 @@ export class Rock extends Entity {
     this.dAngle = randMid() * 0.001;
 
     this.bodyPath = new Path2D( `M ${ getPoints().join( ' L ' ) } Z` );
-
-    //this.div.className = 'shape rock';
   }
 
   bleed() {
