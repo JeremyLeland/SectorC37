@@ -14,7 +14,7 @@ export const Info = {
     size: 10,
     life: 50,
     damage: 50,
-    bodyFill: 'blue',
+    bodyFill: 'dodgerblue',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
   },
   Rock: {

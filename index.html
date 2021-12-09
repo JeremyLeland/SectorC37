@@ -33,8 +33,8 @@
   game.update = ( dt ) => {
 
     if ( player.isAlive() ) {  
-      scrollX = window.innerWidth / 2 - player.x;
-      scrollY = window.innerHeight / 2 - player.y;
+      scrollX = Math.min( 0, Math.max( window.innerWidth - world.width, window.innerWidth / 2 - player.x ) );
+      scrollY = Math.min( 0, Math.max( window.innerHeight - world.height, window.innerHeight / 2 - player.y ) );
       
       player.goalAngle = Math.atan2( 
         game.mouseY - scrollY - player.y, 
