@@ -12,6 +12,7 @@
 
   
   const world = new World( 2000, 2000 );
+  const background = createBackground( world.width, world.height );
 
   for ( let i = 0; i < 15; i ++ ) {
     world.spawn( new Rock( Info.Rock ) );
@@ -63,10 +64,35 @@
 
     ctx.translate( scrollX, scrollY );
 
+    ctx.drawImage( background, 0, 0 );
     world.draw( ctx );
 
     ctx.restore();
   };
+
+  function createBackground( width, height, density = 2000 ) {
+    const background = document.createElement( 'canvas' );
+    background.width = world.width;
+    background.height = world.height;
+
+    const ctx = background.getContext( '2d' );
+    
+    const numStars = width * height / density;
+    for ( let i = 0; i < numStars; i ++ ) {
+      const x = Math.random() * width;
+      const y = Math.random() * height;
+      const r = Math.random() * 1;
+      
+      ctx.beginPath();
+      ctx.arc( x, y, r, 0, Math.PI * 2 );
+
+      const col = Math.random() * 200;
+      ctx.fillStyle = `rgb( ${ col }, ${ col }, ${ col } )`;
+      ctx.fill();
+    }
+
+    return background;
+  }
 
 </script>
 

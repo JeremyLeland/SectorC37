@@ -6,25 +6,23 @@
 <script type="module">
 
   import { Game } from '../src/game.js';
-  import { Ship, Rock } from '../src/entity.js';
-  import { World } from '../src/world.js';
-  import { Info } from '../info/info.js';
-  
-  const world = new World();
 
-  setInterval( () => {
-    const ship = new Ship( Info.Enemy );
-    world.spawn( ship );
-    ship.hitWith( ship );
-  }, 500 );
+  const stars = new Path2D();
+  for ( let i = 0; i < 400; i ++ ) {
+    const x = Math.random() * 500;
+    const y = Math.random() * 500;
+    const r = Math.random() * 1;
+    stars.moveTo( 0, 0 );
+    stars.arc( x, y, r, 0, Math.PI * 2 );
+  }
 
   const game = new Game();
   game.update = ( dt ) => {
-    world.update( dt );
   }
 
   game.draw = ( ctx ) => {
-    world.draw( ctx );
+    ctx.fillStyle = 'white';
+    ctx.fill( stars );
   }
 
 </script>

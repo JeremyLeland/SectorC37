@@ -1,0 +1,31 @@
+<link rel="stylesheet" href="../style.css">
+
+<body>
+</body>
+
+<script type="module">
+
+  import { Game } from '../src/game.js';
+  import { Ship, Rock } from '../src/entity.js';
+  import { World } from '../src/world.js';
+  import { Info } from '../info/info.js';
+  
+  const world = new World();
+
+  setInterval( () => {
+    const ship = new Ship( Info.Enemy );
+    world.spawn( ship );
+    ship.hitWith( ship );
+  }, 500 );
+
+  const game = new Game();
+  game.update = ( dt ) => {
+    world.update( dt );
+  }
+
+  game.draw = ( ctx ) => {
+    world.draw( ctx );
+  }
+
+</script>
+
