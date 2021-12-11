@@ -147,6 +147,7 @@ export const Settings = {
 };
 
 const TIME_BETWEEN_SHOTS = 200;
+const TIME_BETWEEN_TRAILS = 20;
 const TIME_BETWEEN_WANDERS = 5000;
 
 export class Ship extends Entity {
@@ -159,6 +160,7 @@ export class Ship extends Entity {
     super( shipInfo );
 
     this.timers.shoot = 0;
+    this.timers.engineTrail = 0;
     this.timers.wander = 0;
   }
 
@@ -248,6 +250,12 @@ export class Ship extends Entity {
       this.createdEntities.push( bullet );
 
       this.timers.shoot = TIME_BETWEEN_SHOTS;
+    }
+
+    if ( this.timers.engineTrail < 0 ) {
+      this.createFire();
+
+      this.timers.engineTrail = TIME_BETWEEN_TRAILS;
     }
   }
 }
