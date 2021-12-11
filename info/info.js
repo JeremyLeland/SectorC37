@@ -40,5 +40,14 @@ export const Info = {
     damage: 10,
     bodyFill: 'orange',
     bodyPath: new Path2D( `M -1,-1 L 1,-1 L 1,1 L -1,1 Z` ),
-  }
+  },
+  Trail: {
+    size: 5,
+    dSize: -5 / 500,
+    life: 1,
+    decay: 1 / 500,
+    damage: 10,
+    bodyFill: 'orange',
+    bodyPath: new Path2D( `M -1,-1 L 1,-1 L 1,1 L -1,1 Z` ),
+  },
 }

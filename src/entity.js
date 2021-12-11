@@ -54,14 +54,14 @@ export class Entity {
     // children should override
   }
 
-  spawnFromCenter( entity, moveSpeed = 0.075, turnSpeed = 0.04 ) {
+  spawnFromCenter( entity, { spread = 0.5, moveSpeed = 0.075, turnSpeed = 0.04 } = {} ) {
     const dir = randMid() * Math.PI * 2;
     const cos = Math.cos( dir );
     const sin = Math.sin( dir );
  
     Object.assign( entity, { 
-      x: this.x + cos * Math.random() * this.size / 2,
-      y: this.y + sin * Math.random() * this.size / 2,
+      x: this.x + cos * Math.random() * spread * this.size,
+      y: this.y + sin * Math.random() * spread * this.size,
       dx: cos * rand25() * moveSpeed,
       dy: sin * rand25() * moveSpeed,
       dAngle: randMid() * turnSpeed,
@@ -71,7 +71,13 @@ export class Entity {
 
   createFire() {
     const flame = new Flame( Info.Flame );
-    this.spawnFromCenter( flame, 0.01, 0.01 );
+    this.spawnFromCenter( flame, { spread: 0.5, moveSpeed: 0.01, turnSpeed: 0.01 } );
+    this.createdParticles.push( flame );
+  }
+
+  createTrail() {
+    const flame = new Flame( Info.Trail );
+    this.spawnFromCenter( flame, { spread: 0, moveSpeed: 0, turnSpeed: 0.01 } );
     this.createdParticles.push( flame );
   }
 
@@ -147,7 +153,7 @@ export const Settings = {
 };
 
 const TIME_BETWEEN_SHOTS = 200;
-const TIME_BETWEEN_TRAILS = 20;
+const TIME_BETWEEN_TRAILS = 10;
 const TIME_BETWEEN_WANDERS = 5000;
 
 export class Ship extends Entity {
@@ -160,7 +166,7 @@ export class Ship extends Entity {
     super( shipInfo );
 
     this.timers.shoot = 0;
-    this.timers.engineTrail = 0;
+    this.timers.trail = 0;
     this.timers.wander = 0;
   }
 
@@ -252,10 +258,10 @@ export class Ship extends Entity {
       this.timers.shoot = TIME_BETWEEN_SHOTS;
     }
 
-    if ( this.timers.engineTrail < 0 ) {
-      this.createFire();
+    if ( this.timers.trail < 0 ) {
+      this.createTrail();
 
-      this.timers.engineTrail = TIME_BETWEEN_TRAILS;
+      this.timers.trail = TIME_BETWEEN_TRAILS;
     }
   }
 }
