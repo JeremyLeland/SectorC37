@@ -18,7 +18,7 @@
     world.spawnInside( new Rock( Info.Rock ) );
   }
 
-  for ( let i = 0; i < 10; i ++ ) {
+  for ( let i = 0; i < 5; i ++ ) {
     world.spawnInside( new Ship( Info.Enemy ) );
   }
 
@@ -26,6 +26,8 @@
   let playerSpawnTimer = PLAYER_RESPAWN_DELAY;
   let player = new Ship( Info.Player );
   world.spawnInside( player );
+
+  let timeSinceLastWave = 0;
 
   let scrollX = 0, scrollY = 0;
 
@@ -52,8 +54,19 @@
         world.spawnInside( player );
       }
     }
+
+    timeSinceLastWave += dt;
     
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
+
+    if ( timeSinceLastWave > enemies.length * 1000 ) {
+      timeSinceLastWave = 0;
+
+      for ( let i = 0; i < 5; i ++ ) {
+        world.spawnOutside( new Ship( Info.Enemy ) );
+      }
+    }
+
     enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world ) );
 
     world.update( dt );
