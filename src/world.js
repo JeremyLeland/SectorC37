@@ -9,23 +9,40 @@ export class World {
     this.height = height;
   }
 
-  spawn( entity ) {
+  spawnInside( entity ) {
     [ entity.x, entity.y ] = this.getEmptyLocation( entity.size );
-    entity.angle = Math.random() * Math.PI * 2;
+    this.entities.push( entity );
+  }
 
+  spawnOutside( entity ) {
+    [ entity.x, entity.y ] = this.#getOutsideLocation( entity.size );   // TODO: Make sure these aren't colliding, either?
     this.entities.push( entity );
   }
 
   getEmptyLocation( size ) {
     let x, y, tries = 0;
     do {
-      x = Math.random() * this.width;
-      y = Math.random() * this.height;
+      [ x, y ] = this.#getInsideLocation( size );
       tries ++;
     }
     while( tries < 10 && this.entities.some( e => Math.hypot( e.x - x, e.y - y ) < size + SPAWN_DIST ) );
 
     return [ x, y ];
+  }
+
+  #getInsideLocation( size ) {
+    return [
+      size + Math.random() * ( this.width - size * 2 ),
+      size + Math.random() * ( this.height - size * 2 )
+    ];
+  }
+
+  #getOutsideLocation( size ) {
+    const angle = Math.random() * Math.PI * 2;
+    return [ 
+      Math.cos( angle ) * ( this.width + size ), 
+      Math.sin( angle ) * ( this.height + size ) 
+    ];
   }
 
   update( dt ) {

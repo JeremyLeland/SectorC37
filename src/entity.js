@@ -270,6 +270,7 @@ export class Rock extends Entity {
   constructor( info ) {
     super( info );
 
+    this.angle = Math.random() * Math.PI * 2;
     this.dx = randMid() * 0.01;
     this.dy = randMid() * 0.01;
     this.dAngle = randMid() * 0.001;
