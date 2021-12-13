@@ -152,12 +152,42 @@ export const Settings = {
   DrawForces: false,
 };
 
-const TIME_BETWEEN_SHOTS = 200;
+class Gun {
+  offset = { front: 0, side: 0, angle: 0 };
+  timeUntilReady = 0;
+  timeBetweenShots = 200;
+  owner;
+
+  constructor( gunInfo ) {
+    Object.assign( this, gunInfo );
+  }
+
+  update( dt ) {
+    this.timeUntilReady -= dt;
+
+    if ( this.timeUntilReady < 0 && this.owner.isShooting ) {
+      const bullet = new Bullet( Info.Bullet );
+      bullet.angle = this.owner.angle + this.offset.angle;
+      bullet.x = this.owner.x + 
+        Math.cos( this.owner.angle ) * this.offset.front + 
+        Math.cos( this.owner.angle + Math.PI / 2 ) * this.offset.side;
+      bullet.y = this.owner.y + 
+        Math.sin( this.owner.angle ) * this.offset.front + 
+        Math.sin( this.owner.angle + Math.PI / 2 ) * this.offset.side;
+  
+      this.owner.createdEntities.push( bullet );
+
+      this.timeUntilReady = this.timeBetweenShots;
+    }
+  }
+}
+
 const TIME_BETWEEN_TRAILS = 10;
 const TIME_BETWEEN_WANDERS = 5000;
 
 export class Ship extends Entity {
   isShooting = false;
+  guns = [];
 
   wanderX = 0;
   wanderY = 0;
@@ -165,7 +195,19 @@ export class Ship extends Entity {
   constructor( shipInfo ) {
     super( shipInfo );
 
-    this.timers.shoot = 0;
+    this.guns.push(
+      new Gun( { 
+        offset: { front: shipInfo.size, side: -shipInfo.size, angle: 0 }, 
+        owner: this 
+      } )
+    );
+    this.guns.push(
+      new Gun( { 
+        offset: { front: shipInfo.size, side: shipInfo.size, angle: 0 }, 
+        owner: this 
+      } )
+    );
+
     this.timers.trail = 0;
     this.timers.wander = 0;
   }
@@ -245,18 +287,7 @@ export class Ship extends Entity {
   update( dt ) {
     super.update( dt );
 
-    if ( this.timers.shoot < 0 && this.isShooting ) {
-      const bullet = new Bullet( Info.Bullet );
-      const cos = Math.cos( this.angle );
-      const sin = Math.sin( this.angle );
-      bullet.angle = this.angle;
-      bullet.x = this.x + cos * this.size * 2;
-      bullet.y = this.y + sin * this.size * 2;
-  
-      this.createdEntities.push( bullet );
-
-      this.timers.shoot = TIME_BETWEEN_SHOTS;
-    }
+    this.guns.forEach( gun => gun.update( dt ) );
 
     if ( this.timers.trail < 0 ) {
       this.createTrail();
