@@ -3,6 +3,8 @@ export class Game {
   mouseY = 0;
   mouseDown = false;
 
+  keysPressed = new Set();
+
   constructor() {
     const canvas = document.createElement( 'canvas' );
     window.onresize = () => {
@@ -13,6 +15,9 @@ export class Game {
     
     document.body.appendChild( canvas );
     const ctx = canvas.getContext( '2d' );
+
+    window.onkeydown = ( e ) => this.keysPressed.add( e.key );
+    window.onkeyup   = ( e ) => this.keysPressed.delete( e.key );
 
     const onInput = ( e ) => {
       const event = e.touches ? e.touches[ 0 ] : e;
@@ -25,7 +30,6 @@ export class Game {
     document.ontouchstart = ( e ) => { this.mouseDown = true; onInput( e ); }
     document.onmouseup  = ( e ) => this.mouseDown = false;
     document.ontouchend = ( e ) => this.mouseDown = false;
-    
 
     let lastTime = null;
     const animate = ( now ) => {
@@ -44,5 +48,4 @@ export class Game {
 
   update( dt ) {}
   draw( ctx ) {}
-
 }

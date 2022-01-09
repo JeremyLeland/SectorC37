@@ -101,23 +101,6 @@ export class Entity {
       this.timers[ timer ] -= dt;
     }
 
-    // Turn toward goal angle
-    if ( this.goalAngle ) {
-      this.angle = fixAngleTo( this.angle, this.goalAngle );
-      if ( this.goalAngle < this.angle ) {
-        this.angle = Math.max( this.goalAngle, this.angle - this.turnSpeed * dt );
-      }
-      else if ( this.angle < this.goalAngle ) {
-        this.angle = Math.min( this.goalAngle, this.angle + this.turnSpeed * dt );
-      }  
-    }
-    
-    // Move forward
-    if ( this.speed ) {
-      this.dx = Math.cos( this.angle ) * this.speed;
-      this.dy = Math.sin( this.angle ) * this.speed;
-    }
-
     this.x += this.dx * dt;
     this.y += this.dy * dt;
     this.angle += this.dAngle * dt;
@@ -174,6 +157,8 @@ class Gun {
       bullet.y = this.owner.y + 
         Math.sin( this.owner.angle ) * this.offset.front + 
         Math.sin( this.owner.angle + Math.PI / 2 ) * this.offset.side;
+      bullet.dx = this.owner.dx + Math.cos( bullet.angle ) * bullet.speed;
+      bullet.dy = this.owner.dy + Math.sin( bullet.angle ) * bullet.speed;
   
       this.owner.createdEntities.push( bullet );
 
@@ -189,6 +174,9 @@ export class Ship extends Entity {
   isShooting = false;
   guns = [];
 
+  goalAngle = 0;
+  isSliding = false;
+
   wanderX = 0;
   wanderY = 0;
 
@@ -197,13 +185,13 @@ export class Ship extends Entity {
 
     this.guns.push(
       new Gun( { 
-        offset: { front: shipInfo.size, side: -shipInfo.size, angle: 0 }, 
+        offset: { front: shipInfo.size, side: -shipInfo.size, angle: 0.02 }, 
         owner: this 
       } )
     );
     this.guns.push(
       new Gun( { 
-        offset: { front: shipInfo.size, side: shipInfo.size, angle: 0 }, 
+        offset: { front: shipInfo.size, side: shipInfo.size, angle: -0.02 }, 
         owner: this 
       } )
     );
@@ -285,6 +273,29 @@ export class Ship extends Entity {
   }
 
   update( dt ) {
+
+    // TODO: Move dx/dy changes based on angle to here -- entities shouldn't take angle into account when moving
+    // Use isSlinding instead of speed > 0 for determining when to change dx/dy
+
+    // Turn toward goal angle
+    if ( this.goalAngle ) {
+      this.angle = fixAngleTo( this.angle, this.goalAngle );
+      if ( this.goalAngle < this.angle ) {
+        this.angle = Math.max( this.goalAngle, this.angle - this.turnSpeed * dt );
+      }
+      else if ( this.angle < this.goalAngle ) {
+        this.angle = Math.min( this.goalAngle, this.angle + this.turnSpeed * dt );
+      }  
+    }
+    
+    // Move forward
+    if ( !this.isSliding ) {
+      this.dx = Math.cos( this.angle ) * this.speed;
+      this.dy = Math.sin( this.angle ) * this.speed;
+    }
+
+    // TODO TODO: Figure out a smooth way to transition dx/dy after we stop sliding
+
     super.update( dt );
 
     this.guns.forEach( gun => gun.update( dt ) );
