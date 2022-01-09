@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="../style.css">
+<link rel="stylesheet" href="./style.css">
 
 <style>
   #ui {
@@ -20,10 +20,10 @@
 
 <script type="module">
 
-  import { Game } from '../src/game.js';
-  import { Ship, Rock } from '../src/entity.js';
-  import { World } from '../src/world.js';
-  import { Info } from '../info/info.js';
+  import { Game } from './src/game.js';
+  import { Ship, Rock } from './src/entity.js';
+  import { World } from './src/world.js';
+  import { Info } from './info/info.js';
 
   
   const world = new World( 2000, 2000 );
@@ -34,7 +34,7 @@
   }
 
   for ( let i = 0; i < 5; i ++ ) {
-    world.spawnInside( new Ship( Info.Enemy ) );
+    world.spawnInside( new Ship( Info.Scout ) );
   }
 
   const PLAYER_RESPAWN_DELAY = 2000;
@@ -79,7 +79,7 @@
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
     
     healthUI.value = player.life;
-    waveUI.innerText = wave;
+    waveUI.innerText = `${ wave } (${ Math.floor( timeSinceLastWave / 1000 ) })`;
     enemiesUI.innerText = enemies.length;
 
     if ( timeSinceLastWave > enemies.length * 5000 ) {
@@ -87,8 +87,10 @@
       wave ++;
 
       for ( let i = 0; i < 5; i ++ ) {
-        world.spawnOutside( new Ship( Info.Enemy ) );
+        world.spawnOutside( new Ship( Info.Scout ) );
       }
+      
+      world.spawnOutside( new Ship( Info.Frigate ) );
     }
 
     enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world ) );
@@ -99,6 +101,7 @@
   game.draw = ( ctx ) => {
     ctx.save();
 
+    // TODO: Move scroll to game object?
     ctx.translate( scrollX, scrollY );
 
     ctx.drawImage( background, 0, 0 );

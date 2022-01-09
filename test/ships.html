@@ -1,0 +1,34 @@
+<link rel="stylesheet" href="../style.css">
+
+<body>
+</body>
+
+<script type="module">
+
+  import { Game } from '../src/game.js';
+  import { Ship, Rock } from '../src/entity.js';
+  import { World } from '../src/world.js';
+  import { Info } from '../info/info.js';
+
+  const ships = [
+    new Ship( Info.Player ),
+    new Ship( Info.Scout ),
+    new Ship( Info.Frigate ),
+  ];
+  
+  const world = new World( 500, 500 );
+
+  ships.forEach( ship => world.spawnInside( ship ) );
+
+  const game = new Game();
+  game.update = ( dt ) => {    
+    ships.forEach( ship => ship.angle += ship.turnSpeed * dt );
+    world.update( dt );
+  };
+
+  game.draw = ( ctx ) => {
+    world.draw( ctx );
+  };
+
+</script>
+

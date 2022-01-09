@@ -8,13 +8,22 @@ export const Info = {
     bodyFill: 'green',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
   },
-  Enemy: {
+  Scout: {
     speed: 0.15,
     turnSpeed: 0.005,
     size: 10,
     life: 50,
     damage: 50,
     bodyFill: 'dodgerblue',
+    bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+  },
+  Frigate: {
+    speed: 0.1,
+    turnSpeed: 0.002,
+    size: 20,
+    life: 150,
+    damage: 150,
+    bodyFill: 'cyan',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
   },
   Rock: {
