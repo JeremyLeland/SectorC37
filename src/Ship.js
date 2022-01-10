@@ -49,6 +49,7 @@ export class Ship extends Entity {
 
   goalAngle = 0;
   isSliding = false;
+  accel = 0.002;
 
   wanderX = 0;
   wanderY = 0;
@@ -58,13 +59,13 @@ export class Ship extends Entity {
 
     this.guns.push(
       new Gun( { 
-        offset: { front: shipInfo.size, side: -shipInfo.size, angle: 0.02 }, 
+        offset: { front: shipInfo.size, side: -shipInfo.size, angle: 0 }, 
         owner: this 
       } )
     );
     this.guns.push(
       new Gun( { 
-        offset: { front: shipInfo.size, side: shipInfo.size, angle: -0.02 }, 
+        offset: { front: shipInfo.size, side: shipInfo.size, angle: 0 }, 
         owner: this 
       } )
     );
@@ -164,19 +165,19 @@ export class Ship extends Entity {
 
     // Turn toward goal angle
     if ( this.goalAngle ) {
-      this.angle = fixAngleTo( this.angle, this.goalAngle );
-      if ( this.goalAngle < this.angle ) {
-        this.angle = Math.max( this.goalAngle, this.angle - this.turnSpeed * dt );
-      }
-      else if ( this.angle < this.goalAngle ) {
-        this.angle = Math.min( this.goalAngle, this.angle + this.turnSpeed * dt );
-      }  
+      this.angle = approach( 
+        fixAngleTo( this.angle, this.goalAngle ), this.goalAngle, this.turnSpeed, dt 
+      );  
     }
     
     // Move forward
     if ( !this.isSliding ) {
-      this.dx = Math.cos( this.angle ) * this.speed;
-      this.dy = Math.sin( this.angle ) * this.speed;
+      this.dx = approach( 
+        this.dx, Math.cos( this.angle ) * this.speed, this.accel, dt 
+      );
+      this.dy = approach( 
+        this.dy, Math.sin( this.angle ) * this.speed, this.accel, dt
+      );
     }
 
     // TODO TODO: Figure out a smooth way to transition dx/dy after we stop sliding
@@ -185,11 +186,23 @@ export class Ship extends Entity {
 
     this.guns.forEach( gun => gun.update( dt ) );
 
-    if ( this.timers.trail < 0 ) {
+    if ( !this.isSliding && this.timers.trail < 0 ) {
       this.createTrail();
 
       this.timers.trail = TIME_BETWEEN_TRAILS;
     }
+  }
+}
+
+function approach( current, goal, speed, dt ) {
+  if ( goal < current ) {
+    return Math.max( goal, current - speed * dt );
+  }
+  else if ( current < goal ) {
+    return Math.min( goal, current + speed * dt );
+  }
+  else {
+    return current;
   }
 }
 

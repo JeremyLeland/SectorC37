@@ -33,13 +33,13 @@ export const Info = {
     bodyFill: 'brown',
   },
   Bullet: {
-    speed: 0.6,
+    speed: 0.9,
     size: 2,
     life: 1,
     decay: 1 / 5000,
     damage: 10,
     bodyFill: 'yellow',
-    bodyPath: new Path2D( `M 1,0 L 0,1 L -5,0 L 0,-1 Z` ),
+    bodyPath: new Path2D( `M 1,0 L 0,1 L -10,0 L 0,-1 Z` ),
   },
   Flame: {
     size: 0,
