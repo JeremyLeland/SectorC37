@@ -8,6 +8,8 @@ export const Settings = {
   DrawForces: false,
 };
 
+// TODO: Combine Gun and Engine somehow? Very similar code...
+
 class Gun {
   offset = { front: 0, side: 0, angle: 0 };
   timeUntilReady = 0;
@@ -40,12 +42,40 @@ class Gun {
   }
 }
 
+class Engine {
+  offset = { front: 0, side: 0, angle: 0 };
+  trail = new Trail();
+  owner;
+
+  constructor( engineInfo ) {
+    Object.assign( this, engineInfo );
+  }
+
+  update( dt ) {
+    const x = this.owner.x + 
+      Math.cos( this.owner.angle ) * this.offset.front + 
+      Math.cos( this.owner.angle + Math.PI / 2 ) * this.offset.side;
+    const y = this.owner.y + 
+      Math.sin( this.owner.angle ) * this.offset.front + 
+      Math.sin( this.owner.angle + Math.PI / 2 ) * this.offset.side;
+    const angle = this.owner.angle + this.offset.angle;
+    const length = this.owner.speed * dt;
+
+    this.trail.addPoint( x, y, angle, length );
+  }
+
+  draw( ctx ) {
+    this.trail.draw( ctx );
+  }
+}
+
 const TIME_BETWEEN_TRAILS = 10;
 const TIME_BETWEEN_WANDERS = 5000;
 
 export class Ship extends Entity {
   isShooting = false;
   guns = [];
+  engines = [];
 
   goalAngle = 0;
   isSliding = false;
@@ -70,7 +100,13 @@ export class Ship extends Entity {
       } )
     );
 
-    this.timers.trail = 0;
+    this.engines.push(
+      new Engine( {
+        offset: { front: -shipInfo.size, side: 0, angle: 0 },
+        owner: this
+      } )
+    );
+
     this.timers.wander = 0;
   }
 
@@ -92,12 +128,6 @@ export class Ship extends Entity {
   createFire() {
     const flame = new Flame( Info.Flame );
     this.spawnFromCenter( flame, { spread: 0.5, moveSpeed: 0.01, turnSpeed: 0.01 } );
-    this.createdParticles.push( flame );
-  }
-
-  createTrail() {
-    const flame = new Flame( Info.Trail );
-    this.spawnFromCenter( flame, { spread: 0, moveSpeed: 0, turnSpeed: 0.01 } );
     this.createdParticles.push( flame );
   }
 
@@ -185,12 +215,15 @@ export class Ship extends Entity {
     super.update( dt );
 
     this.guns.forEach( gun => gun.update( dt ) );
-
-    if ( !this.isSliding && this.timers.trail < 0 ) {
-      this.createTrail();
-
-      this.timers.trail = TIME_BETWEEN_TRAILS;
+    this.engines.forEach( engine => engine.update( dt ) );
+  }
+  
+  draw( ctx ) {
+    if ( !this.isSliding ) {
+      this.engines.forEach( engine => engine.draw( ctx ) );
     }
+    
+    super.draw( ctx );
   }
 }
 
@@ -250,4 +283,59 @@ function fixAngleTo( angle, otherAngle ) {
   }
 
   return angle;
+}
+
+class Trail {
+  size = 4;
+  maxLength = 20;
+  
+  #points = [];
+  #length = 0;
+
+  addPoint( x, y, angle, length ) {
+    this.#points.push( { x: x, y: y, angle: angle, length: length } );
+    this.#length += length;
+
+    while ( this.#length > this.maxLength && this.#points.length > 0 ) {
+      this.#length -= this.#points.shift().length;
+    }
+  }
+
+  draw( ctx ) { 
+    if ( this.#points.length > 0 ) {
+      ctx.beginPath();
+      
+      const last = this.#points[ 0 ];
+      ctx.moveTo( last.x, last.y );
+      for ( let i = 1; i < this.#points.length - 1; i ++ ) {
+        const width = this.size * i / this.#points.length;
+        const segment = this.#points[ i ];
+  
+        const leftAng = segment.angle - Math.PI / 2;
+        const leftX = segment.x + Math.cos( leftAng ) * width;
+        const leftY = segment.y + Math.sin( leftAng ) * width;
+  
+        ctx.lineTo( leftX, leftY );
+      }
+  
+      const first = this.#points[ this.#points.length - 1 ];
+      ctx.arc( first.x, first.y, this.size, first.angle - Math.PI / 2, first.angle + Math.PI / 2 );
+  
+      for ( let i = this.#points.length - 2; i > 0; i -- ) {
+        const width = this.size * i / this.#points.length;
+        const segment = this.#points[ i ];
+  
+        const rightAng = segment.angle + Math.PI / 2;
+        const rightX = segment.x + Math.cos( rightAng ) * width;
+        const rightY = segment.y + Math.sin( rightAng ) * width;
+  
+        ctx.lineTo( rightX, rightY );
+      }
+  
+      ctx.closePath();
+  
+      ctx.fillStyle = 'orange';
+      ctx.fill();
+    }
+  }
 }
