@@ -21,7 +21,8 @@
 <script type="module">
 
   import { Game } from './src/game.js';
-  import { Ship, Rock } from './src/entity.js';
+  import { Ship } from './src/Ship.js';
+  import { Rock } from './src/Rock.js';
   import { World } from './src/world.js';
   import { Info } from './info/info.js';
 
@@ -44,8 +45,6 @@
 
   let timeSinceLastWave = 0, wave = 1;
 
-  let scrollX = 0, scrollY = 0;
-
   const healthUI = document.getElementById( 'health' );
   const waveUI = document.getElementById( 'wave' );
   const enemiesUI = document.getElementById( 'enemies' );
@@ -54,12 +53,12 @@
   game.update = ( dt ) => {
 
     if ( player.isAlive() ) {  
-      scrollX = Math.min( 0, Math.max( window.innerWidth - world.width, window.innerWidth / 2 - player.x ) );
-      scrollY = Math.min( 0, Math.max( window.innerHeight - world.height, window.innerHeight / 2 - player.y ) );
+      game.scrollX = Math.min( 0, Math.max( window.innerWidth - world.width, window.innerWidth / 2 - player.x ) );
+      game.scrollY = Math.min( 0, Math.max( window.innerHeight - world.height, window.innerHeight / 2 - player.y ) );
       
       player.goalAngle = Math.atan2( 
-        game.mouseY - scrollY - player.y, 
-        game.mouseX - scrollX - player.x
+        game.mouseY - game.scrollY - player.y, 
+        game.mouseX - game.scrollX - player.x
       );
       player.isShooting = game.mouseDown;
 
@@ -101,15 +100,8 @@
   };
 
   game.draw = ( ctx ) => {
-    ctx.save();
-
-    // TODO: Move scroll to game object?
-    ctx.translate( scrollX, scrollY );
-
     ctx.drawImage( background, 0, 0 );
     world.draw( ctx );
-
-    ctx.restore();
   };
 
   function createBackground( width, height, density = 2000 ) {

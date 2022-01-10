@@ -5,6 +5,9 @@ export class Game {
 
   keysPressed = new Set();
 
+  scrollX = 0;
+  scrollY = 0;
+
   constructor() {
     const canvas = document.createElement( 'canvas' );
     window.onresize = () => {
@@ -38,7 +41,11 @@ export class Game {
       lastTime = now;
   
       ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
+
+      ctx.save();
+      ctx.translate( this.scrollX, this.scrollY );
       this.draw( ctx );
+      ctx.restore();
   
       requestAnimationFrame( animate );
     };
