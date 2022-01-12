@@ -44,7 +44,11 @@ class Gun {
 
 class Engine {
   offset = { front: 0, side: 0, angle: 0 };
-  trail = new Trail();
+  trails = [ 
+    new Trail( 4, 20, `rgba( 255, 128, 0, 0.7 )` ),
+    //new Trail( 2, 10, `rgba( 255, 255, 0, 0.8 )` ),
+    //new Trail( 1, 5, `rgba( 255, 255, 255, 0.9 )` )
+  ];
   owner;
 
   constructor( engineInfo ) {
@@ -61,11 +65,11 @@ class Engine {
     const angle = this.owner.angle + this.offset.angle;
     const length = this.owner.speed * dt;
 
-    this.trail.addPoint( x, y, angle, length );
+    this.trails.forEach( trail => trail.addPoint( x, y, angle, length ) );
   }
 
   draw( ctx ) {
-    this.trail.draw( ctx );
+    this.trails.forEach( trail => trail.draw( ctx ) );
   }
 }
 
@@ -189,10 +193,6 @@ export class Ship extends Entity {
   }
 
   update( dt ) {
-
-    // TODO: Move dx/dy changes based on angle to here -- entities shouldn't take angle into account when moving
-    // Use isSlinding instead of speed > 0 for determining when to change dx/dy
-
     // Turn toward goal angle
     if ( this.goalAngle ) {
       this.angle = approach( 
@@ -210,8 +210,6 @@ export class Ship extends Entity {
       );
     }
 
-    // TODO TODO: Figure out a smooth way to transition dx/dy after we stop sliding
-
     super.update( dt );
 
     this.guns.forEach( gun => gun.update( dt ) );
@@ -222,7 +220,7 @@ export class Ship extends Entity {
     if ( !this.isSliding ) {
       this.engines.forEach( engine => engine.draw( ctx ) );
     }
-    
+
     super.draw( ctx );
   }
 }
@@ -286,18 +284,37 @@ function fixAngleTo( angle, otherAngle ) {
 }
 
 class Trail {
-  size = 4;
-  maxLength = 20;
+  size;
+  maxLength;
+  fillStyle;
   
   #points = [];
   #length = 0;
+
+  constructor( size, maxLength, fillStyle ) {
+    this.size = size;
+    this.maxLength = maxLength;
+    this.fillStyle = fillStyle;
+  }
 
   addPoint( x, y, angle, length ) {
     this.#points.push( { x: x, y: y, angle: angle, length: length } );
     this.#length += length;
 
     while ( this.#length > this.maxLength && this.#points.length > 0 ) {
-      this.#length -= this.#points.shift().length;
+      const excess = this.#length - this.maxLength;
+      const tail = this.#points[ 0 ];
+
+      if ( excess > tail.length ) {
+        this.#points.shift();
+        this.#length -= tail.length;
+      }
+      else {
+        tail.x += Math.cos( tail.angle ) * excess;
+        tail.y += Math.sin( tail.angle ) * excess;
+        tail.length -= excess;
+        this.#length -= excess;
+      }
     }
   }
 
@@ -334,7 +351,7 @@ class Trail {
   
       ctx.closePath();
   
-      ctx.fillStyle = 'orange';
+      ctx.fillStyle = this.fillStyle;
       ctx.fill();
     }
   }
