@@ -62,7 +62,8 @@
       );
       player.isShooting = game.mouseDown;
 
-      player.isSliding = game.keysPressed.has( 'Shift' );
+      player.isSliding = game.keysPressed.has( 'Control' );
+      player.isSprinting = game.keysPressed.has( 'Shift' );
     }
     else {
       playerSpawnTimer -= dt;

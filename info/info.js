@@ -1,9 +1,9 @@
 export const Info = {
   Player: {
     speed: 0.3,
-    turnSpeed: 0.005,
+    turnSpeed: 0.007,
     size: 10,
-    life: 100,
+    life: 200,
     damage: 100,
     bodyFill: 'green',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),

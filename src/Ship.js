@@ -80,6 +80,7 @@ const TIME_BETWEEN_WANDERS = 5000;
 
 export class Ship extends Entity {
   isShooting = false;
+  isSprinting = false;
   guns = [];
   engines = [];
 
@@ -187,11 +188,12 @@ export class Ship extends Entity {
     
     // Move forward
     if ( !this.isSliding ) {
+      const speed = ( this.isSprinting ? 2 : 1 ) * this.speed;
       this.dx = approach( 
-        this.dx, Math.cos( this.angle ) * this.speed, this.accel, dt 
+        this.dx, Math.cos( this.angle ) * speed, this.accel, dt 
       );
       this.dy = approach( 
-        this.dy, Math.sin( this.angle ) * this.speed, this.accel, dt
+        this.dy, Math.sin( this.angle ) * speed, this.accel, dt
       );
     }
 
