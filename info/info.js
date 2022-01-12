@@ -7,6 +7,13 @@ export const Info = {
     damage: 100,
     bodyFill: 'green',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+    gunInfo: [
+      { offset: { front: 10, side: -10, angle: 0 } },
+      { offset: { front: 10, side:  10, angle: 0 } }, 
+    ],
+    engineInfo: [
+      { offset: { front: -10, side: 0, angle: 0 } },
+    ]
   },
   Scout: {
     speed: 0.15,
@@ -16,6 +23,13 @@ export const Info = {
     damage: 40,
     bodyFill: 'dodgerblue',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+    gunInfo: [
+      { offset: { front: 10, side: -10, angle: 0 } },
+      { offset: { front: 10, side:  10, angle: 0 } }, 
+    ],
+    engineInfo: [
+      { offset: { front: -10, side: 0, angle: 0 } },
+    ]
   },
   Frigate: {
     speed: 0.1,
@@ -25,6 +39,16 @@ export const Info = {
     damage: 100,
     bodyFill: 'cyan',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+    gunInfo: [
+      { offset: { front: 20, side: -20, angle: 0 } },
+      { offset: { front: 20, side: -10, angle: 0 } },
+      { offset: { front: 20, side:  10, angle: 0 } }, 
+      { offset: { front: 20, side:  20, angle: 0 } }, 
+    ],
+    engineInfo: [
+      { offset: { front: -20, side: -10, angle: 0 } },
+      { offset: { front: -20, side:  10, angle: 0 } },
+    ]
   },
   Rock: {
     size: 50,

@@ -16,8 +16,9 @@ class Gun {
   timeBetweenShots = 200;
   owner;
 
-  constructor( gunInfo ) {
+  constructor( gunInfo, owner ) {
     Object.assign( this, gunInfo );
+    this.owner = owner;
   }
 
   update( dt ) {
@@ -51,8 +52,9 @@ class Engine {
   ];
   owner;
 
-  constructor( engineInfo ) {
+  constructor( engineInfo, owner ) {
     Object.assign( this, engineInfo );
+    this.owner = owner;
   }
 
   update( dt ) {
@@ -91,26 +93,9 @@ export class Ship extends Entity {
   constructor( shipInfo ) {
     super( shipInfo );
 
-    this.guns.push(
-      new Gun( { 
-        offset: { front: shipInfo.size, side: -shipInfo.size, angle: 0 }, 
-        owner: this 
-      } )
-    );
-    this.guns.push(
-      new Gun( { 
-        offset: { front: shipInfo.size, side: shipInfo.size, angle: 0 }, 
-        owner: this 
-      } )
-    );
-
-    this.engines.push(
-      new Engine( {
-        offset: { front: -shipInfo.size, side: 0, angle: 0 },
-        owner: this
-      } )
-    );
-
+    shipInfo.gunInfo.forEach( info => this.guns.push( new Gun( info, this ) ) );
+    shipInfo.engineInfo.forEach( info => this.engines.push( new Engine( info, this ) ) );
+    
     this.timers.wander = 0;
   }
 
