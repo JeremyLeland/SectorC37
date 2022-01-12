@@ -310,8 +310,6 @@ class Trail {
         this.#length -= tail.length;
       }
       else {
-        tail.x += Math.cos( tail.angle ) * excess;
-        tail.y += Math.sin( tail.angle ) * excess;
         tail.length -= excess;
         this.#length -= excess;
       }
@@ -323,7 +321,10 @@ class Trail {
       ctx.beginPath();
       
       const last = this.#points[ 0 ];
-      ctx.moveTo( last.x, last.y );
+      ctx.moveTo( 
+        last.x - Math.cos( last.angle ) * last.length, 
+        last.y - Math.sin( last.angle ) * last.length,
+      );
       for ( let i = 1; i < this.#points.length - 1; i ++ ) {
         const width = this.size * i / this.#points.length;
         const segment = this.#points[ i ];
