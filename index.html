@@ -35,6 +35,8 @@
     world.spawnInside( new Rock( Info.Rock ) );
   }
 
+  setInterval( () => world.spawnOutside( new Rock( Info.Rock ) ), 1000 );
+
   for ( let i = 0; i < 5; i ++ ) {
     world.spawnInside( new Ship( Info.Scout ) );
   }

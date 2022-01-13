@@ -40,8 +40,8 @@ export class World {
   #getOutsideLocation( size ) {
     const angle = Math.random() * Math.PI * 2;
     return [ 
-      Math.cos( angle ) * ( this.width + size ), 
-      Math.sin( angle ) * ( this.height + size ) 
+      this.width  / 2 + Math.cos( angle ) * ( this.width + size ), 
+      this.height / 2 + Math.sin( angle ) * ( this.height + size ) 
     ];
   }
 
@@ -49,7 +49,7 @@ export class World {
     const createdEntities = [], createdParticles = [];
 
     this.entities.forEach( entity => entity.update( dt ) );
-    
+
     // TODO: Not everything checks against everything else...do these by category?
     this.entities.forEach( entity => {
       this.entities.forEach( other => {
@@ -65,16 +65,17 @@ export class World {
           entity.hitWith( hit );
         }
       } );
-
+      
       createdEntities.push( ...entity.createdEntities.splice( 0 ) );
       createdParticles.push( ...entity.createdParticles.splice( 0 ) );
     } );
-
+    
     this.particles.forEach( part => part.update( dt ) );
-
+    
     this.entities.push( ...createdEntities );
     this.particles.push( ...createdParticles );    
-
+    
+    // TODO: Remove entities out of bounds?
     this.entities = this.entities.filter( e => e.isAlive() );
     this.particles = this.particles.filter( p => p.isAlive() );
   }
