@@ -71,7 +71,10 @@ export class World {
   draw( ctx ) {
     // DEBUG
     ctx.beginPath();
-    for ( let rad = 0; rad < this.size; rad += 100 ) {
+    ctx.moveTo( -this.size, 0 );  ctx.lineTo( this.size, 0 );
+    ctx.moveTo( 0, -this.size );  ctx.lineTo( 0, this.size );
+    for ( let rad = 0; rad <= this.size; rad += 500 ) {
+      ctx.moveTo( rad, 0 );
       ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
     }
     ctx.strokeStyle = 'gray';
@@ -84,13 +87,16 @@ export class World {
   drawMinimap( ctx ) {
     ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
 
-    const scaleX = ctx.canvas.width / this.width;
-    const scaleY = ctx.canvas.height / this.height;
-    const scaleSize = Math.min( scaleX, scaleY );
-
+    // Assume a square minimap
+    const scale = ctx.canvas.width / ( this.size * 2 );
+    
     this.entities.filter( e => e.size > 8 ).forEach( e => {
       ctx.beginPath();
-      ctx.arc( e.x * scaleX, e.y * scaleY, Math.max( 1, e.size * scaleSize ), 0, Math.PI * 2 );
+      ctx.arc( 
+        ( this.size + e.x ) * scale, 
+        ( this.size + e.y ) * scale, 
+        Math.max( 1, e.size * scale ), 
+        0, Math.PI * 2 );
       ctx.fillStyle = e.bodyFill;
       ctx.fill();
     } );
