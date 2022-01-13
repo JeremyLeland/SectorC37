@@ -1,7 +1,7 @@
 export const Info = {
   Player: {
-    speed: 0.3,
-    turnSpeed: 0.007,
+    speed: 0.2,
+    turnSpeed: 0.005,
     size: 10,
     life: 200,
     damage: 100,
@@ -62,7 +62,7 @@ export const Info = {
     life: 1,
     decay: 1 / 5000,
     damage: 10,
-    bodyFill: 'yellow',
+    bodyFill: 'rgba( 255, 255, 0, 0.5 )',
     bodyPath: new Path2D( `M 1,0 L 0,1 L -10,0 L 0,-1 Z` ),
   },
   Flame: {

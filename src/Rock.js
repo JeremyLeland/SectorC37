@@ -15,7 +15,7 @@ export class Rock extends Entity {
 
   bleed( hit ) {
     for ( let i = 0; i < 3; i ++ ) {
-      this.createDebris();
+      this.createDebris( hit );
     }
   }
 
@@ -47,7 +47,7 @@ export class Rock extends Entity {
     }
   }
 
-  createDebris() {
+  createDebris( hit ) {
     const shard = new Entity( { 
       size: 3,
       life: 1,
@@ -56,7 +56,7 @@ export class Rock extends Entity {
       bodyPath: this.bodyPath
     } );
 
-    this.spawnFromCenter( shard );
+    hit ? this.spawnFromHit( shard, hit, { spread: 0 } ) : this.spawnFromCenter( shard );
     this.createdParticles.push( shard );
   }
 }

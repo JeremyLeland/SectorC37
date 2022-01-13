@@ -55,8 +55,13 @@ export class World {
       this.entities.forEach( other => {
         if ( entity != other && entity.distanceTo( other ) < 0 ) {
           // TODO: Find actual point of impact, and normal
-          const norm = Math.atan2( entity.y - other.y, entity.x - other.x );
-          const hit = { x: other.x, y: other.y, normal: norm, damage: other.damage };
+          const norm = Math.atan2( other.y - entity.y, other.x - entity.x );
+          const hit = { 
+            x: other.x - Math.cos( norm ) * other.size,
+            y: other.y - Math.sin( norm ) * other.size, 
+            normal: norm, 
+            damage: other.damage
+          };
           entity.hitWith( hit );
         }
       } );

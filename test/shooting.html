@@ -1,0 +1,38 @@
+<link rel="stylesheet" href="../style.css">
+
+<body>
+</body>
+
+<script type="module">
+
+  import { Game } from '../src/Game.js';
+  import { Rock } from '../src/Rock.js';
+  import { Ship } from '../src/Ship.js';
+  import { World } from '../src/world.js';
+  import { Info } from '../info/info.js';
+
+  const shooter = new Ship( Info.Player );
+  shooter.x = 100;
+  shooter.y = 100;
+  shooter.speed = 0;
+  shooter.isShooting = true;
+  const target = new Rock( Info.Rock );
+  target.x = 300;
+  target.y = 100;
+  target.life = 999999999;
+  
+  const world = new World( 500, 500 );
+  world.entities.push( shooter );
+  world.entities.push( target );
+
+  const game = new Game();
+  game.update = ( dt ) => {
+    world.update( dt );
+  };
+
+  game.draw = ( ctx ) => {
+    world.draw( ctx );
+  };
+
+</script>
+

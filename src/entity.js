@@ -71,15 +71,15 @@ export class Entity {
     } );
   }
 
-  spawnFromHit( entity, hit, { spread = 0.5, moveSpeed = 0.075, turnSpeed = 0.04 } = {} ) {
+  spawnFromHit( entity, hit, { moveSpeed = 0.075, turnSpeed = 0.04 } = {} ) {
     const ANGLE_SPREAD = 0.5;   // TODO: Parameter
     const dir = hit.normal + randMid() * ANGLE_SPREAD;
     const cos = Math.cos( dir );
     const sin = Math.sin( dir );
  
     Object.assign( entity, { 
-      x: this.x + cos * Math.random() * spread * this.size,
-      y: this.y + sin * Math.random() * spread * this.size,
+      x: hit.x,
+      y: hit.y,
       dx: cos * rand25() * moveSpeed,
       dy: sin * rand25() * moveSpeed,
       angle: dir,
@@ -114,7 +114,7 @@ export class Entity {
 
     ctx.fillStyle = this.bodyFill;
     // ctx.strokeStyle = 'black';
-    // ctx.lineWidth = 1 / this.size;
+    //ctx.lineWidth = 1 / this.size;
     ctx.fill( this.bodyPath );
     // ctx.stroke( this.bodyPath );
 

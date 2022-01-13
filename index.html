@@ -46,6 +46,7 @@
   let timeSinceLastWave = 0, wave = 1;
 
   const healthUI = document.getElementById( 'health' );
+  healthUI.setAttribute( 'max', Info.Player.life );
   const waveUI = document.getElementById( 'wave' );
   const enemiesUI = document.getElementById( 'enemies' );
 

@@ -130,7 +130,7 @@ export class Ship extends Entity {
       bodyPath: this.bodyPath
     } );
 
-    this.spawnFromCenter( shard );
+    hit ? this.spawnFromHit( shard, hit ) : this.spawnFromCenter( shard );
     this.createdParticles.push( shard );
   }
 
@@ -253,6 +253,9 @@ export class Bullet extends Entity {
         bodyFill: this.bodyFill, 
         bodyPath: this.bodyPath
       } );
+
+      // Bullet debris should fly backwards from hit
+      hit.normal += Math.PI;
   
       this.spawnFromHit( shard, hit, { moveSpeed: this.speed * 0.2, turnSpeed: 0 } );
       this.createdParticles.push( shard );
