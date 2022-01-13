@@ -1,49 +1,37 @@
-const SPAWN_DIST = 20;
+const SPAWN_GAP = 2.5;
 
 export class World {
+  size;
   entities = [];
   particles = [];
 
-  constructor( width = 500, height = 400 ) {
-    this.width = width;
-    this.height = height;
+  constructor( size = 500 ) {
+    this.size = size;
   }
 
   spawnInside( entity ) {
-    [ entity.x, entity.y ] = this.getEmptyLocation( entity.size );
+    [ entity.x, entity.y ] = this.getEmptyLocation( entity );
     this.entities.push( entity );
   }
 
   spawnOutside( entity ) {
-    [ entity.x, entity.y ] = this.#getOutsideLocation( entity.size );   // TODO: Make sure these aren't colliding, either?
+    [ entity.x, entity.y ] = this.getEmptyLocation( entity, this.size * 1.0 );
     this.entities.push( entity );
   }
 
-  getEmptyLocation( size ) {
+  getEmptyLocation( entity, radius = Math.random() * this.size ) {
     let x, y, tries = 0;
     do {
-      [ x, y ] = this.#getInsideLocation( size );
+      const angle = Math.random() * Math.PI * 2;
+      x = Math.cos( angle ) * radius;
+      y = Math.sin( angle ) * radius;
       tries ++;
     }
-    while( tries < 10 && this.entities.some( e => Math.hypot( e.x - x, e.y - y ) < size + SPAWN_DIST ) );
+    while( tries < 10 && this.entities.some( e => Math.hypot( e.x - x, e.y - y ) < entity.size * SPAWN_GAP ) );
 
     return [ x, y ];
   }
 
-  #getInsideLocation( size ) {
-    return [
-      size + Math.random() * ( this.width - size * 2 ),
-      size + Math.random() * ( this.height - size * 2 )
-    ];
-  }
-
-  #getOutsideLocation( size ) {
-    const angle = Math.random() * Math.PI * 2;
-    return [ 
-      this.width  / 2 + Math.cos( angle ) * ( this.width + size ), 
-      this.height / 2 + Math.sin( angle ) * ( this.height + size ) 
-    ];
-  }
 
   update( dt ) {
     const createdEntities = [], createdParticles = [];
@@ -81,6 +69,14 @@ export class World {
   }
 
   draw( ctx ) {
+    // DEBUG
+    ctx.beginPath();
+    for ( let rad = 0; rad < this.size; rad += 100 ) {
+      ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
+    }
+    ctx.strokeStyle = 'gray';
+    ctx.stroke();
+
     this.particles.forEach( p => p.draw( ctx ) );
     this.entities.forEach( e => e.draw( ctx ) );
   }

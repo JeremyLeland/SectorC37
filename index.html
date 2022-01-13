@@ -29,7 +29,7 @@
 
   
   const world = new World( 2000, 2000 );
-  const background = createBackground( world.width, world.height );
+  const background = createBackground( world.size * 2, world.size * 2 );
 
   for ( let i = 0; i < 15; i ++ ) {
     world.spawnInside( new Rock( Info.Rock ) );
@@ -58,8 +58,8 @@
   game.update = ( dt ) => {
 
     if ( player.isAlive() ) {  
-      game.scrollX = Math.min( 0, Math.max( window.innerWidth - world.width, window.innerWidth / 2 - player.x ) );
-      game.scrollY = Math.min( 0, Math.max( window.innerHeight - world.height, window.innerHeight / 2 - player.y ) );
+      game.scrollX = Math.min( world.size, Math.max( window.innerWidth - world.size, window.innerWidth / 2 - player.x ) );
+      game.scrollY = Math.min( world.size, Math.max( window.innerHeight - world.size, window.innerHeight / 2 - player.y ) );
       
       player.goalAngle = Math.atan2( 
         game.mouseY - game.scrollY - player.y, 
@@ -106,15 +106,15 @@
   };
 
   game.draw = ( ctx ) => {
-    ctx.drawImage( background, 0, 0 );
+    ctx.drawImage( background, -world.size, -world.size );
     world.draw( ctx );
     world.drawMinimap( minimapCTX );
   };
 
   function createBackground( width, height, density = 2000 ) {
     const background = document.createElement( 'canvas' );
-    background.width = world.width;
-    background.height = world.height;
+    background.width = world.size * 2;
+    background.height = world.size * 2;
 
     const ctx = background.getContext( '2d' );
     
