@@ -83,4 +83,19 @@ export class World {
     this.particles.forEach( p => p.draw( ctx ) );
     this.entities.forEach( e => e.draw( ctx ) );
   }
+
+  drawMinimap( ctx ) {
+    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
+
+    const scaleX = ctx.canvas.width / this.width;
+    const scaleY = ctx.canvas.height / this.height;
+    const scaleSize = Math.min( scaleX, scaleY );
+
+    this.entities.filter( e => e.size > 8 ).forEach( e => {
+      ctx.beginPath();
+      ctx.arc( e.x * scaleX, e.y * scaleY, Math.max( 1, e.size * scaleSize ), 0, Math.PI * 2 );
+      ctx.fillStyle = e.bodyFill;
+      ctx.fill();
+    } );
+  }
 }

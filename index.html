@@ -15,6 +15,7 @@
     <progress id="health" value="100" max="100"></progress>
     <div>Wave: <span id="wave"></span></div>
     <div>Enemies: <span id="enemies"></span></div>
+    <canvas id="minimap" width="100" height="100"></canvas>
   </div>
 </body>
 
@@ -49,6 +50,7 @@
   healthUI.setAttribute( 'max', Info.Player.life );
   const waveUI = document.getElementById( 'wave' );
   const enemiesUI = document.getElementById( 'enemies' );
+  const minimapCTX = document.getElementById( 'minimap' ).getContext( '2d' );
 
   const game = new Game();
   game.update = ( dt ) => {
@@ -104,6 +106,7 @@
   game.draw = ( ctx ) => {
     ctx.drawImage( background, 0, 0 );
     world.draw( ctx );
+    world.drawMinimap( minimapCTX );
   };
 
   function createBackground( width, height, density = 2000 ) {
