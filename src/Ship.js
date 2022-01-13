@@ -100,13 +100,13 @@ export class Ship extends Entity {
     this.timers.wander = 0;
   }
 
-  bleed() {
+  bleed( hit ) {
     for ( let i = 0; i < 3; i ++ ) {
-      this.createDebris();
+      this.createDebris( hit );
     }
   }
 
-  die() {
+  die( hit ) {
     for ( let i = 0; i < 20; i ++ ) {
       this.createFire();
     }
@@ -119,6 +119,19 @@ export class Ship extends Entity {
     const flame = new Flame( Info.Flame );
     this.spawnFromCenter( flame, { spread: 0.5, moveSpeed: 0.01, turnSpeed: 0.01 } );
     this.createdParticles.push( flame );
+  }
+
+  createDebris( hit ) {
+    const shard = new Entity( { 
+      size: 3,
+      life: 1,
+      decay: 1 / 1000,
+      bodyFill: this.bodyFill, 
+      bodyPath: this.bodyPath
+    } );
+
+    this.spawnFromCenter( shard );
+    this.createdParticles.push( shard );
   }
 
   #getAvoidVectors( entities ) {
@@ -231,7 +244,20 @@ export class Bullet extends Entity {
     super( info );
   }
 
-  // TODO: die() with sparks
+  die( hit ) {
+    for ( let i = 0; i < 1; i ++ ) {
+      const shard = new Entity( { 
+        size: 1,
+        life: 1,
+        decay: 1 / 1000,
+        bodyFill: this.bodyFill, 
+        bodyPath: this.bodyPath
+      } );
+  
+      this.spawnFromHit( shard, hit, { moveSpeed: this.speed * 0.2, turnSpeed: 0 } );
+      this.createdParticles.push( shard );
+    }
+  }
 }
 
 export class Flame extends Entity {

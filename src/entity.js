@@ -34,23 +34,24 @@ export class Entity {
     return Math.hypot( this.x - other.x, this.y - other.y ) - this.size - other.size;
   }
 
-  hitWith( other ) {
+  hitWith( hit ) {
     if ( this.isAlive() ) {
-      this.life -= other.damage;
+      this.life -= hit.damage;
 
-      this.bleed();
+      this.bleed( hit );
   
       if ( this.life <= 0 ) {
-        this.die();
+        this.die( hit );
       }
     }
   }
 
-  bleed() {
+  // TODO: Bleed amount, where hit? ( so we have a direction for particles -- otherwise, go from center in all directions)
+  bleed( hit ) {
     // children should override
   }
 
-  die() {
+  die( hit ) {
     // children should override
   }
 
@@ -64,22 +65,27 @@ export class Entity {
       y: this.y + sin * Math.random() * spread * this.size,
       dx: cos * rand25() * moveSpeed,
       dy: sin * rand25() * moveSpeed,
+      angle: dir,
       dAngle: randMid() * turnSpeed,
       dSize: entity.dSize * rand25(),
     } );
   }
 
-  createDebris() {
-    const shard = new Entity( { 
-      size: 3,
-      life: 1,
-      decay: 1 / 1000,
-      bodyFill: this.bodyFill, 
-      bodyPath: this.bodyPath
+  spawnFromHit( entity, hit, { spread = 0.5, moveSpeed = 0.075, turnSpeed = 0.04 } = {} ) {
+    const ANGLE_SPREAD = 0.5;   // TODO: Parameter
+    const dir = hit.normal + randMid() * ANGLE_SPREAD;
+    const cos = Math.cos( dir );
+    const sin = Math.sin( dir );
+ 
+    Object.assign( entity, { 
+      x: this.x + cos * Math.random() * spread * this.size,
+      y: this.y + sin * Math.random() * spread * this.size,
+      dx: cos * rand25() * moveSpeed,
+      dy: sin * rand25() * moveSpeed,
+      angle: dir,
+      dAngle: randMid() * turnSpeed,
+      dSize: entity.dSize * rand25(),
     } );
-
-    this.spawnFromCenter( shard );
-    this.createdParticles.push( shard );
   }
 
   update( dt ) {

@@ -13,13 +13,13 @@ export class Rock extends Entity {
     this.bodyPath = new Path2D( `M ${ getPoints().join( ' L ' ) } Z` );
   }
 
-  bleed() {
+  bleed( hit ) {
     for ( let i = 0; i < 3; i ++ ) {
       this.createDebris();
     }
   }
 
-  die() {
+  die( hit ) {
     // Make smaller rocks
     if ( this.size > 20 ) {
       [ -1, 1 ].forEach( xOffset => {
@@ -45,6 +45,19 @@ export class Rock extends Entity {
     for ( let i = 0; i < this.size / 4; i ++ ) {
       this.createDebris();
     }
+  }
+
+  createDebris() {
+    const shard = new Entity( { 
+      size: 3,
+      life: 1,
+      decay: 1 / 1000,
+      bodyFill: this.bodyFill, 
+      bodyPath: this.bodyPath
+    } );
+
+    this.spawnFromCenter( shard );
+    this.createdParticles.push( shard );
   }
 }
 
