@@ -8,8 +8,8 @@ export const Info = {
     bodyFill: 'green',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
     gunInfo: [
-      { offset: { front: 10, side: -10, angle: 0 } },
-      { offset: { front: 10, side:  10, angle: 0 } }, 
+      { offset: { front: 0, side: -10, angle: 0 } },
+      { offset: { front: 0, side:  10, angle: 0 } }, 
     ],
     engineInfo: [
       { offset: { front: -10, side: 0, angle: 0 } },
@@ -24,8 +24,8 @@ export const Info = {
     bodyFill: 'dodgerblue',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
     gunInfo: [
-      { offset: { front: 10, side: -10, angle: 0 } },
-      { offset: { front: 10, side:  10, angle: 0 } }, 
+      { offset: { front: 0, side: -10, angle: 0 } },
+      { offset: { front: 0, side:  10, angle: 0 } }, 
     ],
     engineInfo: [
       { offset: { front: -10, side: 0, angle: 0 } },
@@ -40,10 +40,10 @@ export const Info = {
     bodyFill: 'cyan',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
     gunInfo: [
-      { offset: { front: 20, side: -20, angle: 0 } },
-      { offset: { front: 20, side: -10, angle: 0 } },
-      { offset: { front: 20, side:  10, angle: 0 } }, 
-      { offset: { front: 20, side:  20, angle: 0 } }, 
+      { offset: { front:  0, side: -20, angle: 0 } },
+      { offset: { front: 10, side: -10, angle: 0 } },
+      { offset: { front: 10, side:  10, angle: 0 } }, 
+      { offset: { front:  0, side:  20, angle: 0 } }, 
     ],
     engineInfo: [
       { offset: { front: -20, side: -10, angle: 0 } },
@@ -59,12 +59,12 @@ export const Info = {
     bodyFill: 'powderblue',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
     gunInfo: [
-      { offset: { front: 40, side: -30, angle: 0 } },
-      { offset: { front: 40, side: -20, angle: 0 } },
-      { offset: { front: 40, side: -10, angle: 0 } },
-      { offset: { front: 40, side:  10, angle: 0 } }, 
-      { offset: { front: 40, side:  20, angle: 0 } }, 
-      { offset: { front: 40, side:  30, angle: 0 } }, 
+      { offset: { front: 10, side: -30, angle: 0 } },
+      { offset: { front: 20, side: -20, angle: 0 } },
+      { offset: { front: 30, side: -10, angle: 0 } },
+      { offset: { front: 30, side:  10, angle: 0 } }, 
+      { offset: { front: 20, side:  20, angle: 0 } }, 
+      { offset: { front: 10, side:  30, angle: 0 } }, 
     ],
     engineInfo: [
       { offset: { front: -40, side: -20, angle: 0 } },

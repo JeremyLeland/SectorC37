@@ -38,6 +38,7 @@ class Gun {
         Math.sin( this.owner.angle + Math.PI / 2 ) * this.offset.side;
       bullet.dx = this.owner.dx + Math.cos( bullet.angle ) * bullet.speed;
       bullet.dy = this.owner.dy + Math.sin( bullet.angle ) * bullet.speed;
+      bullet.owner = this.owner;
   
       this.owner.createdEntities.push( bullet );
 

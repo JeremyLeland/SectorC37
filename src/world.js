@@ -41,7 +41,7 @@ export class World {
     // TODO: Not everything checks against everything else...do these by category?
     this.entities.forEach( entity => {
       this.entities.forEach( other => {
-        if ( entity != other && entity.distanceTo( other ) < 0 ) {
+        if ( entity != other && entity != other.owner && other != entity.owner && entity.distanceTo( other ) < 0 ) {
           // TODO: Find actual point of impact, and normal
           const norm = Math.atan2( other.y - entity.y, other.x - entity.x );
           const hit = { 
