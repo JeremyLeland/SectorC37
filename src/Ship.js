@@ -246,6 +246,8 @@ function approach( current, goal, speed, dt ) {
 
 
 export class Bullet extends Entity {
+  trail = new Trail( this.size, 40, `rgba( 255, 255, 0, 0.5 )` );
+  
   constructor( info ) {
     super( info );
   }
@@ -266,6 +268,16 @@ export class Bullet extends Entity {
       this.spawnFromHit( shard, hit, { moveSpeed: this.speed * 0.2, turnSpeed: 0 } );
       this.createdParticles.push( shard );
     }
+  }
+
+  update( dt ) {
+    super.update( dt );
+
+    this.trail.addPoint( this.x, this.y, this.angle, this.speed * dt );
+  }
+
+  draw( ctx ) {
+    this.trail.draw( ctx );
   }
 }
 
