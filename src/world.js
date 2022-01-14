@@ -72,7 +72,7 @@ export class World {
     ctx.beginPath();
     ctx.moveTo( -this.size, 0 );  ctx.lineTo( this.size, 0 );
     ctx.moveTo( 0, -this.size );  ctx.lineTo( 0, this.size );
-    for ( let rad = 0; rad <= this.size; rad += 500 ) {
+    for ( let rad = 0; rad <= this.size; rad += 1000 ) {
       ctx.moveTo( rad, 0 );
       ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
     }

@@ -14,6 +14,7 @@
     new Ship( Info.Player ),
     new Ship( Info.Scout ),
     new Ship( Info.Frigate ),
+    new Ship( Info.Destroyer ),
   ];
   
   const world = new World( 500, 500 );
@@ -21,6 +22,8 @@
   ships.forEach( ship => world.spawnInside( ship ) );
 
   const game = new Game();
+  game.scrollX = 500;
+  game.scrollY = 500;
   game.update = ( dt ) => {    
     ships.forEach( ship => ship.angle += ship.turnSpeed * dt );
     world.update( dt );

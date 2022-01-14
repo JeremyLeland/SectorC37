@@ -1,6 +1,9 @@
 import { Entity } from './Entity.js';
 import { Info } from '../info/info.js';
 
+const ATTACK_RANGE = 250;
+const ATTACK_AIM = 0.5;
+
 export const Settings = {
   GoalWeight: 0.5,
   AvoidWeight: 100,
@@ -160,7 +163,7 @@ export class Ship extends Entity {
     const goalX = target?.x ?? this.wanderX;
     const goalY = target?.y ?? this.wanderY;
 
-    const avoidVectors = this.#getAvoidVectors( world.entities );
+    const avoidVectors = this.#getAvoidVectors( world.entities.filter( e => !( e instanceof Bullet ) ) );
     const weighted = avoidVectors.map( vector => {
       const weightedDist = Math.abs( Settings.AvoidWeight / Math.pow( vector.dist, Settings.AvoidPower ) );
       return { 
@@ -184,7 +187,7 @@ export class Ship extends Entity {
 
     if ( target ) {
       const angleToTarget = Math.atan2( target.y - this.y, target.x - this.x );
-      this.isShooting = Math.abs( angleToTarget - this.angle ) < 0.5 && this.distanceTo( target ) < 150;
+      this.isShooting = Math.abs( angleToTarget - this.angle ) < ATTACK_AIM && this.distanceTo( target ) < ATTACK_RANGE;
     }
     else {
       this.isShooting = false;

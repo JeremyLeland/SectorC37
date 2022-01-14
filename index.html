@@ -98,6 +98,7 @@
       }
       
       world.spawnOutside( new Ship( Info.Frigate ) );
+      world.spawnOutside( new Ship( Info.Destroyer ) );
     }
 
     enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world ) );

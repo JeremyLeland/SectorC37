@@ -50,6 +50,28 @@ export const Info = {
       { offset: { front: -20, side:  10, angle: 0 } },
     ]
   },
+  Destroyer: {
+    speed: 0.05,
+    turnSpeed: 0.001,
+    size: 40,
+    life: 300,
+    damage: 300,
+    bodyFill: 'powderblue',
+    bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+    gunInfo: [
+      { offset: { front: 40, side: -30, angle: 0 } },
+      { offset: { front: 40, side: -20, angle: 0 } },
+      { offset: { front: 40, side: -10, angle: 0 } },
+      { offset: { front: 40, side:  10, angle: 0 } }, 
+      { offset: { front: 40, side:  20, angle: 0 } }, 
+      { offset: { front: 40, side:  30, angle: 0 } }, 
+    ],
+    engineInfo: [
+      { offset: { front: -40, side: -20, angle: 0 } },
+      { offset: { front: -40, side:   0, angle: 0 } },
+      { offset: { front: -40, side:  20, angle: 0 } },
+    ]
+  },
   Rock: {
     size: 50,
     life: 150,
