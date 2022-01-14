@@ -63,8 +63,7 @@ export class World {
     this.entities.push( ...createdEntities );
     this.particles.push( ...createdParticles );    
     
-    // TODO: Remove entities out of bounds?
-    this.entities = this.entities.filter( e => e.isAlive() );
+    this.entities = this.entities.filter( e => e.isAlive() && Math.hypot( e.x, e.y ) < this.size * 1.5 );
     this.particles = this.particles.filter( p => p.isAlive() );
   }
 
