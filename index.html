@@ -65,10 +65,11 @@
         game.mouseY - game.scrollY - player.y, 
         game.mouseX - game.scrollX - player.x
       );
-      player.isShooting = game.mouseDown;
-
+      
       player.isSliding = game.keysPressed.has( 'Control' );
       player.isSprinting = game.keysPressed.has( 'Shift' );
+
+      player.isShooting = game.mouseDown && !player.isSprinting;
     }
     else {
       playerSpawnTimer -= dt;

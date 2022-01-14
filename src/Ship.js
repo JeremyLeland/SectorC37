@@ -110,10 +110,10 @@ export class Ship extends Entity {
   }
 
   die( hit ) {
-    for ( let i = 0; i < 20; i ++ ) {
+    for ( let i = 0; i < 2 * this.size; i ++ ) {
       this.createFire();
     }
-    for ( let i = 0; i < 30; i ++ ) {
+    for ( let i = 0; i < 3 * this.size; i ++ ) {
       this.createDebris();
     }
   }
@@ -198,7 +198,10 @@ export class Ship extends Entity {
     // Turn toward goal angle
     if ( this.goalAngle ) {
       this.angle = approach( 
-        fixAngleTo( this.angle, this.goalAngle ), this.goalAngle, this.turnSpeed, dt 
+        fixAngleTo( this.angle, this.goalAngle ), 
+        this.goalAngle, 
+        ( this.isSliding ? 1.5 : 1 ) * this.turnSpeed, 
+        dt 
       );  
     }
     
