@@ -13,6 +13,8 @@ export class Entity {
   speed = 0;
   turnSpeed = 0;
   size = 0;
+  mass = 1;
+  
   life = 0;
   decay = 0;
   damage = 0;
@@ -34,9 +36,9 @@ export class Entity {
     return Math.hypot( this.x - other.x, this.y - other.y ) - this.size - other.size;
   }
 
-  hitWith( hit ) {
+  hitWith( hit, other ) {
     if ( this.isAlive() ) {
-      this.life -= hit.damage;
+      this.life -= other.damage;
 
       this.bleed( hit );
   

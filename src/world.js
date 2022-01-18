@@ -39,18 +39,36 @@ export class World {
     this.entities.forEach( entity => entity.update( dt ) );
 
     // TODO: Not everything checks against everything else...do these by category?
+
+    // TODO: Check each pair of objects only once, and call hit on both of them
+    //       (otherwise, "winner" of collision depends on check order)
+
+    let others = this.entities;
     this.entities.forEach( entity => {
-      this.entities.forEach( other => {
-        if ( entity != other && entity != other.owner && other != entity.owner && entity.distanceTo( other ) < 0 ) {
+      others = others.filter( other => other != entity );
+
+      others.forEach( other => {
+        if ( entity != other.owner && other != entity.owner && entity.distanceTo( other ) < 0 ) {
           // TODO: Find actual point of impact, and normal
           const norm = Math.atan2( other.y - entity.y, other.x - entity.x );
           const hit = { 
             x: other.x - Math.cos( norm ) * other.size,
             y: other.y - Math.sin( norm ) * other.size, 
-            normal: norm, 
-            damage: other.damage
+            normal: norm,
           };
-          entity.hitWith( hit );
+          entity.hitWith( hit, other );
+          other.hitWith( hit, entity );
+
+          // No friction or elasticity in this game
+          const normX = Math.cos( norm ), normY = Math.sin( norm );
+          const p = 2 * ( ( entity.dx - other.dx ) * normX + 
+                          ( entity.dy - other.dy ) * normY ) / 
+                        ( entity.mass + other.mass );
+          
+          entity.dx -= p * other.mass * normX;
+          entity.dy -= p * other.mass * normY;
+          other.dx += p * entity.mass * normX;
+          other.dy += p * entity.mass * normY;
         }
       } );
       
@@ -69,15 +87,15 @@ export class World {
 
   draw( ctx ) {
     // DEBUG
-    ctx.beginPath();
-    ctx.moveTo( -this.size, 0 );  ctx.lineTo( this.size, 0 );
-    ctx.moveTo( 0, -this.size );  ctx.lineTo( 0, this.size );
-    for ( let rad = 0; rad <= this.size; rad += 1000 ) {
-      ctx.moveTo( rad, 0 );
-      ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
-    }
-    ctx.strokeStyle = 'gray';
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.moveTo( -this.size, 0 );  ctx.lineTo( this.size, 0 );
+    // ctx.moveTo( 0, -this.size );  ctx.lineTo( 0, this.size );
+    // for ( let rad = 0; rad <= this.size; rad += 1000 ) {
+    //   ctx.moveTo( rad, 0 );
+    //   ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
+    // }
+    // ctx.strokeStyle = 'gray';
+    // ctx.stroke();
 
     this.particles.forEach( p => p.draw( ctx ) );
     this.entities.forEach( e => e.draw( ctx ) );

@@ -263,9 +263,6 @@ export class Bullet extends Entity {
         bodyPath: this.bodyPath
       } );
 
-      // Bullet debris should fly backwards from hit
-      hit.normal += Math.PI;
-  
       this.spawnFromHit( shard, hit, { moveSpeed: this.speed * 0.2, turnSpeed: 0 } );
       this.createdParticles.push( shard );
     }

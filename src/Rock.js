@@ -27,6 +27,7 @@ export class Rock extends Entity {
           const rock = new Rock( Info.Rock );
           
           rock.size = this.size / 2;
+          rock.mass = rock.size * 0.5;
           rock.life = this.size / 2;
           rock.damage = this.damage / 2;
 
