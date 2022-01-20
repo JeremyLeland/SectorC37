@@ -1,3 +1,5 @@
+
+
 const SPAWN_GAP = 2.5;
 
 export class World {
@@ -79,11 +81,9 @@ export class World {
     this.particles.forEach( part => part.update( dt ) );
     
     this.entities.push( ...createdEntities );
-    this.particles.push( ...createdParticles );    
+    this.particles.push( ...createdParticles );
     
-    // TODO: Remove out-of-bounds asteroids, ships that have reached destination?
-    //       Or maybe just bounce the rocks off of an invisible outer boundry? Then I keep the count the same...
-    this.entities = this.entities.filter( e => e.isAlive() /* && Math.hypot( e.x, e.y ) < this.size * 1.5 */ );
+    this.entities = this.entities.filter( e => e.isAlive() );
     this.particles = this.particles.filter( p => p.isAlive() );
   }
 

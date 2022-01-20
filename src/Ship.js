@@ -92,8 +92,8 @@ export class Ship extends Entity {
   isSliding = false;
   accel = 0.002;
 
-  wanderX = 0;
-  wanderY = 0;
+  goalX = 0;
+  goalY = 0;
 
   constructor( shipInfo ) {
     super( shipInfo );
@@ -160,9 +160,14 @@ export class Ship extends Entity {
     //   [ this.wanderX, this.wanderY ] = world.getEmptyLocation( this.size );
     // }
 
+    // Remove ourselves if we reached our goal
+    if ( Math.hypot( this.goalX - this.x, this.goalY - this.y ) < this.size * 2 ) {
+      this.life = 0;
+    }
+
     // TODO: Only if we are close to target
-    const goalX = target?.x ?? this.wanderX;
-    const goalY = target?.y ?? this.wanderY;
+    const goalX = target?.x ?? this.goalX;
+    const goalY = target?.y ?? this.goalY;
 
     const avoidVectors = this.#getAvoidVectors( world.entities.filter( e => !( e instanceof Bullet ) ) );
     const weighted = avoidVectors.map( vector => {
@@ -230,7 +235,7 @@ export class Ship extends Entity {
 
     ctx.beginPath();
     ctx.moveTo( this.x, this.y );
-    ctx.lineTo( this.wanderX, this.wanderY );
+    ctx.lineTo( this.goalX, this.goalY );
     ctx.stroke();
 
     super.draw( ctx );

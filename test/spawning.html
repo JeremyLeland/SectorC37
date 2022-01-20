@@ -24,7 +24,16 @@
           { type: "scout", x: 50, y: -100 },
           { type: "scout", x: 50, y:  100 },
         ]
-      }
+      },
+      {
+        time: 1000,
+        spawns: [
+            // Don't use angle, use x,y offset (so it's not dependent on level size)
+          { type: "scout", x: 0, y: 0 },
+          { type: "scout", x: 50, y: 0 },
+          { type: "scout", x: 100, y: 0 },
+        ]
+      },
     ]
   };
 
@@ -49,8 +58,8 @@
         [ ship.x, ship.y ] = rotatedXY( level.size + spawn.x, spawn.y, level.entryAngle );
         
         // Head straight across the map
-        [ ship.wanderX, ship.wanderY ] = rotatedXY( level.size + spawn.x, -spawn.y, level.exitAngle );
-        ship.angle = Math.atan2( ship.wanderY - ship.y, ship.wanderX - ship.x );
+        [ ship.goalX, ship.goalY ] = rotatedXY( level.size + spawn.x, -spawn.y, level.exitAngle );
+        ship.angle = Math.atan2( ship.goalY - ship.y, ship.goalX - ship.x );
 
         world.entities.push( ship );
       } );
@@ -59,6 +68,15 @@
     }
 
     world.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( null, world ) );
+
+    // "Bounce" out-of-bounds rocks (to try to keep same number of rocks in level)
+    // TODO: Should we add rocks when other rocks are destoryed? Or just randomly?
+    world.entities.filter( e => e instanceof Rock).forEach( rock => {
+      if ( rock.x < -world.size - rock.size ) rock.dx = -rock.dx;
+      if ( rock.y < -world.size - rock.size ) rock.dy = -rock.dy;
+      if ( world.size + rock.size < rock.x )  rock.dx = -rock.dx;
+      if ( world.size + rock.size < rock.y )  rock.dy = -rock.dy;
+    } );
 
     world.update( dt );
   };
