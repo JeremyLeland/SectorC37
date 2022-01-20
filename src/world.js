@@ -14,17 +14,17 @@ export class World {
     this.entities.push( entity );
   }
 
-  spawnOutside( entity ) {
-    [ entity.x, entity.y ] = this.getEmptyLocation( entity, this.size * 1.0 );
+  spawnOutside( entity, angle ) {
+    [ entity.x, entity.y ] = this.getEmptyLocation( entity, this.size * 1.0, angle );
     this.entities.push( entity );
   }
 
-  getEmptyLocation( entity, radius = Math.random() * this.size ) {
+  getEmptyLocation( entity, radius = Math.random() * this.size, angle = Math.random() * Math.PI * 2, spread = Math.PI / 3) {
     let x, y, tries = 0;
     do {
-      const angle = Math.random() * Math.PI * 2;
-      x = Math.cos( angle ) * radius;
-      y = Math.sin( angle ) * radius;
+      const ang = angle + spread * ( Math.random() - 0.5 );
+      x = Math.cos( ang ) * radius;
+      y = Math.sin( ang ) * radius;
       tries ++;
     }
     while( tries < 10 && this.entities.some( e => Math.hypot( e.x - x, e.y - y ) < entity.size * SPAWN_GAP ) );
@@ -81,21 +81,23 @@ export class World {
     this.entities.push( ...createdEntities );
     this.particles.push( ...createdParticles );    
     
-    this.entities = this.entities.filter( e => e.isAlive() && Math.hypot( e.x, e.y ) < this.size * 1.5 );
+    // TODO: Remove out-of-bounds asteroids, ships that have reached destination?
+    //       Or maybe just bounce the rocks off of an invisible outer boundry? Then I keep the count the same...
+    this.entities = this.entities.filter( e => e.isAlive() /* && Math.hypot( e.x, e.y ) < this.size * 1.5 */ );
     this.particles = this.particles.filter( p => p.isAlive() );
   }
 
   draw( ctx ) {
     // DEBUG
-    // ctx.beginPath();
-    // ctx.moveTo( -this.size, 0 );  ctx.lineTo( this.size, 0 );
-    // ctx.moveTo( 0, -this.size );  ctx.lineTo( 0, this.size );
-    // for ( let rad = 0; rad <= this.size; rad += 1000 ) {
-    //   ctx.moveTo( rad, 0 );
-    //   ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
-    // }
-    // ctx.strokeStyle = 'gray';
-    // ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo( -this.size, 0 );  ctx.lineTo( this.size, 0 );
+    ctx.moveTo( 0, -this.size );  ctx.lineTo( 0, this.size );
+    for ( let rad = 0; rad <= this.size; rad += 100 ) {
+      ctx.moveTo( rad, 0 );
+      ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
+    }
+    ctx.strokeStyle = 'gray';
+    ctx.stroke();
 
     this.particles.forEach( p => p.draw( ctx ) );
     this.entities.forEach( e => e.draw( ctx ) );

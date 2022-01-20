@@ -28,7 +28,7 @@
   import { Info } from './info/info.js';
 
   
-  const world = new World( 2000, 2000 );
+  const world = new World( 2000 );
   const background = createBackground( world.size * 2, world.size * 2 );
 
   for ( let i = 0; i < 15; i ++ ) {
@@ -90,16 +90,16 @@
     waveUI.innerText = `${ wave } (${ Math.floor( timeSinceLastWave / 1000 ) })`;
     enemiesUI.innerText = enemies.length;
 
-    if ( timeSinceLastWave > enemies.length * 5000 ) {
+    if ( timeSinceLastWave > 5000 /*enemies.length * 5000*/ ) {
       timeSinceLastWave = 0;
       wave ++;
 
       for ( let i = 0; i < 5; i ++ ) {
-        world.spawnOutside( new Ship( Info.Scout ) );
+        world.spawnOutside( new Ship( Info.Scout ), 0 );
       }
       
-      world.spawnOutside( new Ship( Info.Frigate ) );
-      world.spawnOutside( new Ship( Info.Destroyer ) );
+      world.spawnOutside( new Ship( Info.Frigate ), 0 );
+      world.spawnOutside( new Ship( Info.Destroyer ), 0 );
     }
 
     enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world ) );

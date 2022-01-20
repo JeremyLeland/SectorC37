@@ -155,10 +155,10 @@ export class Ship extends Entity {
 
   think( target, world ) {
     // TODO: Or if we get close
-    if ( this.timers.wander < 0 ) {
-      this.timers.wander = TIME_BETWEEN_WANDERS;
-      [ this.wanderX, this.wanderY ] = world.getEmptyLocation( this.size );
-    }
+    // if ( this.timers.wander < 0 ) {
+    //   this.timers.wander = TIME_BETWEEN_WANDERS;
+    //   [ this.wanderX, this.wanderY ] = world.getEmptyLocation( this.size );
+    // }
 
     // TODO: Only if we are close to target
     const goalX = target?.x ?? this.wanderX;
@@ -227,6 +227,11 @@ export class Ship extends Entity {
     if ( !this.isSliding ) {
       this.engines.forEach( engine => engine.draw( ctx ) );
     }
+
+    ctx.beginPath();
+    ctx.moveTo( this.x, this.y );
+    ctx.lineTo( this.wanderX, this.wanderY );
+    ctx.stroke();
 
     super.draw( ctx );
   }

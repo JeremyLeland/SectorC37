@@ -1,5 +1,3 @@
-import { Info } from '../info/info.js';
-
 export class Entity {
   x = 0;
   y = 0;
@@ -14,7 +12,7 @@ export class Entity {
   turnSpeed = 0;
   size = 0;
   mass = 1;
-  
+
   life = 0;
   decay = 0;
   damage = 0;

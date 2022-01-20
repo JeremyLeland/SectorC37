@@ -1,0 +1,80 @@
+<link rel="stylesheet" href="../style.css">
+
+<body>
+</body>
+
+<script type="module">
+
+  import { Game } from '../src/game.js';
+  import { Ship } from '../src/Ship.js';
+  import { Rock } from '../src/Rock.js';
+  import { World } from '../src/world.js';
+  import { Info } from '../info/info.js';
+
+  const level = {
+    size: 300,
+    entryAngle: 0,
+    exitAngle: 3,
+    waves: [
+      {
+        time: 0,
+        spawns: [
+            // Don't use angle, use x,y offset (so it's not dependent on level size)
+          { type: "scout", x: 0, y: 0 },
+          { type: "scout", x: 50, y: -100 },
+          { type: "scout", x: 50, y:  100 },
+        ]
+      }
+    ]
+  };
+
+  
+  const world = new World( level.size );
+
+  for ( let i = 0; i < 3; i ++ ) {
+    world.spawnInside( new Rock( Info.Rock ) );
+  }
+
+  let levelTime = 0, waveIndex = 0;
+
+  const game = new Game();
+  game.scrollX = 500;
+  game.scrollY = 500;
+  game.update = ( dt ) => {
+    levelTime += dt;
+    
+    if ( waveIndex < level.waves.length && level.waves[ waveIndex ].time <= levelTime ) {
+      level.waves[ waveIndex ].spawns.forEach( spawn => {
+        const ship = new Ship( Info.Scout );  // TODO: get from spawn.type
+        [ ship.x, ship.y ] = rotatedXY( level.size + spawn.x, spawn.y, level.entryAngle );
+        
+        // Head straight across the map
+        [ ship.wanderX, ship.wanderY ] = rotatedXY( level.size + spawn.x, -spawn.y, level.exitAngle );
+        ship.angle = Math.atan2( ship.wanderY - ship.y, ship.wanderX - ship.x );
+
+        world.entities.push( ship );
+      } );
+
+      waveIndex ++;
+    }
+
+    world.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( null, world ) );
+
+    world.update( dt );
+  };
+
+  game.draw = ( ctx ) => {
+    world.draw( ctx );
+  };
+
+  function rotatedXY( x, y, angle ) {
+    const cosX = Math.cos( angle );
+    const sinX = Math.sin( angle );
+    const cosY = Math.cos( angle - Math.PI / 2 );
+    const sinY = Math.sin( angle - Math.PI / 2 );
+
+    return [ cosX * x + cosY * y, sinX * x + sinY * y ];
+  }
+
+</script>
+
