@@ -1,4 +1,6 @@
-
+import { Ship } from './Ship.js';
+import { Rock } from './Rock.js';
+import { Info } from '../info/info.js';
 
 const SPAWN_GAP = 2.5;
 
@@ -6,6 +8,11 @@ export class World {
   size;
   entities = [];
   particles = [];
+
+  level;
+
+  #levelTime = 0;
+  #waveIndex = 0;
 
   constructor( size = 500 ) {
     this.size = size;
@@ -34,11 +41,46 @@ export class World {
     return [ x, y ];
   }
 
+  #updateLevel( dt ) {
+    this.#levelTime += dt;
+
+    if ( this.#waveIndex < this.level.waves.length && this.level.waves[ this.#waveIndex ].time <= this.#levelTime ) {
+      this.level.waves[ this.#waveIndex ].spawns.forEach( spawn => {
+        const ship = new Ship( Info[ spawn.type ] );
+        [ ship.x, ship.y ] = rotatedXY( this.level.size + spawn.x, spawn.y, this.level.entryAngle );
+        
+        // Head straight across the map
+        [ ship.goalX, ship.goalY ] = rotatedXY( this.level.size + spawn.x, -spawn.y, this.level.exitAngle );
+        ship.angle = Math.atan2( ship.goalY - ship.y, ship.goalX - ship.x );
+
+        this.entities.push( ship );
+      } );
+
+      this.#waveIndex ++;
+    }
+  }
+
+  #handleRocks() {
+    // "Bounce" out-of-bounds rocks (to try to keep same number of rocks in level)
+    // TODO: Should we add rocks when other rocks are destoryed? Or just randomly?
+    this.entities.filter( e => e instanceof Rock).forEach( rock => {
+      if ( rock.x < -this.size - rock.size )  rock.dx = -rock.dx;
+      if ( rock.y < -this.size - rock.size )  rock.dy = -rock.dy;
+      if ( this.size + rock.size < rock.x )   rock.dx = -rock.dx;
+      if ( this.size + rock.size < rock.y )   rock.dy = -rock.dy;
+    } );
+  }
 
   update( dt ) {
+    if ( this.level ) { 
+      this.#updateLevel( dt );
+    }
+
     const createdEntities = [], createdParticles = [];
 
     this.entities.forEach( entity => entity.update( dt ) );
+
+    this.#handleRocks();
 
     // TODO: Not everything checks against everything else...do these by category?
 
@@ -120,4 +162,13 @@ export class World {
       ctx.fill();
     } );
   }
+}
+
+function rotatedXY( x, y, angle ) {
+  const cosX = Math.cos( angle );
+  const sinX = Math.sin( angle );
+  const cosY = Math.cos( angle - Math.PI / 2 );
+  const sinY = Math.sin( angle - Math.PI / 2 );
+
+  return [ cosX * x + cosY * y, sinX * x + sinY * y ];
 }

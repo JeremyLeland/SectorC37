@@ -95,6 +95,8 @@ export class Ship extends Entity {
   goalX = 0;
   goalY = 0;
 
+  #avoidDebug = new Path2D();
+
   constructor( shipInfo ) {
     super( shipInfo );
 
@@ -144,7 +146,10 @@ export class Ship extends Entity {
       const cy = this.y - entity.y;
       const angle = Math.atan2( cy, cx );
       const dist = Math.hypot( cx, cy ) - entity.size - this.size;
-      
+
+      // TODO: Make avoid vector perpendicular to their direction of movement?
+      // It's ok to be close to something as long as we're not going to hit it.
+  
       return { 
         angle: angle,
         dist: dist,
@@ -171,11 +176,21 @@ export class Ship extends Entity {
 
     const avoidVectors = this.#getAvoidVectors( world.entities.filter( e => !( e instanceof Bullet ) ) );
     const weighted = avoidVectors.map( vector => {
+
+      // TODO: Weight based on time until collision instead of distance?
+
       const weightedDist = Math.abs( Settings.AvoidWeight / Math.pow( vector.dist, Settings.AvoidPower ) );
       return { 
         x: Math.cos( vector.angle ) * weightedDist / avoidVectors.length,
         y: Math.sin( vector.angle ) * weightedDist / avoidVectors.length,
       };
+    } );
+
+    const DEBUG_SCALE = 200;
+    this.#avoidDebug = new Path2D();
+    weighted.forEach( vector => {
+      this.#avoidDebug.moveTo( this.x, this.y );
+      this.#avoidDebug.lineTo( this.x + vector.x * DEBUG_SCALE, this.y + vector.y * DEBUG_SCALE );
     } );
 
     const goalAngle = Math.atan2( goalY - this.y, goalX - this.x );
@@ -237,6 +252,8 @@ export class Ship extends Entity {
     ctx.moveTo( this.x, this.y );
     ctx.lineTo( this.goalX, this.goalY );
     ctx.stroke();
+
+    ctx.stroke( this.#avoidDebug );
 
     super.draw( ctx );
   }

@@ -27,26 +27,67 @@
   import { World } from './src/world.js';
   import { Info } from './info/info.js';
 
+
+  const level = {
+    size: 2000,
+    entryAngle: 0,
+    exitAngle: 3,
+    waves: [
+      {
+        time: 0,
+        spawns: [
+          { type: "Scout", x: 0, y: 0 },
+          { type: "Scout", x: 50, y: -100 },
+          { type: "Scout", x: 50, y:  100 },
+        ]
+      },
+      {
+        time: 5000,
+        spawns: [
+          { type: "Scout", x: 0, y: 0 },
+          { type: "Scout", x: 50, y: 0 },
+          { type: "Frigate", x: 100, y: 0 },
+          { type: "Scout", x: 100, y: -100 },
+          { type: "Scout", x: 100, y: 100 },
+        ]
+      },
+      {
+        time: 10000,
+        spawns: [
+          { type: "Scout", x: 0, y: 0 },
+          { type: "Scout", x: 50, y: -50 },
+          { type: "Scout", x: 50, y: 50 },
+          { type: "Scout", x: 100, y: -100 },
+          { type: "Scout", x: 100, y: 100 },
+          { type: "Scout", x: 150, y: 0 },
+          { type: "Destroyer", x: 200, y: 0 },
+        ]
+      },
+    ]
+  };
+
   
-  const world = new World( 2000 );
+  const world = new World( level.size );
   const background = createBackground( world.size * 2, world.size * 2 );
 
   for ( let i = 0; i < 15; i ++ ) {
     world.spawnInside( new Rock( Info.Rock ) );
   }
 
-  setInterval( () => world.spawnOutside( new Rock( Info.Rock ) ), 20000 );
+  world.level = level;
 
-  for ( let i = 0; i < 5; i ++ ) {
-    world.spawnInside( new Ship( Info.Scout ) );
-  }
+  // setInterval( () => world.spawnOutside( new Rock( Info.Rock ) ), 20000 );
+
+  // for ( let i = 0; i < 5; i ++ ) {
+  //   world.spawnInside( new Ship( Info.Scout ) );
+  // }
 
   const PLAYER_RESPAWN_DELAY = 2000;
   let playerSpawnTimer = PLAYER_RESPAWN_DELAY;
   let player = new Ship( Info.Player );
   world.spawnInside( player );
 
-  let timeSinceLastWave = 0, wave = 1;
+  // let timeSinceLastWave = 0, wave = 1;
 
   const healthUI = document.getElementById( 'health' );
   healthUI.setAttribute( 'max', Info.Player.life );
@@ -82,25 +123,25 @@
       }
     }
 
-    timeSinceLastWave += dt;
+    // timeSinceLastWave += dt;
     
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
     
     healthUI.value = player.life;
-    waveUI.innerText = `${ wave } (${ Math.floor( timeSinceLastWave / 1000 ) })`;
+    // waveUI.innerText = `${ wave } (${ Math.floor( timeSinceLastWave / 1000 ) })`;
     enemiesUI.innerText = enemies.length;
 
-    if ( timeSinceLastWave > 5000 /*enemies.length * 5000*/ ) {
-      timeSinceLastWave = 0;
-      wave ++;
+    // if ( timeSinceLastWave > 5000 /*enemies.length * 5000*/ ) {
+    //   timeSinceLastWave = 0;
+    //   wave ++;
 
-      for ( let i = 0; i < 5; i ++ ) {
-        world.spawnOutside( new Ship( Info.Scout ), 0 );
-      }
+    //   for ( let i = 0; i < 5; i ++ ) {
+    //     world.spawnOutside( new Ship( Info.Scout ), 0 );
+    //   }
       
-      world.spawnOutside( new Ship( Info.Frigate ), 0 );
-      world.spawnOutside( new Ship( Info.Destroyer ), 0 );
-    }
+    //   world.spawnOutside( new Ship( Info.Frigate ), 0 );
+    //   world.spawnOutside( new Ship( Info.Destroyer ), 0 );
+    // }
 
     enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world ) );
 

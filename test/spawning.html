@@ -12,26 +12,38 @@
   import { Info } from '../info/info.js';
 
   const level = {
-    size: 300,
+    size: 1000,
     entryAngle: 0,
     exitAngle: 3,
     waves: [
       {
         time: 0,
         spawns: [
-            // Don't use angle, use x,y offset (so it's not dependent on level size)
-          { type: "scout", x: 0, y: 0 },
-          { type: "scout", x: 50, y: -100 },
-          { type: "scout", x: 50, y:  100 },
+          { type: "Scout", x: 0, y: 0 },
+          { type: "Scout", x: 50, y: -100 },
+          { type: "Scout", x: 50, y:  100 },
         ]
       },
       {
-        time: 1000,
+        time: 5000,
         spawns: [
-            // Don't use angle, use x,y offset (so it's not dependent on level size)
-          { type: "scout", x: 0, y: 0 },
-          { type: "scout", x: 50, y: 0 },
-          { type: "scout", x: 100, y: 0 },
+          { type: "Scout", x: 0, y: 0 },
+          { type: "Scout", x: 50, y: 0 },
+          { type: "Frigate", x: 100, y: 0 },
+          { type: "Scout", x: 100, y: -100 },
+          { type: "Scout", x: 100, y: 100 },
+        ]
+      },
+      {
+        time: 10000,
+        spawns: [
+          { type: "Scout", x: 0, y: 0 },
+          { type: "Scout", x: 50, y: -50 },
+          { type: "Scout", x: 50, y: 50 },
+          { type: "Scout", x: 100, y: -100 },
+          { type: "Scout", x: 100, y: 100 },
+          { type: "Scout", x: 150, y: 0 },
+          { type: "Destroyer", x: 200, y: 0 },
         ]
       },
     ]
@@ -44,55 +56,25 @@
     world.spawnInside( new Rock( Info.Rock ) );
   }
 
-  let levelTime = 0, waveIndex = 0;
+  world.level = level;
 
   const game = new Game();
-  game.scrollX = 500;
-  game.scrollY = 500;
+  game.scrollX = 750;
+  game.scrollY = 750;
   game.update = ( dt ) => {
-    levelTime += dt;
     
-    if ( waveIndex < level.waves.length && level.waves[ waveIndex ].time <= levelTime ) {
-      level.waves[ waveIndex ].spawns.forEach( spawn => {
-        const ship = new Ship( Info.Scout );  // TODO: get from spawn.type
-        [ ship.x, ship.y ] = rotatedXY( level.size + spawn.x, spawn.y, level.entryAngle );
-        
-        // Head straight across the map
-        [ ship.goalX, ship.goalY ] = rotatedXY( level.size + spawn.x, -spawn.y, level.exitAngle );
-        ship.angle = Math.atan2( ship.goalY - ship.y, ship.goalX - ship.x );
-
-        world.entities.push( ship );
-      } );
-
-      waveIndex ++;
-    }
-
     world.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( null, world ) );
 
-    // "Bounce" out-of-bounds rocks (to try to keep same number of rocks in level)
-    // TODO: Should we add rocks when other rocks are destoryed? Or just randomly?
-    world.entities.filter( e => e instanceof Rock).forEach( rock => {
-      if ( rock.x < -world.size - rock.size ) rock.dx = -rock.dx;
-      if ( rock.y < -world.size - rock.size ) rock.dy = -rock.dy;
-      if ( world.size + rock.size < rock.x )  rock.dx = -rock.dx;
-      if ( world.size + rock.size < rock.y )  rock.dy = -rock.dy;
-    } );
-
-    world.update( dt );
+    //if ( game.keysPressed.size > 0 ) {
+      world.update( dt );
+    //}
   };
 
   game.draw = ( ctx ) => {
     world.draw( ctx );
   };
 
-  function rotatedXY( x, y, angle ) {
-    const cosX = Math.cos( angle );
-    const sinX = Math.sin( angle );
-    const cosY = Math.cos( angle - Math.PI / 2 );
-    const sinY = Math.sin( angle - Math.PI / 2 );
-
-    return [ cosX * x + cosY * y, sinX * x + sinY * y ];
-  }
+  
 
 </script>
 
