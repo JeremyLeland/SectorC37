@@ -1,6 +1,7 @@
 <link rel="stylesheet" href="../style.css">
 
 <body>
+  <div id="debug" style="position: absolute; z-index: 2; width: 550px"></div>
 </body>
 
 <script type="module">
@@ -15,22 +16,22 @@
   const world = new World();
   world.size = 300;
 
-  const rocks = [];
   for ( let i = 0; i < 3; i ++ ) {
     const rock = new Rock( Info.Rock );
     rock.x = i * 90 - 90;
     rock.y = i * 180 - 180;
-    rocks.push( rock );
     world.entities.push( rock );
   }
 
-  const ship = new Ship( Info.Scout );
-  ship.x = 200;
-  ship.y = 0;
-  ship.angle = Math.PI;
-  ship.goalX = -300;
-  ship.goalY = 0;
-  world.entities.push( ship );
+  for ( let i = 0; i < 3; i ++ ) {
+    const ship = new Ship( Info.Scout );
+    ship.x = 200;
+    ship.y = i * 180 - 90;
+    ship.angle = Math.PI;
+    ship.goalX = -300;
+    ship.goalY = 0;
+    world.entities.push( ship );
+  }
 
   const game = new Game();
   game.scrollX = 500;
@@ -42,73 +43,7 @@
   };
 
   game.draw = ( ctx ) => {
-    world.draw( ctx );
-
-    const goalAngle = Math.atan2( ship.goalY - ship.y, ship.goalX - ship.x );
-
-    const edges = [];
-
-    rocks.forEach( rock => {
-      // https://doubleroot.in/lessons/circle/tangent-from-an-external-point-2/
-      const r = rock.size + ship.size;
-      const h = Math.hypot( rock.x - ship.x, rock.y - ship.y );
-      const angle = Math.atan2( rock.y - ship.y, rock.x - ship.x );
-      const spread = Math.asin( r / h );
-      
-      const left = Util.fixAngle( angle - spread );
-      const right = Util.fixAngle( angle + spread );
-
-      const weighted = 150 / h;
-
-      edges.push( { value: weighted, angle: left } );
-      edges.push( { value: -weighted, angle: right } );
-    } );
-
-    edges.sort( ( a, b ) => a.angle - b.angle );
-
-    let value = 0;
-
-    const cones = [];
-
-    for ( let i = 0; i < edges.length; i ++ ) {
-      const left = edges[ i ];
-      const right = edges[ ( i + 1 ) % edges.length ];
-
-      value += left.value;
-
-      cones.push( { left: left.angle, right: right.angle, value: value } );
-    }
-    
-    cones.forEach( cone => {
-      ctx.beginPath();
-      ctx.moveTo( ship.x, ship.y );
-      ctx.arc( ship.x, ship.y, 500, cone.left, cone.right );
-      ctx.closePath();
-      
-      ctx.fillStyle = `rgba( ${ 0 < cone.value ? '128, 0' : '0, 128' }, 0, ${ cone.value == 0 ? 0.5 : cone.value / 2 } )`;    
-      ctx.fill();
-    } );
-
-    cones.sort( ( a, b ) => a.value - b.value );
-
-    const bestCones = cones.filter( c => c.value == cones[ 0 ].value );
-
-    const closestCone = bestCones.sort( ( a, b ) => Math.min(
-      Math.abs( Util.deltaAngle( a.left, goalAngle ) ),
-      Math.abs( Util.deltaAngle( a.right, goalAngle ) )
-    ) - Math.min(
-      Math.abs( Util.deltaAngle( b.left, goalAngle ) ),
-      Math.abs( Util.deltaAngle( b.right, goalAngle ) )
-    ) )[ 0 ];
-
-    ctx.beginPath();
-    ctx.moveTo( ship.x, ship.y );
-    ctx.arc( ship.x, ship.y, 200, closestCone.left, closestCone.right );
-    ctx.closePath();
-    
-    ctx.fillStyle = `rgba( 0, 0, 255, 0.5 )`;    
-    ctx.fill();
-
+    world.draw( ctx );    
   };
 
 </script>

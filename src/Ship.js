@@ -5,6 +5,7 @@ import * as Util from './Util.js';
 const ATTACK_RANGE = 250;
 const ATTACK_AIM = 0.5;
 
+// const debugDiv = document.getElementById( 'debug' );
 
 // TODO: Combine Gun and Engine somehow? Very similar code...
 
@@ -90,7 +91,7 @@ export class Ship extends Entity {
   goalX = 0;
   goalY = 0;
 
-  #avoidDebug = new Path2D();
+  #cones;
 
   constructor( shipInfo ) {
     super( shipInfo );
@@ -138,14 +139,14 @@ export class Ship extends Entity {
   #getBestCone( goalAngle, entities ) {
     const edges = [], cones = [];
 
-    // NOTE: "left" and "right" are misleading/backwards, more like "lower" and "upper"
-
     entities.forEach( other => {
       const r = other.size + this.size * 2;
       const h = Math.hypot( other.x - this.x, other.y - this.y );
       const angle = Math.atan2( other.y - this.y, other.x - this.x );
       const spread = Math.asin( r / h );
       
+      // TODO: Why the wiggle/waggle? Sometimes the cones disappear?
+
       const left = angle - spread;
       const right = angle + spread;
 
@@ -155,6 +156,8 @@ export class Ship extends Entity {
       edges.push( { value: -weighted, angle: right } );
     } );
 
+    // debugDiv.innerText = 'Edges:\n' + JSON.stringify( edges );
+
     edges.sort( ( a, b ) => a.angle - b.angle );
 
     for ( let i = 0, value = 0; i < edges.length; i ++ ) {
@@ -163,12 +166,22 @@ export class Ship extends Entity {
 
       value += left.value;
 
-      cones.push( { left: left.angle, right: right.angle, value: value } );
+      cones.push( { 
+        left: left.angle, 
+        right: right.angle,
+        value: value
+      } );
     }
+
+    // debugDiv.innerText += '\n\nUnsorted:\n' + JSON.stringify( cones );
 
     cones.sort( ( a, b ) => a.value - b.value );
 
+    // debugDiv.innerText += '\n\nSorted:\n' + JSON.stringify( cones );
+
     const bestCones = cones.filter( c => c.value == cones[ 0 ].value );
+
+    this.#cones = cones;  // for debug drawing
 
     return bestCones.sort( ( a, b ) => Math.min(
       Math.abs( Util.deltaAngle( a.left, goalAngle ) ),
@@ -208,8 +221,7 @@ export class Ship extends Entity {
     }
 
     if ( target ) {
-      const angleToTarget = Math.atan2( target.y - this.y, target.x - this.x );
-      this.isShooting = Math.abs( angleToTarget - this.angle ) < ATTACK_AIM && this.distanceTo( target ) < ATTACK_RANGE;
+      this.isShooting = Math.abs( Util.deltaAngle( goalAngle, this.angle ) ) < ATTACK_AIM && this.distanceTo( target ) < ATTACK_RANGE;
     }
     else {
       this.isShooting = false;
@@ -249,11 +261,22 @@ export class Ship extends Entity {
       this.engines.forEach( engine => engine.draw( ctx ) );
     }
 
+    // DEBUG
     ctx.beginPath();
     ctx.moveTo( this.x, this.y );
     ctx.lineTo( this.goalX, this.goalY );
     ctx.strokeStyle = 'green';
     ctx.stroke();
+
+    this.#cones?.forEach( cone => {
+      ctx.beginPath();
+      ctx.moveTo( this.x, this.y );
+      ctx.arc( this.x, this.y, 0.001 < cone.value ? 50 : 100, cone.left, cone.right );
+      ctx.closePath();
+      
+      ctx.fillStyle = 0.001 < cone.value ? `rgba( 128, 0, 0, ${ cone.value * 0.75 } )` : 'rgba( 0, 128, 0, 0.5 )';    
+      ctx.fill();
+    } );
 
     super.draw( ctx );
   }
