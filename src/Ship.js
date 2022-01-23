@@ -1,15 +1,10 @@
 import { Entity } from './Entity.js';
 import { Info } from '../info/info.js';
+import * as Util from './Util.js';
 
 const ATTACK_RANGE = 250;
 const ATTACK_AIM = 0.5;
 
-export const Settings = {
-  GoalWeight: 0.5,
-  AvoidWeight: 100,
-  AvoidPower: 1,
-  DrawForces: false,
-};
 
 // TODO: Combine Gun and Engine somehow? Very similar code...
 
@@ -140,22 +135,48 @@ export class Ship extends Entity {
     this.createdParticles.push( shard );
   }
 
-  #getAvoidVectors( entities ) {
-    return entities.filter( e => e != this ).map( entity => {
-      const cx = this.x - entity.x;
-      const cy = this.y - entity.y;
-      const angle = Math.atan2( cy, cx );
-      const dist = Math.hypot( cx, cy ) - entity.size - this.size;
+  #getBestCone( goalAngle, entities ) {
+    const edges = [], cones = [];
 
-      // TODO: Make avoid vector perpendicular to their direction of movement?
-      // It's ok to be close to something as long as we're not going to hit it.
-  
-      return { 
-        angle: angle,
-        dist: dist,
-      };
+    // NOTE: "left" and "right" are misleading/backwards, more like "lower" and "upper"
+
+    entities.forEach( other => {
+      const r = other.size + this.size * 2;
+      const h = Math.hypot( other.x - this.x, other.y - this.y );
+      const angle = Math.atan2( other.y - this.y, other.x - this.x );
+      const spread = Math.asin( r / h );
+      
+      const left = angle - spread;
+      const right = angle + spread;
+
+      const weighted = 150 / h;
+
+      edges.push( { value: weighted, angle: left } );
+      edges.push( { value: -weighted, angle: right } );
     } );
-    // TODO: Filter out items we can't crash into (e.g. behind us)?
+
+    edges.sort( ( a, b ) => a.angle - b.angle );
+
+    for ( let i = 0, value = 0; i < edges.length; i ++ ) {
+      const left = edges[ i ];
+      const right = edges[ ( i + 1 ) % edges.length ];
+
+      value += left.value;
+
+      cones.push( { left: left.angle, right: right.angle, value: value } );
+    }
+
+    cones.sort( ( a, b ) => a.value - b.value );
+
+    const bestCones = cones.filter( c => c.value == cones[ 0 ].value );
+
+    return bestCones.sort( ( a, b ) => Math.min(
+      Math.abs( Util.deltaAngle( a.left, goalAngle ) ),
+      Math.abs( Util.deltaAngle( a.right, goalAngle ) )
+    ) - Math.min(
+      Math.abs( Util.deltaAngle( b.left, goalAngle ) ),
+      Math.abs( Util.deltaAngle( b.right, goalAngle ) )
+    ) )[ 0 ];
   }
 
   think( target, world ) {
@@ -173,38 +194,18 @@ export class Ship extends Entity {
     // TODO: Only if we are close to target
     const goalX = target?.x ?? this.goalX;
     const goalY = target?.y ?? this.goalY;
-
-    const avoidVectors = this.#getAvoidVectors( world.entities.filter( e => !( e instanceof Bullet ) ) );
-    const weighted = avoidVectors.map( vector => {
-
-      // TODO: Weight based on time until collision instead of distance?
-
-      const weightedDist = Math.abs( Settings.AvoidWeight / Math.pow( vector.dist, Settings.AvoidPower ) );
-      return { 
-        x: Math.cos( vector.angle ) * weightedDist / avoidVectors.length,
-        y: Math.sin( vector.angle ) * weightedDist / avoidVectors.length,
-      };
-    } );
-
-    const DEBUG_SCALE = 200;
-    this.#avoidDebug = new Path2D();
-    weighted.forEach( vector => {
-      this.#avoidDebug.moveTo( this.x, this.y );
-      this.#avoidDebug.lineTo( this.x + vector.x * DEBUG_SCALE, this.y + vector.y * DEBUG_SCALE );
-    } );
-
     const goalAngle = Math.atan2( goalY - this.y, goalX - this.x );
-    const goalForce = {
-      x: Settings.GoalWeight * Math.cos( goalAngle ), 
-      y: Settings.GoalWeight * Math.sin( goalAngle ),
+
+    // TODO: Only nearby entities?
+    const cone = this.#getBestCone( goalAngle, world.entities.filter( e => e != this ) );
+    
+    if ( Util.betweenAngles( goalAngle, cone.left, cone.right ) ) {
+      this.goalAngle = goalAngle;
     }
-
-    const finalForce = weighted.reduce(
-      ( acc, wv ) => ( { x: acc.x + wv.x, y: acc.y + wv.y } ),
-      goalForce
-    );
-
-    this.goalAngle = Math.atan2( finalForce.y, finalForce.x );    
+    else {
+      this.goalAngle = Math.abs( Util.deltaAngle( cone.left, goalAngle ) ) < Math.abs( Util.deltaAngle( cone.right, goalAngle ) ) ? 
+        cone.left : cone.right;
+    }
 
     if ( target ) {
       const angleToTarget = Math.atan2( target.y - this.y, target.x - this.x );

@@ -1,3 +1,5 @@
+import * as Util from './Util.js';
+
 export class Entity {
   x = 0;
   y = 0;
@@ -56,35 +58,35 @@ export class Entity {
   }
 
   spawnFromCenter( entity, { spread = 0.5, moveSpeed = 0.075, turnSpeed = 0.04 } = {} ) {
-    const dir = randMid() * Math.PI * 2;
+    const dir = Util.randMid() * Math.PI * 2;
     const cos = Math.cos( dir );
     const sin = Math.sin( dir );
  
     Object.assign( entity, { 
       x: this.x + cos * Math.random() * spread * this.size,
       y: this.y + sin * Math.random() * spread * this.size,
-      dx: cos * rand25() * moveSpeed,
-      dy: sin * rand25() * moveSpeed,
+      dx: cos * Util.rand25() * moveSpeed,
+      dy: sin * Util.rand25() * moveSpeed,
       angle: dir,
-      dAngle: randMid() * turnSpeed,
-      dSize: entity.dSize * rand25(),
+      dAngle: Util.randMid() * turnSpeed,
+      dSize: entity.dSize * Util.rand25(),
     } );
   }
 
   spawnFromHit( entity, hit, { moveSpeed = 0.075, turnSpeed = 0.04 } = {} ) {
     const ANGLE_SPREAD = 0.5;   // TODO: Parameter
-    const dir = hit.normal + randMid() * ANGLE_SPREAD;
+    const dir = hit.normal + Util.randMid() * ANGLE_SPREAD;
     const cos = Math.cos( dir );
     const sin = Math.sin( dir );
  
     Object.assign( entity, { 
       x: hit.x,
       y: hit.y,
-      dx: cos * rand25() * moveSpeed,
-      dy: sin * rand25() * moveSpeed,
+      dx: cos * Util.rand25() * moveSpeed,
+      dy: sin * Util.rand25() * moveSpeed,
       angle: dir,
-      dAngle: randMid() * turnSpeed,
-      dSize: entity.dSize * rand25(),
+      dAngle: Util.randMid() * turnSpeed,
+      dSize: entity.dSize * Util.rand25(),
     } );
   }
 
@@ -119,6 +121,13 @@ export class Entity {
     // ctx.stroke( this.bodyPath );
 
     ctx.restore();
+
+    // DEBUG
+    ctx.beginPath();
+    ctx.moveTo( this.x, this.y );
+    ctx.arc( this.x, this.y, this.size, 0, Math.PI * 2 );
+    ctx.strokeStyle = 'white';
+    ctx.stroke();
   }
 
   timeUntilHit( other ) {
@@ -141,8 +150,3 @@ export class Entity {
     return disc < 0 ? Infinity : ( -b - Math.sqrt( disc ) ) / ( 2 * a );
   }
 }
-
-
-
-function rand25()  { return Math.random() + 0.25; }
-function randMid() { return Math.random() - 0.50; }

@@ -1,14 +1,15 @@
 import { Entity } from './Entity.js';
 import { Info } from '../info/info.js';
+import * as Util from './Util.js';
 
 export class Rock extends Entity {
   constructor( info ) {
     super( info );
 
     this.angle = Math.random() * Math.PI * 2;
-    this.dx = randMid() * 0.01;
-    this.dy = randMid() * 0.01;
-    this.dAngle = randMid() * 0.001;
+    this.dx = Util.randMid() * 0.01;
+    this.dy = Util.randMid() * 0.01;
+    this.dAngle = Util.randMid() * 0.001;
 
     this.bodyPath = new Path2D( `M ${ getPoints().join( ' L ' ) } Z` );
   }
@@ -60,19 +61,18 @@ export class Rock extends Entity {
     hit ? this.spawnFromHit( shard, hit, { spread: 0 } ) : this.spawnFromCenter( shard );
     this.createdParticles.push( shard );
   }
+
+
 }
 
 function getPoints( numPoints = 12 ) {
   const spacing = Math.PI * 2 / numPoints;
   const angles = Array.from( Array( numPoints ), ( _, ndx ) => 
-    spacing * ( ndx + randMid() * 0.5 ) 
+    spacing * ( ndx + Util.randMid() * 0.5 ) 
   );
   return angles.map( angle => 
     [ Math.cos( angle ), Math.sin( angle ) ].map( e => 
-      e + randMid() * 0.2 
+      e + Util.randMid() * 0.2 
     )
   );
 }
-
-function rand25()  { return Math.random() + 0.25; }
-function randMid() { return Math.random() - 0.50; }

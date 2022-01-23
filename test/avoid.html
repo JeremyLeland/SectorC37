@@ -10,6 +10,7 @@
   import { Rock } from '../src/Rock.js';
   import { World } from '../src/world.js';
   import { Info } from '../info/info.js';
+  import * as Util from '../src/Util.js';
   
   const world = new World();
   world.size = 300;
@@ -48,13 +49,14 @@
     const edges = [];
 
     rocks.forEach( rock => {
+      // https://doubleroot.in/lessons/circle/tangent-from-an-external-point-2/
       const r = rock.size + ship.size;
       const h = Math.hypot( rock.x - ship.x, rock.y - ship.y );
       const angle = Math.atan2( rock.y - ship.y, rock.x - ship.x );
-      const spread = Math.atan2( r, h );
+      const spread = Math.asin( r / h );
       
-      const left = angle - spread;
-      const right = angle + spread;
+      const left = Util.fixAngle( angle - spread );
+      const right = Util.fixAngle( angle + spread );
 
       const weighted = 150 / h;
 
@@ -83,7 +85,7 @@
       ctx.arc( ship.x, ship.y, 500, cone.left, cone.right );
       ctx.closePath();
       
-      ctx.fillStyle = `rgba( ${ 0 < cone.value ? '128, 0' : '0, 128' }, 0, ${ cone.value == 0 ? 0.5 : cone.value } )`;    
+      ctx.fillStyle = `rgba( ${ 0 < cone.value ? '128, 0' : '0, 128' }, 0, ${ cone.value == 0 ? 0.5 : cone.value / 2 } )`;    
       ctx.fill();
     } );
 
@@ -92,11 +94,11 @@
     const bestCones = cones.filter( c => c.value == cones[ 0 ].value );
 
     const closestCone = bestCones.sort( ( a, b ) => Math.min(
-      Math.abs( deltaAngle( a.left, goalAngle ) ),
-      Math.abs( deltaAngle( a.right, goalAngle ) )
+      Math.abs( Util.deltaAngle( a.left, goalAngle ) ),
+      Math.abs( Util.deltaAngle( a.right, goalAngle ) )
     ) - Math.min(
-      Math.abs( deltaAngle( b.left, goalAngle ) ),
-      Math.abs( deltaAngle( b.right, goalAngle ) )
+      Math.abs( Util.deltaAngle( b.left, goalAngle ) ),
+      Math.abs( Util.deltaAngle( b.right, goalAngle ) )
     ) )[ 0 ];
 
     ctx.beginPath();
@@ -104,17 +106,10 @@
     ctx.arc( ship.x, ship.y, 200, closestCone.left, closestCone.right );
     ctx.closePath();
     
-    ctx.fillStyle = 'blue';    
+    ctx.fillStyle = `rgba( 0, 0, 255, 0.5 )`;    
     ctx.fill();
 
   };
-
-  function deltaAngle( a, b ) {
-    let delta = b - a;
-    if ( delta > Math.PI )        delta -= Math.PI * 2;
-    else if ( delta < -Math.PI )  delta += Math.PI * 2;
-    return delta;
-  }
 
 </script>
 
