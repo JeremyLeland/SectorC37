@@ -5,6 +5,8 @@ import * as Util from './Util.js';
 const ATTACK_RANGE = 250;
 const ATTACK_AIM = 0.5;
 
+const AVOID_TIME = 500;
+
 // const debugDiv = document.getElementById( 'debug' );
 
 // TODO: Combine Gun and Engine somehow? Very similar code...
@@ -141,19 +143,32 @@ export class Ship extends Entity {
 
     entities.forEach( other => {
       const r = other.size + this.size * 2;
-      const h = Math.hypot( other.x - this.x, other.y - this.y );
-      const angle = Math.atan2( other.y - this.y, other.x - this.x );
-      const spread = Math.asin( r / h );
       
-      // TODO: Why the wiggle/waggle? Sometimes the cones disappear?
+      const lefts = [], rights = [], weights = [];
 
-      const left = angle - spread;
-      const right = angle + spread;
+      // TODO: This kind of works with a low-ish AVOID_TIME, but it doesn't
+      // seem to work as well if other is travelling faster. Maybe some
+      // sort of "sweep" test here rather than look at two separate times?
+      [ 0, AVOID_TIME ].forEach( time => {
+        const cx = other.x + other.dx * time - this.x;
+        const cy = other.y + other.dy * time - this.y;
+        const h = Math.hypot( cx, cy );
+        const angle = Math.atan2( cy, cx );
+        const spread = Math.asin( r / h );
 
-      const weighted = 150 / h;
+        // TODO: Add to list of lefts, take min of list
+        
+        lefts.push( angle - spread );
+        rights.push( angle + spread );
+        weights.push( 150 / h );
+      } );
 
-      edges.push( { value: weighted, angle: left } );
-      edges.push( { value: -weighted, angle: right } );
+      const left = Math.min( ...lefts );
+      const right = Math.max( ...rights );
+      const weight = Math.max( ...weights );
+      
+      edges.push( { value: weight, angle: left } );
+      edges.push( { value: -weight, angle: right } );
     } );
 
     // debugDiv.innerText = 'Edges:\n' + JSON.stringify( edges );
@@ -268,13 +283,19 @@ export class Ship extends Entity {
     ctx.strokeStyle = 'green';
     ctx.stroke();
 
+    ctx.beginPath();
+    ctx.moveTo( this.x, this.y );
+    ctx.lineTo( this.x + this.dx * AVOID_TIME, this.y + this.dy * AVOID_TIME );
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
+
     this.#cones?.forEach( cone => {
       ctx.beginPath();
       ctx.moveTo( this.x, this.y );
       ctx.arc( this.x, this.y, 0.001 < cone.value ? 50 : 100, cone.left, cone.right );
       ctx.closePath();
       
-      ctx.fillStyle = 0.001 < cone.value ? `rgba( 128, 0, 0, ${ cone.value * 0.75 } )` : 'rgba( 0, 128, 0, 0.5 )';    
+      ctx.fillStyle = 0.001 < cone.value ? `rgba( 128, 0, 0, ${ cone.value * 0.1 } )` : 'rgba( 0, 128, 0, 0.5 )';    
       ctx.fill();
     } );
 

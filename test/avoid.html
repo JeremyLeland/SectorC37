@@ -14,12 +14,12 @@
   import * as Util from '../src/Util.js';
   
   const world = new World();
-  world.size = 300;
+  world.size = 400;
 
   for ( let i = 0; i < 3; i ++ ) {
     const rock = new Rock( Info.Rock );
     rock.x = i * 90 - 90;
-    rock.y = i * 180 - 180;
+    rock.y = i * 280 - 180;
     world.entities.push( rock );
   }
 
@@ -28,7 +28,7 @@
     ship.x = 200;
     ship.y = i * 180 - 90;
     ship.angle = Math.PI;
-    ship.goalX = -300;
+    ship.goalX = -400;
     ship.goalY = 0;
     world.entities.push( ship );
   }
