@@ -63,7 +63,7 @@
   game.scrollY = 750;
   game.update = ( dt ) => {
     
-    world.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( null, world ) );
+    //world.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( null, world ) );
 
     //if ( game.keysPressed.size > 0 ) {
       world.update( dt );

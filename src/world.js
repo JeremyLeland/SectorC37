@@ -14,8 +14,9 @@ export class World {
   #levelTime = 0;
   #waveIndex = 0;
 
-  constructor( size = 500 ) {
-    this.size = size;
+  constructor( level ) {
+    this.level = level;
+    this.size = level?.size ?? 500;
   }
 
   spawnInside( entity ) {
@@ -37,6 +38,10 @@ export class World {
       tries ++;
     }
     while( tries < 10 && this.entities.some( e => Math.hypot( e.x - x, e.y - y ) < entity.size * SPAWN_GAP ) );
+
+    if ( tries == 10 ) {
+      debugger;
+    }
 
     return [ x, y ];
   }
@@ -76,17 +81,15 @@ export class World {
       this.#updateLevel( dt );
     }
 
-    const createdEntities = [], createdParticles = [];
-
+    
     this.entities.forEach( entity => entity.update( dt ) );
-
+    
     this.#handleRocks();
-
+    this.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( null, this ) );
+    
     // TODO: Not everything checks against everything else...do these by category?
-
-    // TODO: Check each pair of objects only once, and call hit on both of them
-    //       (otherwise, "winner" of collision depends on check order)
-
+    
+    const createdEntities = [], createdParticles = [];
     let others = this.entities;
     this.entities.forEach( entity => {
       others = others.filter( other => other != entity );

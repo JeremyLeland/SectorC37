@@ -251,9 +251,8 @@ export class Ship extends Entity {
     ctx.beginPath();
     ctx.moveTo( this.x, this.y );
     ctx.lineTo( this.goalX, this.goalY );
+    ctx.strokeStyle = 'green';
     ctx.stroke();
-
-    ctx.stroke( this.#avoidDebug );
 
     super.draw( ctx );
   }
