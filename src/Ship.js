@@ -156,11 +156,9 @@ export class Ship extends Entity {
         const h = Math.hypot( cx, cy );
         const angle = Math.atan2( cy, cx );
         const spread = Math.asin( r / h );
-
-        // TODO: Add to list of lefts, take min of list
         
-        lefts.push( angle - spread );
-        rights.push( angle + spread );
+        lefts.push( Util.fixAngle( angle - spread ) );
+        rights.push( Util.fixAngle( angle + spread ) );
         weights.push( 150 / h );
       } );
 
@@ -208,6 +206,8 @@ export class Ship extends Entity {
     
     // debugDiv.innerText += '\n\nGoal Angle: ' + goalAngle;
 
+    // debugDiv.innerText += `\n\nPos: ${ this.x },${ this.y }`;
+
     return bestCones.sort( ( a, b ) => Math.min(
       Math.abs( Util.deltaAngle( a.left, goalAngle ) ),
       Math.abs( Util.deltaAngle( a.right, goalAngle ) )
@@ -236,6 +236,8 @@ export class Ship extends Entity {
 
     // TODO: Only nearby entities?
     const cone = this.#getBestCone( goalAngle, world.entities.filter( e => e != this ) );
+
+    // debugDiv.innerText += '\n\nBest cone: ' + JSON.stringify( cone );
 
     this.#bestCone = cone;
     
