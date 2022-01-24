@@ -3,6 +3,7 @@
 //
 export function fixAngle( a ) {
   return a > Math.PI ? a - Math.PI * 2 : a < -Math.PI ? a + Math.PI * 2 : a;
+  //return a - Math.floor( a / Math.PI ) * Math.PI * 2;
 }
 
 export function deltaAngle( a, b ) {

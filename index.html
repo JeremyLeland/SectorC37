@@ -67,14 +67,12 @@
   };
 
   
-  const world = new World( level.size );
+  const world = new World( level );
   const background = createBackground( world.size * 2, world.size * 2 );
 
   for ( let i = 0; i < 15; i ++ ) {
     world.spawnInside( new Rock( Info.Rock ) );
   }
-
-  world.level = level;
 
   // setInterval( () => world.spawnOutside( new Rock( Info.Rock ) ), 20000 );
 

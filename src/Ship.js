@@ -94,6 +94,7 @@ export class Ship extends Entity {
   goalY = 0;
 
   #cones;
+  #bestCone;
 
   constructor( shipInfo ) {
     super( shipInfo );
@@ -167,24 +168,31 @@ export class Ship extends Entity {
       const right = Math.max( ...rights );
       const weight = Math.max( ...weights );
       
-      edges.push( { value: weight, angle: left } );
-      edges.push( { value: -weight, angle: right } );
+      edges.push( { value: weight, angle: left, type: 'left' } );
+      edges.push( { value: weight, angle: right, type: 'right' } );
     } );
 
     // debugDiv.innerText = 'Edges:\n' + JSON.stringify( edges );
 
     edges.sort( ( a, b ) => a.angle - b.angle );
 
-    for ( let i = 0, value = 0; i < edges.length; i ++ ) {
-      const left = edges[ i ];
-      const right = edges[ ( i + 1 ) % edges.length ];
+    const values = [];
 
-      value += left.value;
+    for ( let i = 0; i < edges.length; i ++ ) {
+      const a = edges[ i ];
+      const b = edges[ ( i + 1 ) % edges.length ];
+
+      if ( a.type == 'left' ) {
+        values.push( a.value );
+      }
+      else {
+        values.pop();
+      }
 
       cones.push( { 
-        left: left.angle, 
-        right: right.angle,
-        value: value
+        left: a.angle, 
+        right: b.angle,
+        value: values.reduce( ( acc, i ) => acc + i, 0 ),
       } );
     }
 
@@ -197,6 +205,8 @@ export class Ship extends Entity {
     const bestCones = cones.filter( c => c.value == cones[ 0 ].value );
 
     this.#cones = cones;  // for debug drawing
+    
+    // debugDiv.innerText += '\n\nGoal Angle: ' + goalAngle;
 
     return bestCones.sort( ( a, b ) => Math.min(
       Math.abs( Util.deltaAngle( a.left, goalAngle ) ),
@@ -226,6 +236,8 @@ export class Ship extends Entity {
 
     // TODO: Only nearby entities?
     const cone = this.#getBestCone( goalAngle, world.entities.filter( e => e != this ) );
+
+    this.#bestCone = cone;
     
     if ( Util.betweenAngles( goalAngle, cone.left, cone.right ) ) {
       this.goalAngle = goalAngle;
@@ -285,7 +297,7 @@ export class Ship extends Entity {
 
     ctx.beginPath();
     ctx.moveTo( this.x, this.y );
-    ctx.lineTo( this.x + this.dx * AVOID_TIME, this.y + this.dy * AVOID_TIME );
+    ctx.lineTo( this.x + Math.cos( this.goalAngle ) * AVOID_TIME, this.y + Math.sin( this.goalAngle ) * AVOID_TIME );
     ctx.strokeStyle = 'blue';
     ctx.stroke();
 
@@ -295,9 +307,19 @@ export class Ship extends Entity {
       ctx.arc( this.x, this.y, 0.001 < cone.value ? 50 : 100, cone.left, cone.right );
       ctx.closePath();
       
-      ctx.fillStyle = 0.001 < cone.value ? `rgba( 128, 0, 0, ${ cone.value * 0.1 } )` : 'rgba( 0, 128, 0, 0.5 )';    
+      ctx.fillStyle = 0.001 < cone.value ? `rgba( 128, 0, 0, ${ cone.value * 0.5 } )` : 'rgba( 0, 128, 0, 0.5 )';    
       ctx.fill();
     } );
+
+    if ( this.#bestCone ) {
+      ctx.beginPath();
+      ctx.moveTo( this.x, this.y );
+      ctx.arc( this.x, this.y, 50, this.#bestCone.left, this.#bestCone.right );
+      ctx.closePath();
+
+      ctx.fillStyle = 'blue';    
+      ctx.fill();
+    }
 
     super.draw( ctx );
   }

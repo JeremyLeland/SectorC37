@@ -50,13 +50,11 @@
   };
 
   
-  const world = new World( level.size );
+  const world = new World( level );
 
   for ( let i = 0; i < 3; i ++ ) {
     world.spawnInside( new Rock( Info.Rock ) );
   }
-
-  world.level = level;
 
   const game = new Game();
   game.scrollX = 750;
