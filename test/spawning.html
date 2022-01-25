@@ -12,7 +12,7 @@
   import { Info } from '../info/info.js';
 
   const level = {
-    size: 1000,
+    size: 500,
     entryAngle: 0,
     exitAngle: 3,
     waves: [
@@ -57,15 +57,15 @@
   }
 
   const game = new Game();
-  game.scrollX = 750;
-  game.scrollY = 750;
+  game.scrollX = 500;
+  game.scrollY = 500;
   game.update = ( dt ) => {
     
     //world.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( null, world ) );
 
-    //if ( game.keysPressed.size > 0 ) {
+    if ( game.keysPressed.size > 0 ) {
       world.update( dt );
-    //}
+    }
   };
 
   game.draw = ( ctx ) => {

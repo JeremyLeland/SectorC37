@@ -7,7 +7,7 @@ const ATTACK_AIM = 0.5;
 
 const AVOID_TIME = 500;
 
-// const debugDiv = document.getElementById( 'debug' );
+const debugDiv = document.getElementById( 'debug' );
 
 // TODO: Combine Gun and Engine somehow? Very similar code...
 
@@ -139,8 +139,8 @@ export class Ship extends Entity {
     this.createdParticles.push( shard );
   }
 
-  #getBestCone( goalAngle, entities ) {
-    const edges = [], cones = [];
+  #getAvoidAngle( goalAngle, entities ) {
+    const cones = [];
 
     entities.forEach( other => {
       const r = other.size + this.size * 2;
@@ -155,66 +155,56 @@ export class Ship extends Entity {
         const cy = other.y + other.dy * time - this.y;
         const h = Math.hypot( cx, cy );
         const angle = Math.atan2( cy, cx );
-        const spread = Math.asin( r / h );
+        const spread = Math.asin( Math.min( 1, r / h ) );   // prevent floating point errors when we get really close
+
+        if ( !h || !angle || !spread ) {
+          debugger;
+        }
         
         lefts.push( Util.fixAngle( angle - spread ) );
         rights.push( Util.fixAngle( angle + spread ) );
         weights.push( 150 / h );
       } );
 
-      const left = Math.min( ...lefts );
-      const right = Math.max( ...rights );
-      const weight = Math.max( ...weights );
-      
-      edges.push( { value: weight, angle: left, type: 'left' } );
-      edges.push( { value: weight, angle: right, type: 'right' } );
+      cones.push( { 
+        left: Math.min( ...lefts ), 
+        right: Math.max( ...rights ),
+        value: Math.max( ...weights ),
+      } );
     } );
 
-    // debugDiv.innerText = 'Edges:\n' + JSON.stringify( edges );
+    // DEBUG
+    // debugDiv.innerText = 'Cones:\n' + JSON.stringify( cones );
+    this.#cones = cones;
 
-    edges.sort( ( a, b ) => a.angle - b.angle );
-
-    const values = [];
-
-    for ( let i = 0; i < edges.length; i ++ ) {
-      const a = edges[ i ];
-      const b = edges[ ( i + 1 ) % edges.length ];
-
-      if ( a.type == 'left' ) {
-        values.push( a.value );
-      }
-      else {
-        values.pop();
-      }
-
-      cones.push( { 
-        left: a.angle, 
-        right: b.angle,
-        value: values.reduce( ( acc, i ) => acc + i, 0 ),
-      } );
-    }
-
-    // debugDiv.innerText += '\n\nUnsorted:\n' + JSON.stringify( cones );
-
-    cones.sort( ( a, b ) => a.value - b.value );
-
-    // debugDiv.innerText += '\n\nSorted:\n' + JSON.stringify( cones );
-
-    const bestCones = cones.filter( c => c.value == cones[ 0 ].value );
-
-    this.#cones = cones;  // for debug drawing
+    const edges = [];
+    const goalAvoidValue = avoidValue( goalAngle, cones );
     
-    // debugDiv.innerText += '\n\nGoal Angle: ' + goalAngle;
+    // debugDiv.innerText += '\n\nGoal Angle: ' + goalAngle + ', avoid value: ' + goalAvoidValue;
 
-    // debugDiv.innerText += `\n\nPos: ${ this.x },${ this.y }`;
-
-    return bestCones.sort( ( a, b ) => Math.min(
-      Math.abs( Util.deltaAngle( a.left, goalAngle ) ),
-      Math.abs( Util.deltaAngle( a.right, goalAngle ) )
-    ) - Math.min(
-      Math.abs( Util.deltaAngle( b.left, goalAngle ) ),
-      Math.abs( Util.deltaAngle( b.right, goalAngle ) )
-    ) )[ 0 ];
+    if ( goalAvoidValue == 0 ) {
+      return goalAngle;
+    }
+    else {   
+      cones.forEach( c => {
+        [ c.left, c.right ].forEach( angle => {
+          edges.push( { 
+            angle: angle, 
+            value: Math.max( 0, avoidValue( angle, cones ) ),
+          } );
+        } );
+      } );
+    
+      // debugDiv.innerText += '\n\Edges:\n' + JSON.stringify( edges );
+    
+      edges.sort( ( a, b ) => a.value - b.value );
+      const bestEdges = edges.filter( c => c.value == edges[ 0 ].value );
+    
+      return bestEdges.sort( ( a, b ) => 
+        Math.abs( Util.deltaAngle( a.angle, goalAngle ) ) - 
+        Math.abs( Util.deltaAngle( b.angle, goalAngle ) )
+      )[ 0 ].angle;
+    }
   }
 
   think( target, world ) {
@@ -234,21 +224,12 @@ export class Ship extends Entity {
     const goalY = target?.y ?? this.goalY;
     const goalAngle = Math.atan2( goalY - this.y, goalX - this.x );
 
-    // TODO: Only nearby entities?
-    const cone = this.#getBestCone( goalAngle, world.entities.filter( e => e != this ) );
-
-    // debugDiv.innerText += '\n\nBest cone: ' + JSON.stringify( cone );
-
-    this.#bestCone = cone;
+    // TODO: Only nearby entities? Handle case of no entities nearby (no best cone?)
+    this.goalAngle = this.#getAvoidAngle(
+      goalAngle, 
+      world.entities.filter( e => e != this && this.distanceTo( e ) < 500 ),
+    );
     
-    if ( Util.betweenAngles( goalAngle, cone.left, cone.right ) ) {
-      this.goalAngle = goalAngle;
-    }
-    else {
-      this.goalAngle = Math.abs( Util.deltaAngle( cone.left, goalAngle ) ) < Math.abs( Util.deltaAngle( cone.right, goalAngle ) ) ? 
-        cone.left : cone.right;
-    }
-
     if ( target ) {
       this.isShooting = Math.abs( Util.deltaAngle( goalAngle, this.angle ) ) < ATTACK_AIM && this.distanceTo( target ) < ATTACK_RANGE;
     }
@@ -325,6 +306,12 @@ export class Ship extends Entity {
 
     super.draw( ctx );
   }
+}
+
+function avoidValue( angle, cones ) {
+  return Math.max( 0, 
+    ...cones.filter( cone => Util.betweenAngles( angle, cone.left, cone.right ) 
+  ).map( c => c.value ) );
 }
 
 function approach( current, goal, speed, dt ) {

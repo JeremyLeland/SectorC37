@@ -18,14 +18,21 @@
 
   for ( let i = 0; i < 3; i ++ ) {
     const rock = new Rock( Info.Rock );
-    rock.x = i * -90 + 90;
-    rock.y = i * 180 - 180;
+    rock.x = i * -120 + 90;
+    rock.y = i * 180 - 80;
+    world.entities.push( rock );
+  }
+
+  for ( let i = 0; i < 3; i ++ ) {
+    const rock = new Rock( Info.Rock );
+    rock.x = i * 150 - 20;
+    rock.y = i * 200 - 180;
     world.entities.push( rock );
   }
 
   for ( let i = 0; i < 3; i ++ ) {
     const ship = new Ship( Info.Scout );
-    ship.x = 200;
+    ship.x = 200 + i * 120;
     ship.y = i * 180 - 90;
     ship.angle = Math.PI;
     ship.goalX = -400;
