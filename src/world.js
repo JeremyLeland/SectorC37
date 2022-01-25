@@ -10,6 +10,7 @@ export class World {
   particles = [];
 
   level;
+  player;
 
   #levelTime = 0;
   #waveIndex = 0;
@@ -85,7 +86,7 @@ export class World {
     this.entities.forEach( entity => entity.update( dt ) );
     
     this.#handleRocks();
-    this.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( null, this ) );
+    this.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( this.player, this ) );
     
     // TODO: Not everything checks against everything else...do these by category?
     
@@ -134,15 +135,15 @@ export class World {
 
   draw( ctx ) {
     // DEBUG
-    ctx.beginPath();
-    ctx.moveTo( -this.size, 0 );  ctx.lineTo( this.size, 0 );
-    ctx.moveTo( 0, -this.size );  ctx.lineTo( 0, this.size );
-    for ( let rad = 0; rad <= this.size; rad += 100 ) {
-      ctx.moveTo( rad, 0 );
-      ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
-    }
-    ctx.strokeStyle = 'gray';
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.moveTo( -this.size, 0 );  ctx.lineTo( this.size, 0 );
+    // ctx.moveTo( 0, -this.size );  ctx.lineTo( 0, this.size );
+    // for ( let rad = 0; rad <= this.size; rad += 100 ) {
+    //   ctx.moveTo( rad, 0 );
+    //   ctx.arc( 0, 0, rad, 0, Math.PI * 2 );
+    // }
+    // ctx.strokeStyle = 'gray';
+    // ctx.stroke();
 
     this.particles.forEach( p => p.draw( ctx ) );
     this.entities.forEach( e => e.draw( ctx ) );

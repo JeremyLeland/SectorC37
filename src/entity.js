@@ -123,11 +123,11 @@ export class Entity {
     ctx.restore();
 
     // DEBUG
-    ctx.beginPath();
-    ctx.moveTo( this.x, this.y );
-    ctx.arc( this.x, this.y, this.size, 0, Math.PI * 2 );
-    ctx.strokeStyle = 'white';
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.moveTo( this.x, this.y );
+    // ctx.arc( this.x, this.y, this.size, 0, Math.PI * 2 );
+    // ctx.strokeStyle = 'white';
+    // ctx.stroke();
   }
 
   timeUntilHit( other ) {

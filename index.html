@@ -84,6 +84,7 @@
   let playerSpawnTimer = PLAYER_RESPAWN_DELAY;
   let player = new Ship( Info.Player );
   world.spawnInside( player );
+  world.player = player;
 
   // let timeSinceLastWave = 0, wave = 1;
 
@@ -118,6 +119,7 @@
 
         player = new Ship( Info.Player );
         world.spawnInside( player );
+        world.player = player;
       }
     }
 

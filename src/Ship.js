@@ -219,15 +219,19 @@ export class Ship extends Entity {
       this.life = 0;
     }
 
-    // TODO: Only if we are close to target
-    const goalX = target?.x ?? this.goalX;
-    const goalY = target?.y ?? this.goalY;
+    let goalX = this.goalX;
+    let goalY = this.goalY;
+
+    if ( target?.distanceTo( this ) < 500 ) {
+      goalX = target.x;
+      goalY = target.y;
+    }
+
     const goalAngle = Math.atan2( goalY - this.y, goalX - this.x );
 
-    // TODO: Only nearby entities? Handle case of no entities nearby (no best cone?)
     this.goalAngle = this.#getAvoidAngle(
       goalAngle, 
-      world.entities.filter( e => e != this && this.distanceTo( e ) < 500 ),
+      world.entities.filter( e => e != this && !( e instanceof Bullet ) && this.distanceTo( e ) < 500 ),
     );
     
     if ( target ) {
@@ -272,37 +276,37 @@ export class Ship extends Entity {
     }
 
     // DEBUG
-    ctx.beginPath();
-    ctx.moveTo( this.x, this.y );
-    ctx.lineTo( this.goalX, this.goalY );
-    ctx.strokeStyle = 'green';
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.moveTo( this.x, this.y );
+    // ctx.lineTo( this.goalX, this.goalY );
+    // ctx.strokeStyle = 'green';
+    // ctx.stroke();
 
-    ctx.beginPath();
-    ctx.moveTo( this.x, this.y );
-    ctx.lineTo( this.x + Math.cos( this.goalAngle ) * AVOID_TIME, this.y + Math.sin( this.goalAngle ) * AVOID_TIME );
-    ctx.strokeStyle = 'blue';
-    ctx.stroke();
+    // ctx.beginPath();
+    // ctx.moveTo( this.x, this.y );
+    // ctx.lineTo( this.x + Math.cos( this.goalAngle ) * AVOID_TIME, this.y + Math.sin( this.goalAngle ) * AVOID_TIME );
+    // ctx.strokeStyle = 'blue';
+    // ctx.stroke();
 
-    this.#cones?.forEach( cone => {
-      ctx.beginPath();
-      ctx.moveTo( this.x, this.y );
-      ctx.arc( this.x, this.y, 0.001 < cone.value ? 50 : 100, cone.left, cone.right );
-      ctx.closePath();
+    // this.#cones?.forEach( cone => {
+    //   ctx.beginPath();
+    //   ctx.moveTo( this.x, this.y );
+    //   ctx.arc( this.x, this.y, 0.001 < cone.value ? 50 : 100, cone.left, cone.right );
+    //   ctx.closePath();
       
-      ctx.fillStyle = 0.001 < cone.value ? `rgba( 128, 0, 0, ${ cone.value * 0.5 } )` : 'rgba( 0, 128, 0, 0.5 )';    
-      ctx.fill();
-    } );
+    //   ctx.fillStyle = 0.001 < cone.value ? `rgba( 128, 0, 0, ${ cone.value * 0.5 } )` : 'rgba( 0, 128, 0, 0.5 )';    
+    //   ctx.fill();
+    // } );
 
-    if ( this.#bestCone ) {
-      ctx.beginPath();
-      ctx.moveTo( this.x, this.y );
-      ctx.arc( this.x, this.y, 50, this.#bestCone.left, this.#bestCone.right );
-      ctx.closePath();
+    // if ( this.#bestCone ) {
+    //   ctx.beginPath();
+    //   ctx.moveTo( this.x, this.y );
+    //   ctx.arc( this.x, this.y, 50, this.#bestCone.left, this.#bestCone.right );
+    //   ctx.closePath();
 
-      ctx.fillStyle = 'blue';    
-      ctx.fill();
-    }
+    //   ctx.fillStyle = 'blue';    
+    //   ctx.fill();
+    // }
 
     super.draw( ctx );
   }
