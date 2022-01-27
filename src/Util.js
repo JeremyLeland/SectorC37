@@ -14,6 +14,15 @@ export function betweenAngles( angle, lower, upper ) {
   return 0 < deltaAngle( lower, angle ) && 0 < deltaAngle( angle, upper ); 
 }
 
+export function rotatedXY( x, y, angle ) {
+  const cosX = Math.cos( angle );
+  const sinX = Math.sin( angle );
+  const cosY = Math.cos( angle - Math.PI / 2 );
+  const sinY = Math.sin( angle - Math.PI / 2 );
+
+  return [ cosX * x + cosY * y, sinX * x + sinY * y ];
+}
+
 //
 // Random
 //

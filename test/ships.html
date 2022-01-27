@@ -17,7 +17,7 @@
     new Ship( Info.Destroyer ),
   ];
   
-  const world = new World( 500, 500 );
+  const world = new World();
 
   ships.forEach( ship => world.spawnInside( ship ) );
 

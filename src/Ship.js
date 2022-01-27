@@ -1,5 +1,7 @@
 import { Entity } from './Entity.js';
+import { Bullet } from './Weapons.js';
 import { Info } from '../info/info.js';
+import { Trail } from './Trail.js';
 import * as Util from './Util.js';
 
 const ATTACK_RANGE = 250;
@@ -26,20 +28,7 @@ class Gun {
     this.timeUntilReady -= dt;
 
     if ( this.timeUntilReady < 0 && this.owner.isShooting ) {
-      const bullet = new Bullet( Info.Bullet );
-      bullet.angle = this.owner.angle + this.offset.angle;
-      bullet.x = this.owner.x + 
-        Math.cos( this.owner.angle ) * this.offset.front + 
-        Math.cos( this.owner.angle + Math.PI / 2 ) * this.offset.side;
-      bullet.y = this.owner.y + 
-        Math.sin( this.owner.angle ) * this.offset.front + 
-        Math.sin( this.owner.angle + Math.PI / 2 ) * this.offset.side;
-      bullet.dx = this.owner.dx + Math.cos( bullet.angle ) * bullet.speed;
-      bullet.dy = this.owner.dy + Math.sin( bullet.angle ) * bullet.speed;
-      bullet.owner = this.owner;
-  
-      this.owner.createdEntities.push( bullet );
-
+      this.owner.createdEntities.push( new Bullet( this ) );
       this.timeUntilReady = this.timeBetweenShots;
     }
   }
@@ -156,10 +145,6 @@ export class Ship extends Entity {
         const h = Math.hypot( cx, cy );
         const angle = Math.atan2( cy, cx );
         const spread = Math.asin( Math.min( 1, r / h ) );   // prevent floating point errors when we get really close
-
-        if ( !h || !angle || !spread ) {
-          debugger;
-        }
         
         lefts.push( Util.fixAngle( angle - spread ) );
         rights.push( Util.fixAngle( angle + spread ) );
@@ -330,41 +315,6 @@ function approach( current, goal, speed, dt ) {
   }
 }
 
-
-
-export class Bullet extends Entity {
-  trail = new Trail( this.size, 40, `rgba( 255, 255, 0, 0.5 )` );
-  
-  constructor( info ) {
-    super( info );
-  }
-
-  die( hit ) {
-    for ( let i = 0; i < 1; i ++ ) {
-      const shard = new Entity( { 
-        size: 1,
-        life: 1,
-        decay: 1 / 1000,
-        bodyFill: this.bodyFill, 
-        bodyPath: this.bodyPath
-      } );
-
-      this.spawnFromHit( shard, hit, { moveSpeed: this.speed * 0.2, turnSpeed: 0 } );
-      this.createdParticles.push( shard );
-    }
-  }
-
-  update( dt ) {
-    super.update( dt );
-
-    this.trail.addPoint( this.x, this.y, this.angle, this.speed * dt );
-  }
-
-  draw( ctx ) {
-    this.trail.draw( ctx );
-  }
-}
-
 export class Flame extends Entity {
   draw( ctx ) {
     ctx.save();
@@ -401,77 +351,3 @@ function fixAngleTo( angle, otherAngle ) {
   return angle;
 }
 
-class Trail {
-  size;
-  maxLength;
-  fillStyle;
-  
-  #points = [];
-  #length = 0;
-
-  constructor( size, maxLength, fillStyle ) {
-    this.size = size;
-    this.maxLength = maxLength;
-    this.fillStyle = fillStyle;
-  }
-
-  addPoint( x, y, angle, length ) {
-    this.#points.push( { x: x, y: y, angle: angle, length: length } );
-    this.#length += length;
-
-    while ( this.#length > this.maxLength && this.#points.length > 0 ) {
-      const excess = this.#length - this.maxLength;
-      const tail = this.#points[ 0 ];
-
-      if ( excess > tail.length ) {
-        this.#points.shift();
-        this.#length -= tail.length;
-      }
-      else {
-        tail.length -= excess;
-        this.#length -= excess;
-      }
-    }
-  }
-
-  draw( ctx ) { 
-    if ( this.#points.length > 0 ) {
-      ctx.beginPath();
-      
-      const last = this.#points[ 0 ];
-      ctx.moveTo( 
-        last.x - Math.cos( last.angle ) * last.length, 
-        last.y - Math.sin( last.angle ) * last.length,
-      );
-      for ( let i = 1; i < this.#points.length - 1; i ++ ) {
-        const width = this.size * i / this.#points.length;
-        const segment = this.#points[ i ];
-  
-        const leftAng = segment.angle - Math.PI / 2;
-        const leftX = segment.x + Math.cos( leftAng ) * width;
-        const leftY = segment.y + Math.sin( leftAng ) * width;
-  
-        ctx.lineTo( leftX, leftY );
-      }
-  
-      const first = this.#points[ this.#points.length - 1 ];
-      ctx.arc( first.x, first.y, this.size, first.angle - Math.PI / 2, first.angle + Math.PI / 2 );
-  
-      for ( let i = this.#points.length - 2; i > 0; i -- ) {
-        const width = this.size * i / this.#points.length;
-        const segment = this.#points[ i ];
-  
-        const rightAng = segment.angle + Math.PI / 2;
-        const rightX = segment.x + Math.cos( rightAng ) * width;
-        const rightY = segment.y + Math.sin( rightAng ) * width;
-  
-        ctx.lineTo( rightX, rightY );
-      }
-  
-      ctx.closePath();
-  
-      ctx.fillStyle = this.fillStyle;
-      ctx.fill();
-    }
-  }
-}
