@@ -4,6 +4,7 @@ import { ShipInfo } from '../info/info.js';
 import { Trail } from './Trail.js';
 import * as Util from './Util.js';
 
+const PURSUE_RANGE = 500;
 const ATTACK_RANGE = 250;
 const ATTACK_AIM = 0.5;
 
@@ -185,7 +186,7 @@ export class Ship extends Entity {
     }
   }
 
-  think( target, world ) {
+  think( world ) {
     // TODO: Or if we get close
     // if ( this.timers.wander < 0 ) {
     //   this.timers.wander = TIME_BETWEEN_WANDERS;
@@ -197,10 +198,12 @@ export class Ship extends Entity {
       this.life = 0;
     }
 
+    const target = world.player?.life > 0 ? world.player : null;
+
     let goalX = this.goalX;
     let goalY = this.goalY;
 
-    if ( target?.distanceTo( this ) < 500 ) {
+    if ( target?.distanceTo( this ) < PURSUE_RANGE ) {
       goalX = target.x;
       goalY = target.y;
     }

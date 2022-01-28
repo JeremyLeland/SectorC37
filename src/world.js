@@ -87,7 +87,7 @@ export class World {
     this.entities.forEach( entity => entity.update( dt ) );
     
     this.#handleRocks();
-    this.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( this.player, this ) );
+    this.entities.filter( e => e instanceof Ship).forEach( enemy => enemy.think( this ) );
     
     // TODO: Not everything checks against everything else...do these by category?
     
