@@ -6,7 +6,7 @@ export class Trail {
   #points = [];
   #length = 0;
 
-  constructor( size, maxLength, fillStyle ) {
+  constructor( { size, maxLength, fillStyle } ) {
     this.size = size;
     this.maxLength = maxLength;
     this.fillStyle = fillStyle;

@@ -39,11 +39,11 @@ export class World {
       y = Math.sin( ang ) * radius;
       tries ++;
     }
-    while( tries < 10 && this.entities.some( e => Math.hypot( e.x - x, e.y - y ) < entity.size * SPAWN_GAP ) );
+    while( tries < 20 && this.entities.some( e => Math.hypot( e.x - x, e.y - y ) < entity.size * SPAWN_GAP ) );
 
-    if ( tries == 10 ) {
-      debugger;
-    }
+    // if ( tries == 20 ) {
+    //   debugger;
+    // }
 
     return [ x, y ];
   }

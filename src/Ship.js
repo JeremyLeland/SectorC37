@@ -36,29 +36,20 @@ class Gun {
 
 class Engine {
   offset = { front: 0, side: 0, angle: 0 };
-  trails = [ 
-    new Trail( 4, 20, `rgba( 255, 128, 0, 0.7 )` ),
-    //new Trail( 2, 10, `rgba( 255, 255, 0, 0.8 )` ),
-    //new Trail( 1, 5, `rgba( 255, 255, 255, 0.9 )` )
-  ];
+  trails = [];
   owner;
 
   constructor( engineInfo, owner ) {
-    Object.assign( this, engineInfo );
+    this.trails.push( new Trail( engineInfo ) );
+    this.offset = engineInfo.offset;
     this.owner = owner;
   }
 
   update( dt ) {
-    const x = this.owner.x + 
-      Math.cos( this.owner.angle ) * this.offset.front + 
-      Math.cos( this.owner.angle + Math.PI / 2 ) * this.offset.side;
-    const y = this.owner.y + 
-      Math.sin( this.owner.angle ) * this.offset.front + 
-      Math.sin( this.owner.angle + Math.PI / 2 ) * this.offset.side;
-    const angle = this.owner.angle + this.offset.angle;
+    const pos = this.owner.getOffset( this.offset );
     const length = this.owner.speed * dt;
 
-    this.trails.forEach( trail => trail.addPoint( x, y, angle, length ) );
+    this.trails.forEach( trail => trail.addPoint( pos.x, pos.y, pos.angle, length ) );
   }
 
   draw( ctx ) {

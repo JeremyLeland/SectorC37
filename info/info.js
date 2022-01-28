@@ -13,7 +13,12 @@ export const Info = {
       { offset: { front: 0, side:  10, angle: 0 } }, 
     ],
     engineInfo: [
-      { offset: { front: -10, side: 0, angle: 0 } },
+      {
+        size: 4,
+        maxLength: 20,
+        offset: { front: -10, side: 0, angle: 0 },
+        fillStyle: 'rgba( 200, 255, 200, 0.7 )',
+      },
     ]
   },
   Scout: {
@@ -30,7 +35,12 @@ export const Info = {
       { offset: { front: 0, side:  10, angle: 0 } }, 
     ],
     engineInfo: [
-      { offset: { front: -10, side: 0, angle: 0 } },
+      {
+        size: 4,
+        maxLength: 20,
+        offset: { front: -10, side: 0, angle: 0 },
+        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      },
     ]
   },
   Frigate: {
@@ -49,8 +59,18 @@ export const Info = {
       { offset: { front:  0, side:  20, angle: 0 } }, 
     ],
     engineInfo: [
-      { offset: { front: -20, side: -10, angle: 0 } },
-      { offset: { front: -20, side:  10, angle: 0 } },
+      {
+        size: 5,
+        maxLength: 20,
+        offset: { front: -20, side: -10, angle: 0 },
+        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      },
+      {
+        size: 5,
+        maxLength: 20,
+        offset: { front: -20, side: 10, angle: 0 },
+        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      },
     ]
   },
   Destroyer: {
@@ -71,9 +91,24 @@ export const Info = {
       { offset: { front: 10, side:  30, angle: 0 } }, 
     ],
     engineInfo: [
-      { offset: { front: -40, side: -20, angle: 0 } },
-      { offset: { front: -40, side:   0, angle: 0 } },
-      { offset: { front: -40, side:  20, angle: 0 } },
+      {
+        size: 5,
+        maxLength: 20,
+        offset: { front: -40, side: -20, angle: 0 },
+        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      },
+      {
+        size: 5,
+        maxLength: 20,
+        offset: { front: -40, side: 0, angle: 0 },
+        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      },
+      {
+        size: 5,
+        maxLength: 20,
+        offset: { front: -40, side: 20, angle: 0 },
+        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      },
     ]
   },
   Rock: {

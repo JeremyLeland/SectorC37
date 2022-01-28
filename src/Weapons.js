@@ -1,7 +1,6 @@
 import { Entity } from './Entity.js';
 import { Info } from '../info/info.js';
 import { Trail } from './Trail.js';
-import * as Util from './Util.js';
 
 export class Bullet extends Entity {
   #trail;
@@ -9,18 +8,14 @@ export class Bullet extends Entity {
   constructor( gun ) {
     super( Info.Bullet );
 
-    this.angle = gun.owner.angle + gun.offset.angle;
-
-    [ this.x, this.y ] = Util.rotatedXY( gun.offset.front, gun.offset.side, this.angle );
-    this.x += gun.owner.x;
-    this.y += gun.owner.y;
+    this.applyOffset( gun.owner, gun.offset );
 
     this.dx = gun.owner.dx + Math.cos( this.angle ) * this.speed;
     this.dy = gun.owner.dy + Math.sin( this.angle ) * this.speed;
 
     this.owner = gun.owner;
 
-    this.#trail = new Trail( this.size, 40, gun.owner.bodyFill );
+    this.#trail = new Trail( { size: this.size, maxLength: 40, fillStyle: gun.owner.bodyFill } );
   }
 
   die( hit ) {

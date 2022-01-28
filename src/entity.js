@@ -90,6 +90,33 @@ export class Entity {
     } );
   }
 
+  // TODO: Do we really need both of these?
+  // TODO: Use Object.apply() to apply the offset
+  // TODO: Share this with Util somehow so world can get it's offsets? (cx, cy, angle, front, side)
+  getOffset( offset ) {
+    const cosX = Math.cos( this.angle );
+    const sinX = Math.sin( this.angle );
+    const cosY = Math.cos( this.angle - Math.PI / 2 );
+    const sinY = Math.sin( this.angle - Math.PI / 2 );
+
+    return {
+      x: this.x + cosX * offset.front + cosY * offset.side,
+      y: this.y + sinX * offset.front + sinY * offset.side,
+      angle: this.angle + offset.angle,
+    };
+  }
+
+  applyOffset( other, offset ) {
+    const cosX = Math.cos( other.angle );
+    const sinX = Math.sin( other.angle );
+    const cosY = Math.cos( other.angle - Math.PI / 2 );
+    const sinY = Math.sin( other.angle - Math.PI / 2 );
+
+    this.x = other.x + cosX * offset.front + cosY * offset.side;
+    this.y = other.y + sinX * offset.front + sinY * offset.side;
+    this.angle = other.angle + offset.angle;
+  }
+
   update( dt ) {
     this.life -= this.decay * dt;   // TODO: Track life and decay separately? Maybe use a timer for decay?
 
