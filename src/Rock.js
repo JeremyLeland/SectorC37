@@ -1,5 +1,5 @@
 import { Entity } from './Entity.js';
-import { Info } from '../info/info.js';
+import { RockInfo } from '../info/info.js';
 import * as Util from './Util.js';
 
 export class Rock extends Entity {
@@ -25,7 +25,7 @@ export class Rock extends Entity {
     if ( this.size > 20 ) {
       [ -1, 1 ].forEach( xOffset => {
         [ -1, 1 ].forEach( yOffset => {
-          const rock = new Rock( Info.Rock );
+          const rock = new Rock( RockInfo );
           
           rock.size = this.size / 2;
           rock.mass = rock.size * 0.5;

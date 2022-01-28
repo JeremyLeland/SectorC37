@@ -1,6 +1,6 @@
 import { Entity } from './Entity.js';
 import { Bullet } from './Weapons.js';
-import { Info } from '../info/info.js';
+import { ShipInfo } from '../info/info.js';
 import { Trail } from './Trail.js';
 import * as Util from './Util.js';
 
@@ -9,7 +9,7 @@ const ATTACK_AIM = 0.5;
 
 const AVOID_TIME = 500;
 
-const debugDiv = document.getElementById( 'debug' );
+// const debugDiv = document.getElementById( 'debug' );
 
 // TODO: Combine Gun and Engine somehow? Very similar code...
 
@@ -36,11 +36,13 @@ class Gun {
 
 class Engine {
   offset = { front: 0, side: 0, angle: 0 };
-  trails = [];
+  #trail;
   owner;
 
   constructor( engineInfo, owner ) {
-    this.trails.push( new Trail( engineInfo ) );
+    this.#trail = new Trail( { 
+      size: engineInfo.size, maxLength: engineInfo.maxLength, fillStyle: owner.engineColor 
+    } );
     this.offset = engineInfo.offset;
     this.owner = owner;
   }
@@ -49,11 +51,11 @@ class Engine {
     const pos = this.owner.getOffset( this.offset );
     const length = this.owner.speed * dt;
 
-    this.trails.forEach( trail => trail.addPoint( pos.x, pos.y, pos.angle, length ) );
+    this.#trail.addPoint( pos.x, pos.y, pos.angle, length );
   }
 
   draw( ctx ) {
-    this.trails.forEach( trail => trail.draw( ctx ) );
+    this.#trail.draw( ctx );
   }
 }
 
@@ -101,7 +103,7 @@ export class Ship extends Entity {
   }
 
   createFire() {
-    const flame = new Flame( Info.Flame );
+    const flame = new Flame( ShipInfo.Flame );
     this.spawnFromCenter( flame, { spread: 0.5, moveSpeed: 0.01, turnSpeed: 0.01 } );
     this.createdParticles.push( flame );
   }

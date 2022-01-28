@@ -1,6 +1,6 @@
 import { Ship } from './Ship.js';
 import { Rock } from './Rock.js';
-import { Info } from '../info/info.js';
+import { ShipInfo } from '../info/info.js';
 import * as Util from './Util.js';
 
 const SPAWN_GAP = 2.5;
@@ -53,7 +53,7 @@ export class World {
 
     if ( this.#waveIndex < this.level.waves.length && this.level.waves[ this.#waveIndex ].time <= this.#levelTime ) {
       this.level.waves[ this.#waveIndex ].spawns.forEach( spawn => {
-        const ship = new Ship( Info[ spawn.type ] );
+        const ship = new Ship( ShipInfo[ spawn.type ] );
         [ ship.x, ship.y ] = Util.rotatedXY( this.level.size + spawn.x, spawn.y, this.level.entryAngle );
         
         // Head straight across the map

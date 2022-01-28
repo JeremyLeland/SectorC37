@@ -1,4 +1,4 @@
-export const Info = {
+export const ShipInfo = {
   Player: {
     speed: 0.2,
     turnSpeed: 0.005,
@@ -8,6 +8,8 @@ export const Info = {
     damage: 100,
     bodyFill: 'green',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+    bulletColor: 'rgba( 200, 255, 200, 0.7 )',
+    engineColor: 'rgba( 200, 255, 200, 0.7 )',
     gunInfo: [
       { offset: { front: 0, side: -10, angle: 0 } },
       { offset: { front: 0, side:  10, angle: 0 } }, 
@@ -17,7 +19,6 @@ export const Info = {
         size: 4,
         maxLength: 20,
         offset: { front: -10, side: 0, angle: 0 },
-        fillStyle: 'rgba( 200, 255, 200, 0.7 )',
       },
     ]
   },
@@ -30,6 +31,8 @@ export const Info = {
     damage: 40,
     bodyFill: 'dodgerblue',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+    bulletColor: 'rgba( 200, 200, 255, 0.7 )',
+    engineColor: 'rgba( 200, 200, 255, 0.7 )',
     gunInfo: [
       { offset: { front: 0, side: -10, angle: 0 } },
       { offset: { front: 0, side:  10, angle: 0 } }, 
@@ -39,7 +42,6 @@ export const Info = {
         size: 4,
         maxLength: 20,
         offset: { front: -10, side: 0, angle: 0 },
-        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
       },
     ]
   },
@@ -52,6 +54,8 @@ export const Info = {
     damage: 100,
     bodyFill: 'cyan',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+    bulletColor: 'rgba( 200, 255, 255, 0.7 )',
+    engineColor: 'rgba( 200, 200, 255, 0.7 )',
     gunInfo: [
       { offset: { front:  0, side: -20, angle: 0 } },
       { offset: { front: 10, side: -10, angle: 0 } },
@@ -63,13 +67,11 @@ export const Info = {
         size: 5,
         maxLength: 20,
         offset: { front: -20, side: -10, angle: 0 },
-        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
       },
       {
         size: 5,
         maxLength: 20,
         offset: { front: -20, side: 10, angle: 0 },
-        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
       },
     ]
   },
@@ -82,6 +84,8 @@ export const Info = {
     damage: 300,
     bodyFill: 'powderblue',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
+    bulletColor: 'rgba( 200, 200, 200, 0.7 )',
+    engineColor: 'rgba( 200, 200, 255, 0.7 )',
     gunInfo: [
       { offset: { front: 10, side: -30, angle: 0 } },
       { offset: { front: 20, side: -20, angle: 0 } },
@@ -95,29 +99,22 @@ export const Info = {
         size: 5,
         maxLength: 20,
         offset: { front: -40, side: -20, angle: 0 },
-        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
       },
       {
-        size: 5,
+        size: 6,
         maxLength: 20,
         offset: { front: -40, side: 0, angle: 0 },
-        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
       },
       {
         size: 5,
         maxLength: 20,
         offset: { front: -40, side: 20, angle: 0 },
-        fillStyle: 'rgba( 200, 200, 255, 0.7 )',
       },
     ]
   },
-  Rock: {
-    size: 50,
-    mass: 25,
-    life: 250,
-    damage: 350,
-    bodyFill: 'brown',
-  },
+};
+
+export const WeaponInfo = {
   Bullet: {
     speed: 0.9,
     size: 2,
@@ -125,9 +122,18 @@ export const Info = {
     life: 1,
     decay: 1 / 5000,
     damage: 10,
-    bodyFill: 'rgba( 255, 255, 0, 0.5 )',
-    bodyPath: new Path2D( `M 1,0 L 0,1 L -10,0 L 0,-1 Z` ),
   },
+};
+
+export const RockInfo = {
+  size: 50,
+  mass: 25,
+  life: 250,
+  damage: 350,
+  bodyFill: 'brown',
+};
+
+export const ParticleInfo = {
   Flame: {
     size: 0,
     dSize: 20 / 1000,
@@ -137,13 +143,4 @@ export const Info = {
     bodyFill: 'orange',
     bodyPath: new Path2D( `M -1,-1 L 1,-1 L 1,1 L -1,1 Z` ),
   },
-  Trail: {
-    size: 5,
-    dSize: -5 / 500,
-    life: 1,
-    decay: 1 / 500,
-    damage: 10,
-    bodyFill: 'orange',
-    bodyPath: new Path2D( `M -1,-1 L 1,-1 L 1,1 L -1,1 Z` ),
-  },
-}
+};

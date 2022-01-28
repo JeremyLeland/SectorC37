@@ -1,12 +1,12 @@
 import { Entity } from './Entity.js';
-import { Info } from '../info/info.js';
+import { WeaponInfo } from '../info/info.js';
 import { Trail } from './Trail.js';
 
 export class Bullet extends Entity {
   #trail;
   
   constructor( gun ) {
-    super( Info.Bullet );
+    super( WeaponInfo.Bullet );
 
     this.applyOffset( gun.owner, gun.offset );
 
@@ -15,7 +15,7 @@ export class Bullet extends Entity {
 
     this.owner = gun.owner;
 
-    this.#trail = new Trail( { size: this.size, maxLength: 40, fillStyle: gun.owner.bodyFill } );
+    this.#trail = new Trail( { size: this.size, maxLength: 40, fillStyle: gun.owner.bulletColor } );
   }
 
   die( hit ) {

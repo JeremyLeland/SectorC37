@@ -25,7 +25,7 @@
   import { Ship } from './src/Ship.js';
   import { Rock } from './src/Rock.js';
   import { World } from './src/world.js';
-  import { Info } from './info/info.js';
+  import { ShipInfo, RockInfo } from './info/info.js';
 
 
   const level = {
@@ -71,25 +71,17 @@
   const background = createBackground( world.size * 2, world.size * 2 );
 
   for ( let i = 0; i < 15; i ++ ) {
-    world.spawnInside( new Rock( Info.Rock ) );
+    world.spawnInside( new Rock( RockInfo ) );
   }
-
-  // setInterval( () => world.spawnOutside( new Rock( Info.Rock ) ), 20000 );
-
-  // for ( let i = 0; i < 5; i ++ ) {
-  //   world.spawnInside( new Ship( Info.Scout ) );
-  // }
 
   const PLAYER_RESPAWN_DELAY = 2000;
   let playerSpawnTimer = PLAYER_RESPAWN_DELAY;
-  let player = new Ship( Info.Player );
+  let player = new Ship( ShipInfo.Player );
   world.spawnInside( player );
   world.player = player;
 
-  // let timeSinceLastWave = 0, wave = 1;
-
   const healthUI = document.getElementById( 'health' );
-  healthUI.setAttribute( 'max', Info.Player.life );
+  healthUI.setAttribute( 'max', ShipInfo.Player.life );
   const waveUI = document.getElementById( 'wave' );
   const enemiesUI = document.getElementById( 'enemies' );
   const minimapCTX = document.getElementById( 'minimap' ).getContext( '2d' );
@@ -117,33 +109,18 @@
       if ( playerSpawnTimer < 0 && game.mouseDown ) {
         playerSpawnTimer = PLAYER_RESPAWN_DELAY;
 
-        player = new Ship( Info.Player );
+        player = new Ship( ShipInfo.Player );
         world.spawnInside( player );
         world.player = player;
       }
     }
 
-    // timeSinceLastWave += dt;
     
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
     
     healthUI.value = player.life;
-    // waveUI.innerText = `${ wave } (${ Math.floor( timeSinceLastWave / 1000 ) })`;
     enemiesUI.innerText = enemies.length;
 
-    // if ( timeSinceLastWave > 5000 /*enemies.length * 5000*/ ) {
-    //   timeSinceLastWave = 0;
-    //   wave ++;
-
-    //   for ( let i = 0; i < 5; i ++ ) {
-    //     world.spawnOutside( new Ship( Info.Scout ), 0 );
-    //   }
-      
-    //   world.spawnOutside( new Ship( Info.Frigate ), 0 );
-    //   world.spawnOutside( new Ship( Info.Destroyer ), 0 );
-    // }
-
-    //enemies.forEach( enemy => enemy.think( player.isAlive() ? player : null, world ) );
 
     world.update( dt );
   };
