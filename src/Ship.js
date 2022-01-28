@@ -1,6 +1,6 @@
 import { Entity } from './Entity.js';
 import { Bullet } from './Weapons.js';
-import { ShipInfo } from '../info/info.js';
+import { ParticleInfo } from '../info/info.js';
 import { Trail } from './Trail.js';
 import * as Util from './Util.js';
 
@@ -73,8 +73,8 @@ export class Ship extends Entity {
   isSliding = false;
   accel = 0.002;
 
-  goalX = 0;
-  goalY = 0;
+  goalX;
+  goalY;
 
   #cones;
   #bestCone;
@@ -104,7 +104,7 @@ export class Ship extends Entity {
   }
 
   createFire() {
-    const flame = new Flame( ShipInfo.Flame );
+    const flame = new Flame( ParticleInfo.Flame );
     this.spawnFromCenter( flame, { spread: 0.5, moveSpeed: 0.01, turnSpeed: 0.01 } );
     this.createdParticles.push( flame );
   }

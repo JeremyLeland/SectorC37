@@ -87,12 +87,12 @@ export const ShipInfo = {
     bulletColor: 'rgba( 200, 200, 200, 0.7 )',
     engineColor: 'rgba( 200, 200, 255, 0.7 )',
     gunInfo: [
-      { offset: { front: 10, side: -30, angle: 0 } },
-      { offset: { front: 20, side: -20, angle: 0 } },
+      { offset: { front: 10, side: -30, angle: 0.2 } },
+      { offset: { front: 20, side: -20, angle: 0.1 } },
       { offset: { front: 30, side: -10, angle: 0 } },
-      { offset: { front: 30, side:  10, angle: 0 } }, 
-      { offset: { front: 20, side:  20, angle: 0 } }, 
-      { offset: { front: 10, side:  30, angle: 0 } }, 
+      { offset: { front: 30, side:  10, angle: -0 } }, 
+      { offset: { front: 20, side:  20, angle: -0.1 } }, 
+      { offset: { front: 10, side:  30, angle: -0.2 } }, 
     ],
     engineInfo: [
       {
