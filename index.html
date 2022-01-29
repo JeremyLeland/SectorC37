@@ -3,6 +3,9 @@
 <style>
   #ui {
     position: absolute;
+    vertical-align: top;
+    display: flex;
+    gap: 8px;
   }
   #health {
     background-color: red;
@@ -12,10 +15,12 @@
 <body>
   <div id="ui">
     <label for="health">Health: </label>
-    <progress id="health" value="100" max="100"></progress>
-    <div>Wave: <span id="wave"></span></div>
-    <div>Enemies: <span id="enemies"></span></div>
+    <progress id="health"></progress>
+    <label for="energy">Energy: </label>
+    <progress id="energy"></progress>
     <canvas id="minimap" width="100" height="100"></canvas>
+    <label for="enemies">Enemies: </label>
+    <span id="enemies"></span>
   </div>
 </body>
 
@@ -99,8 +104,8 @@
   world.player = player;
 
   const healthUI = document.getElementById( 'health' );
-  healthUI.setAttribute( 'max', ShipInfo.Player.life );
-  const waveUI = document.getElementById( 'wave' );
+  
+  const energyUI = document.getElementById( 'energy' );
   const enemiesUI = document.getElementById( 'enemies' );
   const minimapCTX = document.getElementById( 'minimap' ).getContext( '2d' );
 
@@ -133,12 +138,13 @@
       }
     }
 
-    
-    const enemies = world.entities.filter( e => e != player && e instanceof Ship );
-    
     healthUI.value = player.life;
-    enemiesUI.innerText = enemies.length;
+    healthUI.setAttribute( 'max', player.maxLife );
+    energyUI.value = player.energy;
+    energyUI.setAttribute( 'max', player.maxEnergy );
 
+    const enemies = world.entities.filter( e => e != player && e instanceof Ship );
+    enemiesUI.innerText = enemies.length;
 
     world.update( dt );
   };

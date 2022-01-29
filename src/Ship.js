@@ -28,9 +28,12 @@ class Gun {
   update( dt ) {
     this.timeUntilReady -= dt;
 
-    if ( this.timeUntilReady < 0 && this.owner.isShooting ) {
+    if ( this.timeUntilReady < 0 && this.owner.isShooting && this.owner.energy > 5 ) {
       this.owner.createdEntities.push( new Bullet( this ) );
       this.timeUntilReady = this.timeBetweenShots;
+
+      // TODO: This should happen once-per-shot in Weapon, using Weapon energy cost
+      this.owner.energy -= 5;
     }
   }
 }
@@ -69,6 +72,9 @@ export class Ship extends Entity {
   guns = [];
   engines = [];
 
+  maxLife;
+  maxEnergy;
+
   goalAngle = 0;
   isSliding = false;
   accel = 0.002;
@@ -85,6 +91,9 @@ export class Ship extends Entity {
     shipInfo.gunInfo.forEach( info => this.guns.push( new Gun( info, this ) ) );
     shipInfo.engineInfo.forEach( info => this.engines.push( new Engine( info, this ) ) );
     
+    this.maxLife = shipInfo.life;
+    this.maxEnergy = shipInfo.energy;
+
     this.timers.wander = 0;
   }
 
@@ -236,7 +245,12 @@ export class Ship extends Entity {
     
     // Move forward
     if ( !this.isSliding ) {
-      const speed = ( this.isSprinting ? 2 : 1 ) * this.speed;
+      let speed = this.speed;
+      if ( this.isSprinting && this.energy > 2 ) {
+        speed *= 2;
+        this.energy -= 2;
+      }
+
       this.dx = approach( 
         this.dx, Math.cos( this.angle ) * speed, this.accel, dt 
       );
@@ -246,6 +260,8 @@ export class Ship extends Entity {
     }
 
     super.update( dt );
+
+    this.energy = Math.min( this.maxEnergy, this.energy + this.energyRechargeRate * dt );
 
     this.guns.forEach( gun => gun.update( dt ) );
     this.engines.forEach( engine => engine.update( dt ) );
