@@ -11,18 +11,16 @@ export const ShipInfo = {
     bodyFill: 'green',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
     bulletColor: 'rgba( 200, 255, 200, 0.7 )',
-    engineColor: 'rgba( 200, 255, 200, 0.7 )',
     gunInfo: [
       { offset: { front: 0, side: -10, angle: 0 } },
       { offset: { front: 0, side:  10, angle: 0 } }, 
     ],
-    engineInfo: [
-      {
-        size: 4,
-        maxLength: 20,
-        offset: { front: -10, side: 0, angle: 0 },
-      },
-    ]
+    engineInfo: {
+      size: 4,
+      maxLength: 20,
+      fillStyle: 'rgba( 200, 255, 200, 0.7 )',
+      offsets: [ { front: -10, side: 0, angle: 0 } ],
+    },
   },
   Scout: {
     speed: 0.15,
@@ -36,18 +34,16 @@ export const ShipInfo = {
     bodyFill: 'dodgerblue',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
     bulletColor: 'rgba( 200, 200, 255, 0.7 )',
-    engineColor: 'rgba( 200, 200, 255, 0.7 )',
     gunInfo: [
       { offset: { front: 0, side: -10, angle: 0 } },
       { offset: { front: 0, side:  10, angle: 0 } }, 
     ],
-    engineInfo: [
-      {
-        size: 4,
-        maxLength: 20,
-        offset: { front: -10, side: 0, angle: 0 },
-      },
-    ]
+    engineInfo: {
+      size: 4,
+      maxLength: 20,
+      fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      offsets: [ { front: -10, side: 0, angle: 0 } ],
+    },
   },
   Frigate: {
     speed: 0.1,
@@ -61,25 +57,21 @@ export const ShipInfo = {
     bodyFill: 'cyan',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
     bulletColor: 'rgba( 200, 255, 255, 0.7 )',
-    engineColor: 'rgba( 200, 200, 255, 0.7 )',
     gunInfo: [
       { offset: { front:  0, side: -20, angle: 0 } },
       { offset: { front: 10, side: -10, angle: 0 } },
       { offset: { front: 10, side:  10, angle: 0 } }, 
       { offset: { front:  0, side:  20, angle: 0 } }, 
     ],
-    engineInfo: [
-      {
-        size: 5,
-        maxLength: 20,
-        offset: { front: -20, side: -10, angle: 0 },
-      },
-      {
-        size: 5,
-        maxLength: 20,
-        offset: { front: -20, side: 10, angle: 0 },
-      },
-    ]
+    engineInfo: {
+      size: 5,
+      maxLength: 20,
+      fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      offsets: [
+        { front: -20, side: -10, angle: 0 },
+        { front: -20, side:  10, angle: 0 },
+      ],
+    },
   },
   Destroyer: {
     speed: 0.05,
@@ -93,7 +85,6 @@ export const ShipInfo = {
     bodyFill: 'powderblue',
     bodyPath: new Path2D( 'M 1,0 L -1 1 L -1 -1 Z' ),
     bulletColor: 'rgba( 200, 200, 200, 0.7 )',
-    engineColor: 'rgba( 200, 200, 255, 0.7 )',
     gunInfo: [
       { offset: { front: 10, side: -30, angle: 0.2 } },
       { offset: { front: 20, side: -20, angle: 0.1 } },
@@ -102,23 +93,16 @@ export const ShipInfo = {
       { offset: { front: 20, side:  20, angle: -0.1 } }, 
       { offset: { front: 10, side:  30, angle: -0.2 } }, 
     ],
-    engineInfo: [
-      {
-        size: 5,
-        maxLength: 20,
-        offset: { front: -40, side: -20, angle: 0 },
-      },
-      {
-        size: 6,
-        maxLength: 20,
-        offset: { front: -40, side: 0, angle: 0 },
-      },
-      {
-        size: 5,
-        maxLength: 20,
-        offset: { front: -40, side: 20, angle: 0 },
-      },
-    ]
+    engineInfo: {
+      size: 5,
+      maxLength: 20,
+      fillStyle: 'rgba( 200, 200, 255, 0.7 )',
+      offsets: [
+        { front: -40, side: -20, angle: 0 },
+        { front: -40, side:   0, angle: 0 },
+        { front: -40, side:  20, angle: 0 },
+      ],
+    },
   },
 };
 

@@ -39,27 +39,40 @@ class Gun {
 }
 
 class Engine {
-  offset = { front: 0, side: 0, angle: 0 };
-  #trail;
+  size;
+  maxLength;
+  fillStyle;
+  offsets;
   owner;
 
+  #trail;
+
   constructor( engineInfo, owner ) {
-    this.#trail = new Trail( { 
-      size: engineInfo.size, maxLength: engineInfo.maxLength, fillStyle: owner.engineColor 
-    } );
-    this.offset = engineInfo.offset;
+    Object.assign( this, engineInfo );
+
+    this.#trail = new Trail( this.maxLength );
     this.owner = owner;
   }
 
   update( dt ) {
-    const pos = this.owner.getOffset( this.offset );
     const length = this.owner.speed * dt;
 
-    this.#trail.addPoint( pos.x, pos.y, pos.angle, length );
+    this.#trail.addPoint( this.owner.x, this.owner.y, this.owner.angle, length );
   }
 
   draw( ctx ) {
-    this.#trail.draw( ctx );
+    ctx.fillStyle = this.fillStyle;
+
+    this.offsets.forEach( offset => {
+      ctx.save();
+
+      const pos = this.owner.getOffset( offset );
+      ctx.translate( pos.x - this.owner.x, pos.y - this.owner.y );
+      ctx.fill( this.#trail.getPath( this.size ) );
+
+      ctx.restore();
+    } );
+
   }
 }
 
@@ -69,8 +82,9 @@ const TIME_BETWEEN_WANDERS = 5000;
 export class Ship extends Entity {
   isShooting = false;
   isSprinting = false;
+  
   guns = [];
-  engines = [];
+  engine;
 
   maxLife;
   maxEnergy;
@@ -89,7 +103,7 @@ export class Ship extends Entity {
     super( shipInfo );
 
     shipInfo.gunInfo.forEach( info => this.guns.push( new Gun( info, this ) ) );
-    shipInfo.engineInfo.forEach( info => this.engines.push( new Engine( info, this ) ) );
+    this.engine = new Engine( shipInfo.engineInfo, this );
     
     this.maxLife = shipInfo.life;
     this.maxEnergy = shipInfo.energy;
@@ -264,12 +278,12 @@ export class Ship extends Entity {
     this.energy = Math.min( this.maxEnergy, this.energy + this.energyRechargeRate * dt );
 
     this.guns.forEach( gun => gun.update( dt ) );
-    this.engines.forEach( engine => engine.update( dt ) );
+    this.engine.update( dt );
   }
   
   draw( ctx ) {
     if ( !this.isSliding ) {
-      this.engines.forEach( engine => engine.draw( ctx ) );
+      this.engine.draw( ctx );
     }
 
     // DEBUG

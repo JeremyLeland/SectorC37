@@ -13,9 +13,10 @@ export class Bullet extends Entity {
     this.dx = gun.owner.dx + Math.cos( this.angle ) * this.speed;
     this.dy = gun.owner.dy + Math.sin( this.angle ) * this.speed;
 
+    this.fillStyle = gun.owner.bulletColor;
     this.owner = gun.owner;
 
-    this.#trail = new Trail( { size: this.size, maxLength: 40, fillStyle: gun.owner.bulletColor } );
+    this.#trail = new Trail( 40 );
   }
 
   die( hit ) {
@@ -40,6 +41,7 @@ export class Bullet extends Entity {
   }
 
   draw( ctx ) {
-    this.#trail.draw( ctx );
+    ctx.fillStyle = this.fillStyle;
+    ctx.fill( this.#trail.getPath( this.size ) );
   }
 }

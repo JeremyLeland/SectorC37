@@ -1,15 +1,11 @@
 export class Trail {
-  size;
   maxLength;
-  fillStyle;
   
   #points = [];
   #length = 0;
 
-  constructor( { size, maxLength, fillStyle } ) {
-    this.size = size;
+  constructor( maxLength ) {
     this.maxLength = maxLength;
-    this.fillStyle = fillStyle;
   }
 
   addPoint( x, y, angle, length ) {
@@ -31,44 +27,43 @@ export class Trail {
     }
   }
 
-  draw( ctx ) { 
+  getPath( size ) {
+    const path = new Path2D();
+
     if ( this.#points.length > 0 ) {
-      ctx.beginPath();
-      
       const last = this.#points[ 0 ];
-      ctx.moveTo( 
+      path.moveTo( 
         last.x - Math.cos( last.angle ) * last.length, 
         last.y - Math.sin( last.angle ) * last.length,
       );
       for ( let i = 1; i < this.#points.length - 1; i ++ ) {
-        const width = this.size * i / this.#points.length;
+        const width = size * i / this.#points.length;
         const segment = this.#points[ i ];
   
         const leftAng = segment.angle - Math.PI / 2;
         const leftX = segment.x + Math.cos( leftAng ) * width;
         const leftY = segment.y + Math.sin( leftAng ) * width;
   
-        ctx.lineTo( leftX, leftY );
+        path.lineTo( leftX, leftY );
       }
   
       const first = this.#points[ this.#points.length - 1 ];
-      ctx.arc( first.x, first.y, this.size, first.angle - Math.PI / 2, first.angle + Math.PI / 2 );
+      path.arc( first.x, first.y, size, first.angle - Math.PI / 2, first.angle + Math.PI / 2 );
   
       for ( let i = this.#points.length - 2; i > 0; i -- ) {
-        const width = this.size * i / this.#points.length;
+        const width = size * i / this.#points.length;
         const segment = this.#points[ i ];
   
         const rightAng = segment.angle + Math.PI / 2;
         const rightX = segment.x + Math.cos( rightAng ) * width;
         const rightY = segment.y + Math.sin( rightAng ) * width;
   
-        ctx.lineTo( rightX, rightY );
+        path.lineTo( rightX, rightY );
       }
   
-      ctx.closePath();
-  
-      ctx.fillStyle = this.fillStyle;
-      ctx.fill();
+      path.closePath();
     }
+
+    return path;
   }
 }
