@@ -15,10 +15,13 @@ const AVOID_TIME = 500;
 // TODO: Combine Gun and Engine somehow? Very similar code...
 
 class Gun {
-  offset = { front: 0, side: 0, angle: 0 };
-  timeUntilReady = 0;
-  timeBetweenShots = 200;
+  energyCost;
+  timeBetweenShots;
+  bulletInfo;
+  offsets;
   owner;
+  
+  #timeUntilReady = 0;
 
   constructor( gunInfo, owner ) {
     Object.assign( this, gunInfo );
@@ -26,14 +29,17 @@ class Gun {
   }
 
   update( dt ) {
-    this.timeUntilReady -= dt;
+    this.#timeUntilReady -= dt;
 
-    if ( this.timeUntilReady < 0 && this.owner.isShooting && this.owner.energy > 5 ) {
-      this.owner.createdEntities.push( new Bullet( this ) );
-      this.timeUntilReady = this.timeBetweenShots;
+    if ( this.#timeUntilReady < 0 && this.owner.isShooting && 
+         this.energyCost < this.owner.energy ) {
+      this.offsets.forEach( offset => this.owner.createdEntities.push( 
+        new Bullet( this.bulletInfo, offset, this.owner ) 
+      ) );
+      this.#timeUntilReady = this.timeBetweenShots;
 
       // TODO: This should happen once-per-shot in Weapon, using Weapon energy cost
-      this.owner.energy -= 5;
+      this.owner.energy -= this.energyCost;
     }
   }
 }
@@ -83,7 +89,7 @@ export class Ship extends Entity {
   isShooting = false;
   isSprinting = false;
   
-  guns = [];
+  gun;
   engine;
 
   maxLife;
@@ -102,7 +108,7 @@ export class Ship extends Entity {
   constructor( shipInfo ) {
     super( shipInfo );
 
-    shipInfo.gunInfo.forEach( info => this.guns.push( new Gun( info, this ) ) );
+    this.gun = new Gun( shipInfo.gunInfo, this );
     this.engine = new Engine( shipInfo.engineInfo, this );
     
     this.maxLife = shipInfo.life;
@@ -277,7 +283,7 @@ export class Ship extends Entity {
 
     this.energy = Math.min( this.maxEnergy, this.energy + this.energyRechargeRate * dt );
 
-    this.guns.forEach( gun => gun.update( dt ) );
+    this.gun.update( dt );
     this.engine.update( dt );
   }
   

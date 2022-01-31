@@ -5,18 +5,17 @@ import { Trail } from './Trail.js';
 export class Bullet extends Entity {
   #trail;
   
-  constructor( gun ) {
-    super( WeaponInfo.Bullet );
+  constructor( bulletInfo, offset, owner ) {
+    super( bulletInfo );
 
-    this.applyOffset( gun.owner, gun.offset );
+    this.applyOffset( owner, offset );
 
-    this.dx = gun.owner.dx + Math.cos( this.angle ) * this.speed;
-    this.dy = gun.owner.dy + Math.sin( this.angle ) * this.speed;
+    this.dx = owner.dx + Math.cos( this.angle ) * this.speed;
+    this.dy = owner.dy + Math.sin( this.angle ) * this.speed;
 
-    this.fillStyle = gun.owner.bulletColor;
-    this.owner = gun.owner;
+    this.owner = owner;
 
-    this.#trail = new Trail( 40 );
+    this.#trail = new Trail( this.trailLength );
   }
 
   die( hit ) {
