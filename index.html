@@ -6,18 +6,30 @@
     vertical-align: top;
     display: flex;
     gap: 8px;
+    margin-left: 4px;
   }
-  #health {
-    background-color: red;
+
+  .bar {
+    width: 150px;
+    height: 8px;
+    margin-top: 5px;
+    border: 1px solid white;
   }
+
+  #health { height: 100%; background-color: red; }
+  #energy { height: 100%; background-color: lightskyblue; }
 </style>
 
 <body>
   <div id="ui">
-    <label for="health">Health: </label>
-    <progress id="health"></progress>
-    <label for="energy">Energy: </label>
-    <progress id="energy"></progress>
+    Health:
+    <div class="bar">
+      <div id="health"></div>
+    </div>
+    Energy:
+    <div class="bar">
+      <div id="energy"></div>
+    </div>
     <canvas id="minimap" width="100" height="100"></canvas>
     <label for="enemies">Enemies: </label>
     <span id="enemies"></span>
@@ -138,10 +150,8 @@
       }
     }
 
-    healthUI.value = player.life;
-    healthUI.setAttribute( 'max', player.maxLife );
-    energyUI.value = player.energy;
-    energyUI.setAttribute( 'max', player.maxEnergy );
+    healthUI.style.width = `${ 100 * Math.max( 0, player.life ) / player.maxLife }%`;
+    energyUI.style.width = `${ 100 * Math.max( 0, player.energy ) / player.maxEnergy }%`;
 
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
     enemiesUI.innerText = enemies.length;
