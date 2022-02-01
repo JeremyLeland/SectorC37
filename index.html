@@ -9,26 +9,30 @@
     margin-left: 4px;
   }
 
-  .bar {
+  .outer_bar {
     width: 150px;
     height: 8px;
     margin-top: 5px;
     border: 1px solid white;
   }
 
-  #health { height: 100%; background-color: red; }
-  #energy { height: 100%; background-color: lightskyblue; }
+  .inner_bar {
+    height: 100%;
+  }
+
+  #health { background-color: red; }
+  #energy { background-color: lightskyblue; }
 </style>
 
 <body>
   <div id="ui">
     Health:
-    <div class="bar">
-      <div id="health"></div>
+    <div class="outer_bar">
+      <div class="inner_bar" id="health"></div>
     </div>
     Energy:
-    <div class="bar">
-      <div id="energy"></div>
+    <div class="outer_bar">
+      <div class="inner_bar" id="energy"></div>
     </div>
     <canvas id="minimap" width="100" height="100"></canvas>
     <label for="enemies">Enemies: </label>
