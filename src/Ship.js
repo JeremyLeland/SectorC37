@@ -102,8 +102,7 @@ export class Ship extends Entity {
   goalX;
   goalY;
 
-  #cones;
-  #bestCone;
+  #avoid;
 
   constructor( shipInfo ) {
     super( shipInfo );
@@ -151,7 +150,7 @@ export class Ship extends Entity {
     this.createdParticles.push( shard );
   }
 
-  #getAvoidAngle( goalAngle, entities ) {
+  #getAvoid( goalAngle, entities ) {
     const cones = [];
 
     entities.forEach( other => {
@@ -183,7 +182,6 @@ export class Ship extends Entity {
 
     // DEBUG
     // debugDiv.innerText = 'Cones:\n' + JSON.stringify( cones );
-    this.#cones = cones;
 
     const edges = [];
     const goalAvoidValue = avoidValue( goalAngle, cones );
@@ -208,10 +206,13 @@ export class Ship extends Entity {
       edges.sort( ( a, b ) => a.value - b.value );
       const bestEdges = edges.filter( c => c.value == edges[ 0 ].value );
     
-      return bestEdges.sort( ( a, b ) => 
-        Math.abs( Util.deltaAngle( a.angle, goalAngle ) ) - 
-        Math.abs( Util.deltaAngle( b.angle, goalAngle ) )
-      )[ 0 ].angle;
+      return {
+        cones: cones,
+        bestAngle: bestEdges.sort( ( a, b ) => 
+          Math.abs( Util.deltaAngle( a.angle, goalAngle ) ) - 
+          Math.abs( Util.deltaAngle( b.angle, goalAngle ) )
+        )[ 0 ].angle
+      }
     }
   }
 
@@ -239,10 +240,14 @@ export class Ship extends Entity {
 
     const goalAngle = Math.atan2( goalY - this.y, goalX - this.x );
 
-    this.goalAngle = this.#getAvoidAngle(
+    this.#avoid = this.#getAvoid(
       goalAngle, 
-      world.entities.filter( e => e != this && !( e instanceof Bullet ) && this.distanceTo( e ) < 500 ),
+      world.entities.filter( e => 
+        e != this && !( e instanceof Bullet ) && 
+        this.distanceTo( e ) < ( e == world.player ? 250 : 500 )
+      ),
     );
+    this.goalAngle = this.#avoid.bestAngle;
     
     if ( target ) {
       this.isShooting = Math.abs( Util.deltaAngle( goalAngle, this.angle ) ) < ATTACK_AIM && this.distanceTo( target ) < ATTACK_RANGE;
@@ -293,37 +298,27 @@ export class Ship extends Entity {
     }
 
     // DEBUG
-    // ctx.beginPath();
-    // ctx.moveTo( this.x, this.y );
-    // ctx.lineTo( this.goalX, this.goalY );
-    // ctx.strokeStyle = 'green';
-    // ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo( this.x, this.y );
+    ctx.lineTo( this.goalX, this.goalY );
+    ctx.strokeStyle = 'green';
+    ctx.stroke();
 
-    // ctx.beginPath();
-    // ctx.moveTo( this.x, this.y );
-    // ctx.lineTo( this.x + Math.cos( this.goalAngle ) * AVOID_TIME, this.y + Math.sin( this.goalAngle ) * AVOID_TIME );
-    // ctx.strokeStyle = 'blue';
-    // ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo( this.x, this.y );
+    ctx.lineTo( this.x + Math.cos( this.goalAngle ) * AVOID_TIME, this.y + Math.sin( this.goalAngle ) * AVOID_TIME );
+    ctx.strokeStyle = 'blue';
+    ctx.stroke();
 
-    // this.#cones?.forEach( cone => {
-    //   ctx.beginPath();
-    //   ctx.moveTo( this.x, this.y );
-    //   ctx.arc( this.x, this.y, 0.001 < cone.value ? 50 : 100, cone.left, cone.right );
-    //   ctx.closePath();
+    this.#avoid?.cones?.forEach( cone => {
+      ctx.beginPath();
+      ctx.moveTo( this.x, this.y );
+      ctx.arc( this.x, this.y, cone.value * 100, cone.left, cone.right );
+      ctx.closePath();
       
-    //   ctx.fillStyle = 0.001 < cone.value ? `rgba( 128, 0, 0, ${ cone.value * 0.5 } )` : 'rgba( 0, 128, 0, 0.5 )';    
-    //   ctx.fill();
-    // } );
-
-    // if ( this.#bestCone ) {
-    //   ctx.beginPath();
-    //   ctx.moveTo( this.x, this.y );
-    //   ctx.arc( this.x, this.y, 50, this.#bestCone.left, this.#bestCone.right );
-    //   ctx.closePath();
-
-    //   ctx.fillStyle = 'blue';    
-    //   ctx.fill();
-    // }
+      ctx.fillStyle = `rgba( ${ cone.value * 100 }, 0, 0, 0.2 )`;    
+      ctx.fill();
+    } );
 
     super.draw( ctx );
   }

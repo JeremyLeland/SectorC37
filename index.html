@@ -160,7 +160,9 @@
     const enemies = world.entities.filter( e => e != player && e instanceof Ship );
     enemiesUI.innerText = enemies.length;
 
-    world.update( dt );
+    if ( !game.keysPressed.has( ' ' ) ) {
+      world.update( dt );
+    }
   };
 
   game.draw = ( ctx ) => {
