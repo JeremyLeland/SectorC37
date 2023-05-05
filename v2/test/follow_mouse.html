@@ -1,0 +1,229 @@
+<title>Avoid Cones</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { EntitySimulator } from './EntitySimulator.js';
+  import { ValuesPanel } from './ValuesPanel.js';
+  import { Entity } from '../src/Entity.js';
+  import { AvoidCones } from '../src/AvoidCones.js';
+  import * as Util from '../src/Util.js';
+
+  
+  function shipPath() {
+    const path = new Path2D();
+    path.moveTo( 1, 0 );
+    path.arc( 0, 0, 1, 2.2, -2.2 );
+    path.closePath();
+    return path;
+  }
+
+  function rockPath() {
+    const path = new Path2D();
+    path.arc( 0, 0, 1, 0, Math.PI * 2 );
+    return path;
+  }
+
+  class Ship extends Entity {
+    type = 'ship';
+    size = 16;
+    // color = 'green';
+    drawPath = shipPath();
+    turnSpeed = 0.005;
+    moveSpeed = 0.05;
+    avoids = [ 'ship', 'rock' ];
+
+    update( dt ) {
+      if ( dt > 0 ) {
+
+        // const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );
+        // const turn = Math.min( Math.abs( goalTurn ), this.turnSpeed * dt );
+        // this.angle += Math.sign( goalTurn ) * turn;
+
+
+        const toGoalAngle = Util.deltaAngle( this.angle, this.goalAngle );
+        if ( /*Math.sign( toGoalAngle ) == Math.sign( this.dAngle ) && */
+             Math.abs( toGoalAngle ) < Math.abs( this.dAngle * dt ) ) {
+          this.angle = this.goalAngle;
+          this.dAngle = 0;
+        }
+        else {
+          this.angle = Util.fixAngle( this.angle + this.dAngle * dt );
+        }
+        
+        this.x += Math.cos( this.angle ) * this.moveSpeed * dt;
+        this.y += Math.sin( this.angle ) * this.moveSpeed * dt;
+        
+        // super.update( dt );
+      }
+    }
+  }
+
+  class Rock extends Entity {
+    type = 'rock';
+    size = 30;
+    color = 'brown';
+    drawPath = rockPath();
+  }
+
+  const entities = [
+    // new Ship( { x: 200, y: 200, angle:  1, color: 'red' } ),
+    // new Ship( { x: 250, y: 250, angle:  0, color: 'orange' } ),
+    // new Ship( { x: 200, y: 300, angle: -1, color: 'yellow' } ),
+    // new Ship( { x: 600, y: 280, angle:  0, color: 'salmon' } ),
+    // new Ship( { x: 600, y: 310, angle:  0, color: 'maroon' } ),
+    // new Ship( { x: 100, y: 300, angle: -1, color: 'pink' } ),
+    // new Rock( { x: 400, y: 250 } ),
+    // new Rock( { x: 400, y: 320 } ),
+    // new Rock( { x: 400, y: 390 } ),
+
+    new Ship( { x: 400, y: 400, angle: 0, color: 'green' } ),
+    new Rock( { x: 150, y: 350 } ),
+    new Rock( { x: 250, y: 450 } ),
+    new Rock( { x: 350, y: 500 } ),
+  ];
+
+  const Constants = {
+    AvoidDistance: 100,
+    UIScale: 100,
+  };
+
+  new ValuesPanel( Constants ).valueChanged = refresh;
+  new EntitySimulator( entities ).onInput = refresh;
+
+  const canvas = new AnimatedCanvas();
+
+  let target = { x: 500, y: 300 };
+
+  canvas.update = ( dt ) => {
+    entities.forEach( entity => {
+
+      if ( entity.avoids ) {
+        const closedCones = [];
+
+        entities.filter( e => e != entity && entity.avoids.includes( e.type ) ).forEach( other => {
+          const cx = other.x - entity.x;
+          const cy = other.y - entity.y;
+          const dist = Math.hypot( cx, cy );
+          
+          if ( dist < Constants.AvoidDistance ) {
+            const angle = Math.atan2( cy, cx );
+          
+            const r = entity.size + other.size + 10;
+            const h = dist;
+            const spread = Math.asin( Math.min( 1, r / h ) );   // min() prevents floating errors when we get really close
+
+            closedCones.push( { left: angle - spread, right: angle + spread } );
+          }
+        } );
+
+        entity.avoidCones = new AvoidCones( closedCones );
+
+        const targetAngle = Math.atan2( target.y - entity.y, target.x - entity.x );
+
+        
+        // AvoidCones always gives us a cone, either "closed" (avoid!) or "open" (all clear)
+        // If we're in a closed cone, get out of it as quickly as possible to avoid collision (whichever end is closest)
+        // If we're in an open cone, head toward whichever side is closest to target angle
+
+        const forwardCone = entity.avoidCones.getCone( entity.angle );
+
+        if ( !forwardCone ) {
+          debugger;
+        }
+
+        if ( forwardCone.open ) {
+          entity.goalAngle = Util.clampAngle( targetAngle, forwardCone.left, forwardCone.right );
+        }
+        else {
+          entity.goalAngle = Util.closestAngle( entity.angle, forwardCone.left, forwardCone.right );
+        }
+
+        if ( entity.angle != entity.goalAngle ) {
+
+          // For now, special-casing a completely open forward cone to avoid fishtailing
+          // TODO: Find a more general way to avoid completely changing direction for minor moves 
+          // Maybe don't change dAngle if forward cone is greater than 3/4 of circle, or something?
+
+          if ( entity.dAngle == 0 || ( forwardCone.left != -Math.PI || forwardCone.right != Math.PI ) ) { 
+            const dir = Util.betweenAngles( entity.goalAngle, entity.angle, forwardCone.right ) ? 1 : -1;
+            entity.dAngle = dir * entity.turnSpeed;
+          }
+        }
+      }
+    } );
+
+    entities.forEach( entity => entity.update( dt ) );
+  };
+  
+  canvas.draw = ( ctx ) => {
+    entities.forEach( entity => entity.draw( ctx ) );
+
+    // Avoid cones
+    entities.forEach( entity => {
+      ctx.strokeStyle = 'green';
+      ctx.beginPath();
+      ctx.moveTo( entity.x, entity.y );
+      ctx.lineTo( target.x, target.y );
+      ctx.stroke();
+
+      ctx.save();
+      ctx.translate( entity.x, entity.y );
+
+      ctx.fillStyle = entity.color;
+      ctx.strokeStyle = 'white';
+      entity.avoidCones?.draw( ctx, Constants.UIScale );
+      
+      ctx.beginPath();
+      ctx.moveTo( 0, 0 );
+      ctx.lineTo( Math.cos( entity.goalAngle ) * Constants.UIScale, Math.sin( entity.goalAngle ) * Constants.UIScale );
+      ctx.stroke();
+
+      ctx.restore();
+    } );
+  };
+ 
+  canvas.start();
+
+  function refresh() {
+    // canvas.update( 0 );
+    // canvas.redraw();
+  }
+  
+  refresh();
+
+  function randomColor() {
+    return `hsl( ${ Math.random() * 360 }deg, ${ Math.random() * 50 + 25 }%, ${ Math.random() * 50 + 25 }% )`;
+  }
+
+  function randomBrown() {
+    return `hsl( ${ 30 + Math.random() * 10 }deg, ${ Math.random() * 25 + 75 }%, ${ Math.random() * 25 }% )`;
+  }
+
+  let mouseX = 0, mouseY = 0;
+
+  document.addEventListener( 'keydown', ( e ) => {
+    if ( e.key == 's' ) {
+      entities.push( new Ship( { x: mouseX, y: mouseY, color: randomColor() } ) );
+    }
+    if ( e.key == 'r' ) {
+      entities.push( new Rock( { x: mouseX, y: mouseY } ) );
+    }
+    else {
+      // canvas.update( 30 );
+    }
+    
+    // canvas.update( 0 );
+    // canvas.redraw();
+  } );
+  
+  document.addEventListener( 'mousedown', ( e ) => {
+    target = { x: e.clientX, y: e.clientY };
+  } );
+
+  document.addEventListener( 'mousemove', ( e ) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  } );
+  
+</script>
