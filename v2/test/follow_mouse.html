@@ -90,8 +90,8 @@
     entities.forEach( entity => {
 
       if ( entity.avoids ) {
-        const closedCones = [];
 
+        entity.avoidCones = new AvoidCones();
         entities.filter( e => e != entity && entity.avoids.includes( e.type ) ).forEach( other => {
           const cx = other.x - entity.x;
           const cy = other.y - entity.y;
@@ -104,14 +104,11 @@
             const h = dist;
             const spread = Math.asin( Math.min( 1, r / h ) );   // min() prevents floating errors when we get really close
 
-            closedCones.push( { left: angle - spread, right: angle + spread } );
+            entity.avoidCones.addCone( { left: angle - spread, right: angle + spread } );
           }
         } );
 
-        entity.avoidCones = new AvoidCones( closedCones );
-
         const targetAngle = Math.atan2( target.y - entity.y, target.x - entity.x );
-
         const targetCone = entity.avoidCones.getCone( targetAngle );
 
         if ( targetCone ) {
