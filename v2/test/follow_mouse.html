@@ -1,4 +1,4 @@
-<title>Avoid Cones</title>
+<title>Follow the Mouse</title>
 <link rel="stylesheet" href="../grid.css">
 
 <script type="module">
@@ -32,7 +32,7 @@
     turnSpeed = 0.005;
     moveSpeed = 0.05;
     avoids = [ 'rock' ];
-
+    aligns = [ 'ship' ];
 
     update( dt ) {
       if ( dt > 0 ) {
@@ -68,7 +68,7 @@
     // new Rock( { x: 400, y: 320 } ),
     // new Rock( { x: 400, y: 390 } ),
 
-    new Ship( { x: 400, y: 400, angle: 0, color: 'green' } ),
+    new Ship( { x: 400, y: 400, angle: 0, color: randomColor() } ),
     new Rock( { x: 150, y: 350 } ),
     new Rock( { x: 250, y: 450 } ),
     new Rock( { x: 350, y: 500 } ),
@@ -76,6 +76,9 @@
 
   const Constants = {
     AvoidDistance: 100,
+    TargetWeight: 0.25,
+    AlignWeight: 5,
+    AvoidWeight: 2,
     UIScale: 100,
   };
 
@@ -89,8 +92,51 @@
   canvas.update = ( dt ) => {
     entities.forEach( entity => {
 
-      if ( entity.avoids ) {
+      entity.vectors = [];
 
+      const targetWeight = Constants.TargetWeight;
+      const targetAngle = Math.atan2( target.y - entity.y, target.x - entity.x );
+      entity.vectors.push( {
+        x: Math.cos( targetAngle ) * targetWeight,
+        y: Math.sin( targetAngle ) * targetWeight,
+        src: { color: 'gray' },
+      } );
+
+      if ( entity.aligns ) {
+        entities.filter( e => e != entity && entity.aligns.includes( e.type ) ).forEach( other => {
+          const cx = other.x - entity.x;
+          const cy = other.y - entity.y;
+          const dist = Math.max( 0.1, Math.hypot( cx, cy ) - entity.size - other.size );
+          const angle = Math.atan2( cy, cx );
+
+          const avoidWeight = Constants.AvoidWeight / dist;
+          entity.vectors.push( {
+            x: -Math.cos( angle ) * avoidWeight,
+            y: -Math.sin( angle ) * avoidWeight,
+            src: other,
+          } );
+
+          const alignWeight = Constants.AlignWeight / dist;
+          const averageAngle = entity.angle + Util.deltaAngle( entity.angle, other.angle ) / 2;
+          
+          entity.vectors.push ( {
+            x: Math.cos( averageAngle ) * alignWeight,
+            y: Math.sin( averageAngle ) * alignWeight,
+            src: other,
+          } );
+        } );
+      }
+
+      if ( entity.vectors.length > 0 ) {
+        entity.totalVector = entity.vectors.reduce( ( a, b ) => ( { x: a.x + b.x, y: a.y + b.y } ), { x: 0, y: 0 } );
+        entity.goalAngle = Math.atan2( entity.totalVector.y, entity.totalVector.x );
+      }
+      else {
+        entity.totalVector = null;
+        entity.goalAngle = entity.angle;
+      }
+
+      if ( entity.avoids ) {
         entity.avoidCones = new AvoidCones();
         entities.filter( e => e != entity && entity.avoids.includes( e.type ) ).forEach( other => {
           const cx = other.x - entity.x;
@@ -108,14 +154,10 @@
           }
         } );
 
-        const targetAngle = Math.atan2( target.y - entity.y, target.x - entity.x );
-        const targetCone = entity.avoidCones.getCone( targetAngle );
+        const goalCone = entity.avoidCones.getCone( entity.goalAngle );
 
-        if ( targetCone ) {
-          entity.goalAngle = Util.closestAngle( entity.angle, targetCone.left, targetCone.right );
-        }
-        else {
-          entity.goalAngle = targetAngle;
+        if ( goalCone ) {
+          entity.goalAngle = Util.closestAngle( entity.angle, goalCone.left, goalCone.right );
         }
       }
     } );
@@ -128,19 +170,27 @@
 
     // Avoid cones
     entities.forEach( entity => {
-      ctx.strokeStyle = 'green';
+      ctx.strokeStyle = 'gray';
       ctx.beginPath();
-      ctx.moveTo( entity.x, entity.y );
-      ctx.lineTo( target.x, target.y );
+      ctx.moveTo( target.x, target.y );
+      ctx.lineTo( entity.x, entity.y );
+      ctx.setLineDash( [ 5, 5 ] );
       ctx.stroke();
+      ctx.setLineDash( [] );
 
       ctx.save();
       ctx.translate( entity.x, entity.y );
 
-      ctx.fillStyle = entity.color;
-      ctx.strokeStyle = 'white';
-      entity.avoidCones?.draw( ctx, Constants.UIScale );
+      if ( entity.avoidCones ) {
+        ctx.fillStyle = entity.color;
+        ctx.strokeStyle = 'white';
+        entity.avoidCones.draw( ctx, Constants.UIScale );
+      }
       
+      drawVector( entity.totalVector, ctx, 'white' );
+      if ( entity.alignVector )   drawVector( entity.alignVector, ctx, 'green' );
+      entity.vectors?.forEach( v => drawVector( v, ctx, v.src.color ) );
+
       ctx.beginPath();
       ctx.moveTo( 0, 0 );
       ctx.lineTo( Math.cos( entity.goalAngle ) * Constants.UIScale, Math.sin( entity.goalAngle ) * Constants.UIScale );
@@ -149,12 +199,37 @@
       ctx.restore();
     } );
   };
+
+  function drawVector( vector, ctx, color = 'white' ) {
+    if ( !vector )  return;
+
+    const x = vector.x * Constants.UIScale;
+    const y = vector.y * Constants.UIScale;
+    const angle = Math.atan2( y, x );
+
+    ctx.strokeStyle = ctx.fillStyle = color;
+    
+    ctx.beginPath();
+    ctx.moveTo( 0, 0 );
+    ctx.lineTo( x, y );
+    
+    ctx.stroke();
+    
+    // TODO: Combine w/above?
+
+    const HEAD_LENGTH = 5;
+    const HEAD_WIDTH = 2.5;
+    ctx.beginPath();
+    ctx.moveTo( x, y );
+    ctx.arc( x, y, HEAD_LENGTH, angle + HEAD_WIDTH, angle - HEAD_WIDTH );
+    ctx.fill();
+  }
  
-  canvas.start();
+  // canvas.start();
 
   function refresh() {
-    // canvas.update( 0 );
-    // canvas.redraw();
+    canvas.update( 0 );
+    canvas.redraw();
   }
   
   refresh();
@@ -177,11 +252,11 @@
       entities.push( new Rock( { x: mouseX, y: mouseY } ) );
     }
     else {
-      // canvas.update( 30 );
+      canvas.update( 30 );
     }
     
-    // canvas.update( 0 );
-    // canvas.redraw();
+    canvas.update( 0 );
+    canvas.redraw();
   } );
   
   document.addEventListener( 'mousedown', ( e ) => {
