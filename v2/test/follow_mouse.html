@@ -31,25 +31,16 @@
     drawPath = shipPath();
     turnSpeed = 0.005;
     moveSpeed = 0.05;
-    avoids = [ 'ship', 'rock' ];
+    avoids = [ 'rock' ];
+
 
     update( dt ) {
       if ( dt > 0 ) {
 
-        // const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );
-        // const turn = Math.min( Math.abs( goalTurn ), this.turnSpeed * dt );
-        // this.angle += Math.sign( goalTurn ) * turn;
-
-
-        const toGoalAngle = Util.deltaAngle( this.angle, this.goalAngle );
-        if ( /*Math.sign( toGoalAngle ) == Math.sign( this.dAngle ) && */
-             Math.abs( toGoalAngle ) < Math.abs( this.dAngle * dt ) ) {
-          this.angle = this.goalAngle;
-          this.dAngle = 0;
-        }
-        else {
-          this.angle = Util.fixAngle( this.angle + this.dAngle * dt );
-        }
+        const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );
+        const turn = Math.min( Math.abs( goalTurn ), this.turnSpeed * dt );
+        this.angle += Math.sign( goalTurn ) * turn;
+        this.angle = Util.fixAngle( this.angle );
         
         this.x += Math.cos( this.angle ) * this.moveSpeed * dt;
         this.y += Math.sin( this.angle ) * this.moveSpeed * dt;
@@ -121,34 +112,13 @@
 
         const targetAngle = Math.atan2( target.y - entity.y, target.x - entity.x );
 
-        
-        // AvoidCones always gives us a cone, either "closed" (avoid!) or "open" (all clear)
-        // If we're in a closed cone, get out of it as quickly as possible to avoid collision (whichever end is closest)
-        // If we're in an open cone, head toward whichever side is closest to target angle
+        const targetCone = entity.avoidCones.getCone( targetAngle );
 
-        const forwardCone = entity.avoidCones.getCone( entity.angle );
-
-        if ( !forwardCone ) {
-          debugger;
-        }
-
-        if ( forwardCone.open ) {
-          entity.goalAngle = Util.clampAngle( targetAngle, forwardCone.left, forwardCone.right );
+        if ( targetCone ) {
+          entity.goalAngle = Util.closestAngle( entity.angle, targetCone.left, targetCone.right );
         }
         else {
-          entity.goalAngle = Util.closestAngle( entity.angle, forwardCone.left, forwardCone.right );
-        }
-
-        if ( entity.angle != entity.goalAngle ) {
-
-          // For now, special-casing a completely open forward cone to avoid fishtailing
-          // TODO: Find a more general way to avoid completely changing direction for minor moves 
-          // Maybe don't change dAngle if forward cone is greater than 3/4 of circle, or something?
-
-          if ( entity.dAngle == 0 || ( forwardCone.left != -Math.PI || forwardCone.right != Math.PI ) ) { 
-            const dir = Util.betweenAngles( entity.goalAngle, entity.angle, forwardCone.right ) ? 1 : -1;
-            entity.dAngle = dir * entity.turnSpeed;
-          }
+          entity.goalAngle = targetAngle;
         }
       }
     } );
