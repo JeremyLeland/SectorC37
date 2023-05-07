@@ -6,6 +6,7 @@
   import { EntitySimulator } from './EntitySimulator.js';
   import { ValuesPanel } from './ValuesPanel.js';
   import { Entity } from '../src/Entity.js';
+  import { Actor } from '../src/Actor.js';
   import { AvoidCones } from '../src/AvoidCones.js';
   import * as Util from '../src/Util.js';
 
@@ -24,7 +25,7 @@
     return path;
   }
 
-  class Ship extends Entity {
+  class Ship extends Actor {
     type = 'ship';
     size = 16;
     // color = 'green';
@@ -33,21 +34,6 @@
     moveSpeed = 0.05;
     avoids = [ 'rock' ];
     aligns = [ 'ship' ];
-
-    update( dt ) {
-      if ( dt > 0 ) {
-
-        const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );
-        const turn = Math.min( Math.abs( goalTurn ), this.turnSpeed * dt );
-        this.angle += Math.sign( goalTurn ) * turn;
-        this.angle = Util.fixAngle( this.angle );
-        
-        this.x += Math.cos( this.angle ) * this.moveSpeed * dt;
-        this.y += Math.sin( this.angle ) * this.moveSpeed * dt;
-        
-        // super.update( dt );
-      }
-    }
   }
 
   class Rock extends Entity {
@@ -92,48 +78,12 @@
   canvas.update = ( dt ) => {
     entities.forEach( entity => {
 
-      entity.vectors = [];
-
-      const targetWeight = Constants.TargetWeight;
-      const targetAngle = Math.atan2( target.y - entity.y, target.x - entity.x );
-      entity.vectors.push( {
-        x: Math.cos( targetAngle ) * targetWeight,
-        y: Math.sin( targetAngle ) * targetWeight,
-        src: { color: 'gray' },
-      } );
+      if ( entity instanceof Ship ) {
+        entity.setTarget( target );
+      }
 
       if ( entity.aligns ) {
-        entities.filter( e => e != entity && entity.aligns.includes( e.type ) ).forEach( other => {
-          const cx = other.x - entity.x;
-          const cy = other.y - entity.y;
-          const dist = Math.max( 0.1, Math.hypot( cx, cy ) - entity.size - other.size );
-          const angle = Math.atan2( cy, cx );
-
-          const avoidWeight = Constants.AvoidWeight / dist;
-          entity.vectors.push( {
-            x: -Math.cos( angle ) * avoidWeight,
-            y: -Math.sin( angle ) * avoidWeight,
-            src: other,
-          } );
-
-          const alignWeight = Constants.AlignWeight / dist;
-          const averageAngle = entity.angle + Util.deltaAngle( entity.angle, other.angle ) / 2;
-          
-          entity.vectors.push ( {
-            x: Math.cos( averageAngle ) * alignWeight,
-            y: Math.sin( averageAngle ) * alignWeight,
-            src: other,
-          } );
-        } );
-      }
-
-      if ( entity.vectors.length > 0 ) {
-        entity.totalVector = entity.vectors.reduce( ( a, b ) => ( { x: a.x + b.x, y: a.y + b.y } ), { x: 0, y: 0 } );
-        entity.goalAngle = Math.atan2( entity.totalVector.y, entity.totalVector.x );
-      }
-      else {
-        entity.totalVector = null;
-        entity.goalAngle = entity.angle;
+        entity.align( entities.filter( e => e != entity && entity.aligns.includes( e.type ) ) );
       }
 
       if ( entity.avoids ) {
@@ -170,14 +120,6 @@
 
     // Avoid cones
     entities.forEach( entity => {
-      ctx.strokeStyle = 'gray';
-      ctx.beginPath();
-      ctx.moveTo( target.x, target.y );
-      ctx.lineTo( entity.x, entity.y );
-      ctx.setLineDash( [ 5, 5 ] );
-      ctx.stroke();
-      ctx.setLineDash( [] );
-
       ctx.save();
       ctx.translate( entity.x, entity.y );
 
@@ -186,10 +128,6 @@
         ctx.strokeStyle = 'white';
         entity.avoidCones.draw( ctx, Constants.UIScale );
       }
-      
-      drawVector( entity.totalVector, ctx, 'white' );
-      if ( entity.alignVector )   drawVector( entity.alignVector, ctx, 'green' );
-      entity.vectors?.forEach( v => drawVector( v, ctx, v.src.color ) );
 
       ctx.beginPath();
       ctx.moveTo( 0, 0 );
@@ -200,31 +138,6 @@
     } );
   };
 
-  function drawVector( vector, ctx, color = 'white' ) {
-    if ( !vector )  return;
-
-    const x = vector.x * Constants.UIScale;
-    const y = vector.y * Constants.UIScale;
-    const angle = Math.atan2( y, x );
-
-    ctx.strokeStyle = ctx.fillStyle = color;
-    
-    ctx.beginPath();
-    ctx.moveTo( 0, 0 );
-    ctx.lineTo( x, y );
-    
-    ctx.stroke();
-    
-    // TODO: Combine w/above?
-
-    const HEAD_LENGTH = 5;
-    const HEAD_WIDTH = 2.5;
-    ctx.beginPath();
-    ctx.moveTo( x, y );
-    ctx.arc( x, y, HEAD_LENGTH, angle + HEAD_WIDTH, angle - HEAD_WIDTH );
-    ctx.fill();
-  }
- 
   // canvas.start();
 
   function refresh() {
