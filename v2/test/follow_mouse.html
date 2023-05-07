@@ -7,7 +7,6 @@
   import { ValuesPanel } from './ValuesPanel.js';
   import { Entity } from '../src/Entity.js';
   import { Actor } from '../src/Actor.js';
-  import { AvoidCones } from '../src/AvoidCones.js';
   import * as Util from '../src/Util.js';
 
   
@@ -87,28 +86,7 @@
       }
 
       if ( entity.avoids ) {
-        entity.avoidCones = new AvoidCones();
-        entities.filter( e => e != entity && entity.avoids.includes( e.type ) ).forEach( other => {
-          const cx = other.x - entity.x;
-          const cy = other.y - entity.y;
-          const dist = Math.hypot( cx, cy );
-          
-          if ( dist < Constants.AvoidDistance ) {
-            const angle = Math.atan2( cy, cx );
-          
-            const r = entity.size + other.size + 10;
-            const h = dist;
-            const spread = Math.asin( Math.min( 1, r / h ) );   // min() prevents floating errors when we get really close
-
-            entity.avoidCones.addCone( { left: angle - spread, right: angle + spread } );
-          }
-        } );
-
-        const goalCone = entity.avoidCones.getCone( entity.goalAngle );
-
-        if ( goalCone ) {
-          entity.goalAngle = Util.closestAngle( entity.angle, goalCone.left, goalCone.right );
-        }
+        entity.avoid( entities.filter( e => e != entity && entity.avoids.includes( e.type ) ) );
       }
     } );
 
@@ -117,25 +95,6 @@
   
   canvas.draw = ( ctx ) => {
     entities.forEach( entity => entity.draw( ctx ) );
-
-    // Avoid cones
-    entities.forEach( entity => {
-      ctx.save();
-      ctx.translate( entity.x, entity.y );
-
-      if ( entity.avoidCones ) {
-        ctx.fillStyle = entity.color;
-        ctx.strokeStyle = 'white';
-        entity.avoidCones.draw( ctx, Constants.UIScale );
-      }
-
-      ctx.beginPath();
-      ctx.moveTo( 0, 0 );
-      ctx.lineTo( Math.cos( entity.goalAngle ) * Constants.UIScale, Math.sin( entity.goalAngle ) * Constants.UIScale );
-      ctx.stroke();
-
-      ctx.restore();
-    } );
   };
 
   // canvas.start();

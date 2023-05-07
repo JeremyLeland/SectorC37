@@ -1,4 +1,5 @@
 import { Entity } from '../src/Entity.js';
+import { AvoidCones } from '../src/AvoidCones.js';
 import * as Util from '../src/Util.js';
 
 const Constants = {
@@ -72,6 +73,31 @@ export class Actor extends Entity {
     this.goalAngle = Math.atan2( this.totalVector.y, this.totalVector.x );
   }
 
+  avoid( others ) {
+    this.avoidCones = new AvoidCones();
+    others.forEach( other => {
+      const cx = other.x - this.x;
+      const cy = other.y - this.y;
+      const dist = Math.hypot( cx, cy );
+      
+      if ( dist < Constants.AvoidDistance ) {
+        const angle = Math.atan2( cy, cx );
+      
+        const r = this.size + other.size + 10;  // TODO: Don't randomly hardcode this
+        const h = dist;
+        const spread = Math.asin( Math.min( 1, r / h ) );   // min() prevents floating errors when we get really close
+
+        this.avoidCones.addCone( { left: angle - spread, right: angle + spread } );
+      }
+    } );
+
+    const goalCone = this.avoidCones.getCone( this.goalAngle );
+
+    if ( goalCone ) {
+      this.goalAngle = Util.closestAngle( this.angle, goalCone.left, goalCone.right );
+    }
+  }
+
   draw( ctx ) {
     super.draw( ctx );
 
@@ -87,6 +113,18 @@ export class Actor extends Entity {
 
     ctx.save();
     ctx.translate( this.x, this.y );
+
+    if ( this.avoidCones ) {
+      ctx.fillStyle = this.color;
+      ctx.strokeStyle = 'white';
+      this.avoidCones.draw( ctx, Constants.UIScale );
+    }
+
+    ctx.strokeStyle = this.color;
+    ctx.beginPath();
+    ctx.moveTo( 0, 0 );
+    ctx.lineTo( Math.cos( this.goalAngle ) * Constants.UIScale, Math.sin( this.goalAngle ) * Constants.UIScale );
+    ctx.stroke();
 
     drawVector( this.totalVector, ctx, 'white' );
     this.vectors?.forEach( v => drawVector( v, ctx, v.src.color ) );
