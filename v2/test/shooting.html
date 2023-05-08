@@ -1,0 +1,131 @@
+<title>Shooting Practice</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { Entity } from '../src/Entity.js';
+  import { Actor } from '../src/Actor.js';
+  import { Gun } from '../src/Gun.js';
+  import * as Util from '../src/Util.js';
+
+  
+  function shipPath() {
+    const path = new Path2D();
+    path.moveTo( 1, 0 );
+    path.arc( 0, 0, 1, 2.2, -2.2 );
+    path.closePath();
+    return path;
+  }
+
+  function rockPath() {
+    const path = new Path2D();
+    path.arc( 0, 0, 1, 0, Math.PI * 2 );
+    return path;
+  }
+
+  class Ship extends Actor {
+    type = 'ship';
+    size = 16;
+    // color = 'green';
+    drawPath = shipPath();
+    turnSpeed = 0.005;
+    moveSpeed = 0; //0.05;
+    // avoids = [ 'rock' ];
+    // aligns = [ 'ship' ];
+
+    guns = [
+      new PlayerGun( { offset: { front: 1, side: -1, angle: 0 } } ),
+      new PlayerGun( { offset: { front: 1, side:  1, angle: 0 } } ),
+    ];
+  }
+
+  function bulletPath() {
+    const path = new Path2D();
+    path.moveTo( -1, 0 );
+    path.arc( 0, 0, 1, -1, 1 );
+    path.closePath();
+    return path;
+  }
+
+  class PlayerBullet extends Entity {
+    size = 4;
+    trailLength = 40;
+    mass = 0.05;
+    life = 1;
+    decay = 1 / 5000;
+    damage = 10;
+    color = 'yellow';
+    drawPath = bulletPath();
+  }
+
+  class PlayerGun extends Gun {
+    timeBetweenShots = 200;
+    bulletSpeed = 0.6;
+
+    getBullet( values ) {
+      return new PlayerBullet( values );
+    }
+  }
+
+  class Rock extends Entity {
+    type = 'rock';
+    size = 30;
+    // color = 'brown';
+    drawPath = rockPath();
+  }
+
+  const player = new Ship( { x: 400, y: 400, angle: 0, color: 'green' } );
+
+  const entities = [
+    player,
+    new Rock( { x: 600, y: 400, color: randomBrown() } ),
+    new Rock( { x: 250, y: 500, color: randomBrown() } ),
+    new Rock( { x: 350, y: 600, color: randomBrown() } ),
+  ];
+
+  const canvas = new AnimatedCanvas();
+
+  canvas.update = ( dt ) => {
+    entities.forEach( entity => {
+      entity.update( dt );
+
+      entities.push( ...entity.createdEntities.splice( 0 ) );
+    } );
+  };
+  
+  canvas.draw = ( ctx ) => {
+    entities.forEach( entity => entity.draw( ctx ) );
+  };
+
+  canvas.start();
+
+  function randomColor() {
+    return `hsl( ${ Math.random() * 360 }deg, ${ Math.random() * 50 + 25 }%, ${ Math.random() * 50 + 25 }% )`;
+  }
+
+  function randomBrown() {
+    return `hsl( ${ 20 + Math.random() * 10 }deg, ${ 100 }%, ${ 25 + Math.random() * 25 }% )`;
+  }
+
+  let mouseX = 0, mouseY = 0;
+
+  document.addEventListener( 'keydown', ( e ) => {
+    if ( e.key == 's' ) {
+      entities.push( new Ship( { x: mouseX, y: mouseY, color: randomColor() } ) );
+    }
+    if ( e.key == 'r' ) {
+      entities.push( new Rock( { x: mouseX, y: mouseY, color: randomBrown() } ) );
+    }
+  } );
+  
+  document.addEventListener( 'mousedown', ( e ) => {
+    
+  } );
+
+  document.addEventListener( 'mousemove', ( e ) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    player.setTarget( { x: mouseX, y: mouseY } );
+  } );
+  
+</script>

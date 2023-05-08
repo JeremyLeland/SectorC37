@@ -17,6 +17,9 @@ export class Actor extends Entity {
 
   target;
 
+  guns = [];
+  isShooting = true;
+
   update( dt ) {
     const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );
     const turn = Math.min( Math.abs( goalTurn ), this.turnSpeed * dt );
@@ -25,7 +28,9 @@ export class Actor extends Entity {
     
     this.x += Math.cos( this.angle ) * this.moveSpeed * dt;
     this.y += Math.sin( this.angle ) * this.moveSpeed * dt;
-      
+    
+    this.guns.forEach( gun => gun.update( dt, this ) );
+
     // super.update( dt );
   }
 

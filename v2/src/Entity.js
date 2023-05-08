@@ -2,6 +2,7 @@ export class Entity {
   x = 0;
   y = 0;
   angle = 0;
+  size = 1;
 
   dx = 0;
   dy = 0;
@@ -14,6 +15,8 @@ export class Entity {
   color = 'black';
   drawPath = new Path2D();
   type = 'entity';
+
+  createdEntities = [];
 
   constructor( values ) {
     Object.assign( this, values );
@@ -43,5 +46,16 @@ export class Entity {
     ctx.stroke( this.drawPath );
 
     ctx.restore();
+  }
+
+  getOffset( offset ) {
+    const cos = Math.cos( this.angle );
+    const sin = Math.sin( this.angle );
+    
+    return {
+      x: this.x + this.size * ( cos * offset.front - sin * offset.side ),
+      y: this.y + this.size * ( sin * offset.front + cos * offset.side ),
+      angle: this.angle + offset.angle,
+    }
   }
 }
