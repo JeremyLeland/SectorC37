@@ -18,7 +18,7 @@ export class Actor extends Entity {
   target;
 
   guns = [];
-  isShooting = true;
+  isShooting = false;
 
   update( dt ) {
     const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );

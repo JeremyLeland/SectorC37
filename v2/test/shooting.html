@@ -26,7 +26,7 @@
   class Ship extends Actor {
     type = 'ship';
     size = 16;
-    // color = 'green';
+    color = randomColor();
     drawPath = shipPath();
     turnSpeed = 0.005;
     moveSpeed = 0; //0.05;
@@ -51,11 +51,10 @@
     size = 4;
     trailLength = 40;
     mass = 0.05;
-    life = 1;
-    decay = 1 / 5000;
     damage = 10;
     color = 'yellow';
     drawPath = bulletPath();
+    lifeSpan = 1000;
   }
 
   class PlayerGun extends Gun {
@@ -69,14 +68,14 @@
 
   class Rock extends Entity {
     type = 'rock';
-    size = 30;
+    size = 20 + Math.random() * 20;
     // color = 'brown';
     drawPath = rockPath();
   }
 
-  const player = new Ship( { x: 400, y: 400, angle: 0, color: 'green' } );
+  const player = new Ship( { x: 400, y: 400, angle: 0 } );
 
-  const entities = [
+  let entities = [
     player,
     new Rock( { x: 600, y: 400, color: randomBrown() } ),
     new Rock( { x: 250, y: 500, color: randomBrown() } ),
@@ -90,6 +89,7 @@
       entity.update( dt );
 
       entities.push( ...entity.createdEntities.splice( 0 ) );
+      entities = entities.filter( e => e.isAlive );
     } );
   };
   
@@ -100,7 +100,7 @@
   canvas.start();
 
   function randomColor() {
-    return `hsl( ${ Math.random() * 360 }deg, ${ Math.random() * 50 + 25 }%, ${ Math.random() * 50 + 25 }% )`;
+    return `hsl( ${ Math.random() * 360 }deg, ${ Math.random() * 100 }%, ${ 50 }% )`;
   }
 
   function randomBrown() {
@@ -118,9 +118,8 @@
     }
   } );
   
-  document.addEventListener( 'mousedown', ( e ) => {
-    
-  } );
+  document.addEventListener( 'mousedown', ( e ) => player.isShooting = true  );
+  document.addEventListener( 'mouseup',   ( e ) => player.isShooting = false );
 
   document.addEventListener( 'mousemove', ( e ) => {
     mouseX = e.clientX;

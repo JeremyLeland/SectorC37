@@ -7,14 +7,20 @@ export class Entity {
   dx = 0;
   dy = 0;
   dAngle = 0;
+  dSize = 0;
 
   ddx = 0;
   ddy = 0;
   ddAngle = 0;
+  ddSize = 0;
 
   color = 'black';
   drawPath = new Path2D();
   type = 'entity';
+
+  life = 1;
+  lifeSpan = Infinity;
+  isAlive = true;
 
   createdEntities = [];
 
@@ -25,11 +31,16 @@ export class Entity {
   update( dt ) {
     this.dx += this.ddx * dt;
     this.dy += this.ddy * dt;
-    this.ddAngle = this.dAngle * dt;
+    this.dAngle += this.ddAngle * dt;
+    this.dSize += this.ddSize * dt;
 
     this.x += this.dx * dt;
     this.y += this.dy * dt;
     this.angle += this.dAngle * dt;
+    this.size += this.dSize * dt;
+
+    this.lifeSpan -= dt;
+    this.isAlive = this.life > 0 && this.lifeSpan > 0;
   }
 
   draw( ctx ) {
