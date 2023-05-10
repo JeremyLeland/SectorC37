@@ -3,6 +3,7 @@
 
 <script type="module">
   import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { EntitySimulator } from './EntitySimulator.js';
   import { Entity } from '../src/Entity.js';
   import { Actor } from '../src/Actor.js';
   import { Gun } from '../src/Gun.js';
@@ -35,7 +36,7 @@
     size = 16;
     color = randomColor();
     drawPath = shipPath();
-    turnSpeed = 0.005;
+    turnSpeed = 0; //0.005;
     moveSpeed = 0; //0.05;
     // avoids = [ 'rock' ];
     // aligns = [ 'ship' ];
@@ -90,15 +91,27 @@
     new Rock( { x: 350, y: 600 } ),
   ];
 
+  const sim = new EntitySimulator( entities );
+
   const canvas = new AnimatedCanvas();
 
   canvas.update = ( dt ) => {
-    entities.forEach( entity => {
-      entity.update( dt );
+    const createdEntities = [];
 
-      entities.push( ...entity.createdEntities.splice( 0 ) );
-      entities = entities.filter( e => e.isAlive );
+    entities.forEach( entity => {
+
+      if ( entity != player ) {
+        entity.target = player;
+      }
+
+      entity.update( dt, entities );
+      createdEntities.push( ...entity.createdEntities.splice( 0 ) );
     } );
+    
+    entities.push( ...createdEntities );
+    entities = entities.filter( e => e.isAlive );
+
+    sim.entities = entities;
   };
   
   canvas.draw = ( ctx ) => {
@@ -119,20 +132,20 @@
 
   document.addEventListener( 'keydown', ( e ) => {
     if ( e.key == 's' ) {
-      entities.push( new Ship( { x: mouseX, y: mouseY, color: randomColor() } ) );
+      entities.push( new Ship( { x: mouseX, y: mouseY } ) );
     }
     if ( e.key == 'r' ) {
-      entities.push( new Rock( { x: mouseX, y: mouseY, color: randomBrown() } ) );
+      entities.push( new Rock( { x: mouseX, y: mouseY } ) );
     }
   } );
   
-  document.addEventListener( 'mousedown', ( e ) => player.isShooting = true  );
-  document.addEventListener( 'mouseup',   ( e ) => player.isShooting = false );
+  // document.addEventListener( 'mousedown', ( e ) => player.isShooting = true  );
+  // document.addEventListener( 'mouseup',   ( e ) => player.isShooting = false );
 
   document.addEventListener( 'mousemove', ( e ) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    player.setTarget( { x: mouseX, y: mouseY } );
+    player.target = { x: mouseX, y: mouseY };
   } );
   
 </script>

@@ -7,6 +7,8 @@ const Constants = {
   TargetWeight: 0.25,
   AlignWeight: 5,
   AvoidWeight: 2,
+  ShootDistance: 200,
+  ShootAngle: 0.25,
   UIScale: 100,
 };
 
@@ -16,11 +18,36 @@ export class Actor extends Entity {
   goalAngle = 0;
 
   target;
+  aligns;
+  avoids;
 
   guns = [];
   isShooting = false;
 
-  update( dt ) {
+  update( dt, entities ) {
+    if ( this.target ) {
+      const tx = this.target.x - this.x;
+      const ty = this.target.y - this.y;
+      const tangle = Math.atan2( ty, tx );
+
+      this.goalAngle = tangle;
+
+      if ( this.target.isAlive ) {
+        const tdist = Math.hypot( tx, ty );// - this.size - this.target.size;
+        const inFront = Math.abs( tangle - this.angle ) < Constants.ShootAngle;
+
+        this.isShooting = inFront && tdist < Constants.ShootDistance;
+      }
+    }
+
+    if ( this.aligns ) {
+      this.align( entities.filter( e => e != this && this.aligns.includes( e.type ) ) );
+    }
+
+    if ( this.avoids ) {
+      this.avoid( entities.filter( e => e != this && this.avoids.includes( e.type ) ) );
+    }
+
     const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );
     const turn = Math.min( Math.abs( goalTurn ), this.turnSpeed * dt );
     this.angle += Math.sign( goalTurn ) * turn;
@@ -32,11 +59,6 @@ export class Actor extends Entity {
     this.guns.forEach( gun => gun.update( dt, this ) );
 
     // super.update( dt );
-  }
-
-  setTarget( target ) {
-    this.target = target;
-    this.goalAngle = Math.atan2( target.y - this.y, target.x - this.x );
   }
 
   align( others ) {
@@ -118,6 +140,12 @@ export class Actor extends Entity {
 
     ctx.save();
     ctx.translate( this.x, this.y );
+
+    ctx.fillStyle = 'rgba( 100, 100, 100, 0.1 )';
+    ctx.beginPath();
+    ctx.moveTo( 0, 0 );
+    ctx.arc( 0, 0, Constants.ShootDistance, this.angle - Constants.ShootAngle, this.angle + Constants.ShootAngle );
+    ctx.fill();
 
     if ( this.avoidCones ) {
       ctx.fillStyle = this.color;

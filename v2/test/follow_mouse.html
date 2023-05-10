@@ -78,19 +78,11 @@
     entities.forEach( entity => {
 
       if ( entity instanceof Ship ) {
-        entity.setTarget( target );
-      }
-
-      if ( entity.aligns ) {
-        entity.align( entities.filter( e => e != entity && entity.aligns.includes( e.type ) ) );
-      }
-
-      if ( entity.avoids ) {
-        entity.avoid( entities.filter( e => e != entity && entity.avoids.includes( e.type ) ) );
+        entity.target = target;
       }
     } );
 
-    entities.forEach( entity => entity.update( dt ) );
+    entities.forEach( entity => entity.update( dt, entities ) );
   };
   
   canvas.draw = ( ctx ) => {
