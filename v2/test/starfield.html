@@ -1,0 +1,40 @@
+<title>Shooting Practice</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { Starfield } from '../src/Starfield.js';
+
+  const world = { size: 500 };
+
+  const starfield = new Starfield( world.size * 2, world.size * 2, 2000, 3 );
+
+  let scrollX = 0, scrollY = 0;
+
+  const canvas = new AnimatedCanvas();
+
+  canvas.update = ( dt ) => {
+    scrollX = mouseX - window.innerWidth / 2;
+    scrollY = mouseY - window.innerHeight / 2;
+  };
+  
+  canvas.draw = ( ctx ) => {
+    ctx.save();
+    ctx.translate( window.innerWidth / 2, window.innerHeight / 2 );
+    starfield.draw( ctx, scrollX, scrollY );
+    ctx.restore();
+  };
+
+  // canvas.start();
+
+  let mouseX = 0, mouseY = 0;
+  
+  document.addEventListener( 'mousemove', ( e ) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    canvas.update( 0 );
+    canvas.redraw();
+  } );
+  
+</script>
