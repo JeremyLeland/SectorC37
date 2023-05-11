@@ -17,7 +17,7 @@ export class Starfield {
         ctx.fillRect( 0, 0, width, height );
       }
       
-      const numStars = width * height / density;
+      const numStars = density / width * height;
       for ( let i = 0; i < numStars; i ++ ) {
         const x = Math.random() * width;
         const y = Math.random() * height;

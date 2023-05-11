@@ -3,13 +3,14 @@ import { AvoidCones } from '../src/AvoidCones.js';
 import * as Util from '../src/Util.js';
 
 const Constants = {
-  AvoidDistance: 100,
+  AvoidDistance: 200,
   TargetWeight: 0.25,
   AlignWeight: 5,
   AvoidWeight: 2,
   ShootDistance: 200,
   ShootAngle: 0.25,
   UIScale: 100,
+  Debug: false,
 };
 
 export class Actor extends Entity {
@@ -128,41 +129,43 @@ export class Actor extends Entity {
   draw( ctx ) {
     super.draw( ctx );
 
-    if ( this.target ) {
-      ctx.strokeStyle = 'gray';
+    if ( Constants.Debug ) {
+      if ( this.target ) {
+        ctx.strokeStyle = 'gray';
+        ctx.beginPath();
+        ctx.moveTo( this.target.x, this.target.y );
+        ctx.lineTo( this.x, this.y );
+        ctx.setLineDash( [ 5, 5 ] );
+        ctx.stroke();
+        ctx.setLineDash( [] );
+      }
+
+      ctx.save();
+      ctx.translate( this.x, this.y );
+
+      ctx.fillStyle = 'rgba( 100, 100, 100, 0.1 )';
       ctx.beginPath();
-      ctx.moveTo( this.target.x, this.target.y );
-      ctx.lineTo( this.x, this.y );
-      ctx.setLineDash( [ 5, 5 ] );
+      ctx.moveTo( 0, 0 );
+      ctx.arc( 0, 0, Constants.ShootDistance, this.angle - Constants.ShootAngle, this.angle + Constants.ShootAngle );
+      ctx.fill();
+
+      if ( this.avoidCones ) {
+        ctx.fillStyle = this.color;
+        ctx.strokeStyle = 'white';
+        this.avoidCones.draw( ctx, Constants.UIScale );
+      }
+
+      ctx.strokeStyle = this.color;
+      ctx.beginPath();
+      ctx.moveTo( 0, 0 );
+      ctx.lineTo( Math.cos( this.goalAngle ) * Constants.UIScale, Math.sin( this.goalAngle ) * Constants.UIScale );
       ctx.stroke();
-      ctx.setLineDash( [] );
+
+      drawVector( this.totalVector, ctx, 'white' );
+      this.vectors?.forEach( v => drawVector( v, ctx, v.src.color ) );
+
+      ctx.restore();
     }
-
-    ctx.save();
-    ctx.translate( this.x, this.y );
-
-    ctx.fillStyle = 'rgba( 100, 100, 100, 0.1 )';
-    ctx.beginPath();
-    ctx.moveTo( 0, 0 );
-    ctx.arc( 0, 0, Constants.ShootDistance, this.angle - Constants.ShootAngle, this.angle + Constants.ShootAngle );
-    ctx.fill();
-
-    if ( this.avoidCones ) {
-      ctx.fillStyle = this.color;
-      ctx.strokeStyle = 'white';
-      this.avoidCones.draw( ctx, Constants.UIScale );
-    }
-
-    ctx.strokeStyle = this.color;
-    ctx.beginPath();
-    ctx.moveTo( 0, 0 );
-    ctx.lineTo( Math.cos( this.goalAngle ) * Constants.UIScale, Math.sin( this.goalAngle ) * Constants.UIScale );
-    ctx.stroke();
-
-    drawVector( this.totalVector, ctx, 'white' );
-    this.vectors?.forEach( v => drawVector( v, ctx, v.src.color ) );
-
-    ctx.restore();
   } 
 }
 
