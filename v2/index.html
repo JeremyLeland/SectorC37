@@ -86,12 +86,11 @@
   let mouseX = 0, mouseY = 0;
 
   document.addEventListener( 'keydown', ( e ) => {
-    if ( e.key == 's' ) {
-      // entities.push( new Ship( { x: mouseX, y: mouseY } ) );
-    }
-    if ( e.key == 'r' ) {
-      // entities.push( new Rock( { x: mouseX, y: mouseY } ) );
-    }
+    if ( e.key == 'Control' )   player.isSliding = true;
+  } );
+
+  document.addEventListener( 'keyup', ( e ) => {
+    if ( e.key == 'Control' )   player.isSliding = false;
   } );
   
   document.addEventListener( 'mousedown', ( e ) => player.isShooting = true  );

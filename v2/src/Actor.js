@@ -14,6 +14,8 @@ const Constants = {
 };
 
 export class Actor extends Entity {
+  accel = 0.002;  // temp: trying out accelerating by direction, then capping it
+
   turnSpeed = 0;
   moveSpeed = 0;
   goalAngle = 0;
@@ -24,6 +26,7 @@ export class Actor extends Entity {
 
   guns = [];
   isShooting = false;
+  isSliding = false;
 
   update( dt, entities ) {
     if ( this.target ) {
@@ -54,12 +57,22 @@ export class Actor extends Entity {
     this.angle += Math.sign( goalTurn ) * turn;
     this.angle = Util.fixAngle( this.angle );
     
-    this.x += Math.cos( this.angle ) * this.moveSpeed * dt;
-    this.y += Math.sin( this.angle ) * this.moveSpeed * dt;
+    if ( !this.isSliding ) {
+      this.dx += Math.cos( this.angle ) * this.accel * dt;
+      this.dy += Math.sin( this.angle ) * this.accel * dt;
+    }
+
+    const vel = Math.hypot( this.dx, this.dy );
+    if ( vel > this.moveSpeed ) {
+      this.dx *= this.moveSpeed / vel;
+      this.dy *= this.moveSpeed / vel;
+    }
+
+    this.x += this.dx * dt;
+    this.y += this.dy * dt;
     
     this.guns.forEach( gun => gun.update( dt, this ) );
 
-    // super.update( dt );
   }
 
   align( others ) {
