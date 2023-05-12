@@ -7,7 +7,7 @@ const Constants = {
   TargetWeight: 0.25,
   AlignWeight: 5,
   AvoidWeight: 2,
-  ShootDistance: 200,
+  ShootDistance: 300,
   ShootAngle: 0.25,
   UIScale: 100,
   Debug: false,
