@@ -22,6 +22,8 @@ export class Entity {
   lifeSpan = Infinity;
   isAlive = true;
 
+  boundingLines;
+
   createdEntities = [];
 
   constructor( values ) {
@@ -38,6 +40,8 @@ export class Entity {
     this.y += this.dy * dt;
     this.angle += this.dAngle * dt;
     this.size += this.dSize * dt;
+
+    this.boundingLines?.update( this );
 
     this.lifeSpan -= dt;
     this.isAlive = this.life > 0 && this.lifeSpan > 0;
@@ -57,6 +61,8 @@ export class Entity {
     ctx.stroke( this.drawPath );
 
     ctx.restore();
+
+    this.boundingLines?.draw( ctx );
   }
 
   getOffset( offset ) {

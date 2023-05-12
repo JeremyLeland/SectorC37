@@ -70,9 +70,10 @@ export class Actor extends Entity {
 
     this.x += this.dx * dt;
     this.y += this.dy * dt;
+
+    this.boundingLines?.update( this );
     
     this.guns.forEach( gun => gun.update( dt, this ) );
-
   }
 
   align( others ) {

@@ -1,6 +1,7 @@
 import { Entity } from './Entity.js';
 import { Actor } from './Actor.js';
 import { Gun } from './Gun.js';
+import { BoundingLines } from './BoundingLines.js';
 
 export class Rock extends Entity {
   type = 'rock';
@@ -44,6 +45,10 @@ export class Player extends Actor {
     new PlayerGun( { offset: { front: 1, side: -1, angle: 0 } } ),
     new PlayerGun( { offset: { front: 1, side:  1, angle: 0 } } ),
   ];
+
+  boundingLines = new BoundingLines( [
+    [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
+  ] );
 }
 
 class PlayerBullet extends Entity {
