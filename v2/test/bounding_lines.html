@@ -1,0 +1,68 @@
+<title>BoundingLines Collision</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { Entity } from '../src/Entity.js';
+  import { BoundingLines } from '../src/BoundingLines.js';
+
+  const entities = [
+    new Entity( {
+      x: 400,
+      y: 400,
+      size: 40,
+      boundingLines: new BoundingLines( [
+        [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
+      ] ),
+    } ),
+    new Entity( {
+      x: 450,
+      y: 400,
+      size: 40,
+      boundingLines: new BoundingLines( [
+        [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
+      ] ),
+    } ),
+  ];
+
+  const canvas = new AnimatedCanvas();
+
+  canvas.update = ( dt ) => {
+    entities.forEach( e => e.update( dt ) );
+  };
+  
+  canvas.draw = ( ctx ) => {
+    entities.forEach( e => e.draw( ctx ) );
+
+    const [ a, b ] = entities;
+    const hit = a.boundingLines.getHit( b.boundingLines, 0, 0 );
+
+    if ( hit.position ) {
+      ctx.beginPath();
+      ctx.arc( hit.position.x, hit.position.y, 5, 0, Math.PI * 2 );
+      ctx.fillStyle = 'yellow';
+      ctx.fill();
+    }
+  };
+
+  // canvas.start();
+  canvas.update( 0 );
+  canvas.redraw();
+
+  let mouseX, mouseY;
+  
+  document.addEventListener( 'mousemove', ( e ) => {
+    mouseX ??= e.clientX;
+    mouseY ??= e.clientY;
+
+    entities[ 0 ].x += e.clientX - mouseX;
+    entities[ 0 ].y += e.clientY - mouseY;
+
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    canvas.update( 0 );
+    canvas.redraw();
+  } );
+  
+</script>

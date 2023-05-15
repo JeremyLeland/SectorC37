@@ -32,4 +32,36 @@ export class BoundingLines {
     ctx.strokeStyle = 'red';
     this.lines?.forEach( line => line.draw( ctx ) );
   }
+
+  // Find when we would hit another set of BoundingLines (given a relative velocity)
+  getHit( other, dx, dy ) {
+
+    let closestHit = { time: Infinity };
+
+    this.lines.forEach( a => {
+      other.lines.forEach( b => {
+        // Already colliding?
+        const intersection = Line.getIntersection( 
+          a.x1, a.y1, a.x2, a.y2, 
+          b.x1, b.y1, b.x2, b.y2 
+        );
+
+        const inBounds = intersection && 
+          0 <= intersection.uA && intersection.uA <= 1 && 
+          0 <= intersection.uB && intersection.uB <= 1;
+
+        const hit = inBounds ? 
+          { time: 0, position: intersection.position } : 
+          { time: Infinity };
+    
+        if ( 0 <= hit.time && hit.time < closestHit.time ) {
+          closestHit = hit;
+        }
+      } );
+    } );
+
+    // TODO: Return range of points if already intersecting? (e.g. bite)
+
+    return closestHit;
+  }
 }
