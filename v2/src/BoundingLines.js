@@ -48,7 +48,9 @@ export class BoundingLines {
           b.x1, b.y1, b.x2, b.y2,
         );
 
-        if ( intersection && 0 < closestHit.time ) {
+        if ( intersection && 
+              0 <= intersection.uA && intersection.uA <= 1 && 
+              0 <= intersection.uB && intersection.uB <= 1 ) {
           closestHit = { 
             time: 0, 
             position: {
@@ -64,7 +66,9 @@ export class BoundingLines {
           b.x1, b.y1, b.x2, b.y2,
         );
 
-        if ( aToB && aToB.uA < closestHit.time ) {
+        if ( aToB && 
+             0 <= aToB.uB && aToB.uB <= 1 &&
+             0 < aToB.uA && aToB.uA < closestHit.time ) {
           closestHit = {
             time: aToB.uA,
             position: {
@@ -74,14 +78,14 @@ export class BoundingLines {
           };
         }
 
-        // TODO: Can't use relative movement to determine position, just time
-
         const bToA = Line.getIntersection( 
           a.x1, a.y1, a.x2, a.y2,
           b.x1, b.y1, b.x1 + otherDX - thisDX, b.y1 + otherDY - thisDY, 
         );
 
-        if ( bToA && bToA.uB < closestHit.time ) {
+        if ( bToA && 
+             0 <= bToA.uA && bToA.uA <= 1 &&
+             0 < bToA.uB && bToA.uB < closestHit.time ) {
           closestHit = {
             time: bToA.uB,
             position: {
@@ -94,8 +98,6 @@ export class BoundingLines {
     } );
 
     // TODO: Return range of points if already intersecting? (e.g. bite)
-
-    closestHit.entities = [ this, other ];
 
     return closestHit;
   }

@@ -43,18 +43,13 @@ export class Line {
       const uA = ( ( x4 - x3 ) * ( y1 - y3 ) - ( y4 - y3 ) * ( x1 - x3 ) ) / D;
       const uB = ( ( x2 - x1 ) * ( y1 - y3 ) - ( y2 - y1 ) * ( x1 - x3 ) ) / D;
 
-      // For now, we only care about intersections within the segments. 
-      // Revisit if we end up needing info about non-segment intersections
-      if ( 0 <= uA && uA <= 1 && 
-           0 <= uB && uB <= 1 ) {
-        return {
-          uA: uA,
-          uB: uB,
-          // position: {
-          //   x: x1 + ( x2 - x1 ) * uA,
-          //   y: y1 + ( y2 - y1 ) * uA,
-          // }
-        }
+      return {
+        uA: uA,
+        uB: uB,
+        // position: {
+        //   x: x1 + ( x2 - x1 ) * uA,
+        //   y: y1 + ( y2 - y1 ) * uA,
+        // }
       }
     }
   }

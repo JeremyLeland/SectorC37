@@ -80,4 +80,21 @@ export class Entity {
       angle: this.angle + offset.angle,
     }
   }
+
+  getHit( other ) {
+    if ( this.boundingLines && other.boundingLines ) {
+
+      // TODO: Find a better way to make sure these are set
+      if ( !this.boundingLines.lines )  this.boundingLines.update( this );
+      if ( !other.boundingLines.lines )  other.boundingLines.update( other );
+
+      const hit = this.boundingLines.getHit( other.boundingLines, this.dx, this.dy, other.dx, other.dy );
+      hit.entities = [ this, other ];
+      return hit;
+    }
+  }
+
+  hitWith( hit ) {
+    this.isAlive = false;
+  }
 }

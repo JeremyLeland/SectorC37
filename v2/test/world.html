@@ -1,0 +1,54 @@
+<title>Shooting Practice</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { World } from '../src/World.js';
+  import { Starfield } from '../src/Starfield.js';
+  import { Player, Ship, Rock } from '../src/SectorC37.js';
+  import * as Util from '../src/Util.js';
+
+
+  const player = new Player( { x: 200, y: 200, angle: 0 } );
+  
+  const world = new World( 1000 );
+  world.entities = [ player ];
+  
+  for ( let i = 0; i < 3; i ++ ) {
+    world.entities.push( new Rock( { x: Math.random() * 500, y: Math.random() * 500 } ) );
+  }
+
+  let scrollX = 0, scrollY = 0;
+
+  const canvas = new AnimatedCanvas();
+
+  canvas.update = ( dt ) => {
+    player.target = { x: mouseX - scrollX, y: mouseY - scrollY };
+
+    world.update( dt );
+  };
+  
+  canvas.draw = ( ctx ) => {
+    world.draw( ctx );
+  };
+
+  canvas.start();
+
+  let mouseX = 0, mouseY = 0;
+
+  document.addEventListener( 'keydown', ( e ) => {
+    if ( e.key == 'Control' )   player.isSliding = true;
+  } );
+
+  document.addEventListener( 'keyup', ( e ) => {
+    if ( e.key == 'Control' )   player.isSliding = false;
+  } );
+  
+  document.addEventListener( 'mousedown', ( e ) => player.isShooting = true  );
+  document.addEventListener( 'mouseup',   ( e ) => player.isShooting = false );
+  document.addEventListener( 'mousemove', ( e ) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  } );
+  
+</script>
