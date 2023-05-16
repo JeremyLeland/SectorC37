@@ -19,6 +19,9 @@ export class Rock extends Entity {
   dx = 0.1 * ( Math.random() - 0.5 );
   dy = 0.1 * ( Math.random() - 0.5 );
   dAngle = 0.004 * ( Math.random() - 0.5 );
+
+  life = this.size * 100;
+  damage = this.size;
 }
 
 function rockPoints() {
@@ -48,6 +51,9 @@ export class Player extends Actor {
 
   turnSpeed = 0.005;
   moveSpeed = 0.2;
+
+  life = 200;
+  damage = 100;
 
   guns = [
     new PlayerGun( { offset: { front: 1, side: -1, angle: 0 } } ),
@@ -99,6 +105,9 @@ export class Ship extends Actor {
 
   avoids = [ 'rock', 'player' ];
   aligns = [ 'ship' ];
+
+  life = 20;
+  damage = 50;
 
   guns = [
     new ShipGun( { offset: { front: 1, side: -1, angle: 0 } } ),

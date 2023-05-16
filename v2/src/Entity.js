@@ -95,6 +95,19 @@ export class Entity {
   }
 
   hitWith( hit ) {
-    this.isAlive = false;
+    hit.entities.forEach( e => {
+      if ( e != this && e.damage ) {
+        this.life -= e.damage;
+        this.bleed( hit );
+
+        if ( this.life <= 0 ) {
+          this.isAlive = false;
+          this.die( hit );
+        }
+      }
+    } );
   }
+
+  bleed( hit ) {}
+  die( hit ) {}
 }
