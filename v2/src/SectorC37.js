@@ -1,6 +1,7 @@
 import { Entity } from './Entity.js';
 import { Actor } from './Actor.js';
 import { Gun } from './Gun.js';
+import { Trail } from './Trail.js';
 import { BoundingLines } from './BoundingLines.js';
 
 export class Rock extends Entity {
@@ -28,7 +29,7 @@ function rockPoints() {
   const points = [];
   const sides = 10 + Math.random() * 5;
   for ( let i = 0; i < sides; i ++ ) {
-    const angle = Math.PI * 2 * ( i + 0.25 + 0.5 * Math.random() ) / sides;
+    const angle = Math.PI * 2 * ( i + 0.35 + 0.3 * Math.random() ) / sides;
     const dist = 0.75 + 0.25 * Math.random();
     points.push( [ Math.cos( angle ) * dist, Math.sin( angle ) * dist ] );
   }
@@ -58,6 +59,10 @@ export class Player extends Actor {
   guns = [
     new PlayerGun( { offset: { front: 1, side: -1, angle: 0 } } ),
     new PlayerGun( { offset: { front: 1, side:  1, angle: 0 } } ),
+  ];
+
+  trails = [
+    new Trail( { maxWidth: this.size / 3, maxLength: 50 } ),
   ];
 
   boundingLines = new BoundingLines( [

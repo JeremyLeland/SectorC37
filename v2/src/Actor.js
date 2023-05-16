@@ -74,6 +74,10 @@ export class Actor extends Entity {
     this.boundingLines?.update( this );
     
     this.guns.forEach( gun => gun.update( dt, this ) );
+
+    this.trails?.forEach( trail => trail.update(
+      this.getOffset( { front: -0.5, side: 0, angle: 0 } )
+    ) );
   }
 
   align( others ) {
@@ -141,6 +145,11 @@ export class Actor extends Entity {
   }
 
   draw( ctx ) {
+    if ( this.trails ) {
+      ctx.fillStyle = 'red';
+      this.trails.forEach( trail => ctx.fill( trail.getPath() ) );
+    }
+
     super.draw( ctx );
 
     if ( Constants.Debug ) {

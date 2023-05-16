@@ -1,5 +1,5 @@
 export class Entity {
-  static DebugBounds = true;
+  static DebugBounds = false;
 
   x = 0;
   y = 0;
