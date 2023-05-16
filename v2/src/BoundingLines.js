@@ -29,38 +29,73 @@ export class BoundingLines {
   }
 
   draw( ctx ) {
-    ctx.strokeStyle = 'red';
     this.lines?.forEach( line => line.draw( ctx ) );
   }
 
-  // Find when we would hit another set of BoundingLines (given a relative velocity)
-  getHit( other, dx, dy ) {
+  // Find when we would hit another set of BoundingLines (with given velocities)
+  getHit( other, thisDX, thisDY, otherDX, otherDY ) {
 
     let closestHit = { time: Infinity };
 
     this.lines.forEach( a => {
       other.lines.forEach( b => {
+
+        // TODO: Completely surrounded, no lines intersecting (e.g. splash damage?)
+
         // Already colliding?
         const intersection = Line.getIntersection( 
           a.x1, a.y1, a.x2, a.y2, 
-          b.x1, b.y1, b.x2, b.y2 
+          b.x1, b.y1, b.x2, b.y2,
         );
 
-        const inBounds = intersection && 
-          0 <= intersection.uA && intersection.uA <= 1 && 
-          0 <= intersection.uB && intersection.uB <= 1;
+        if ( intersection && 0 < closestHit.time ) {
+          closestHit = { 
+            time: 0, 
+            position: {
+              x: a.x1 + ( a.x2 - a.x1 ) * intersection.uA,
+              y: a.y1 + ( a.y2 - a.y1 ) * intersection.uA,
+            }
+          };
+        }
 
-        const hit = inBounds ? 
-          { time: 0, position: intersection.position } : 
-          { time: Infinity };
-    
-        if ( 0 <= hit.time && hit.time < closestHit.time ) {
-          closestHit = hit;
+        // Test endpoints against lines
+        const aToB = Line.getIntersection( 
+          a.x1, a.y1, a.x1 + thisDX - otherDX, a.y1 + thisDY - otherDY,
+          b.x1, b.y1, b.x2, b.y2,
+        );
+
+        if ( aToB && aToB.uA < closestHit.time ) {
+          closestHit = {
+            time: aToB.uA,
+            position: {
+              x: a.x1 + thisDX * aToB.uA,
+              y: a.y1 + thisDY * aToB.uA,
+            }
+          };
+        }
+
+        // TODO: Can't use relative movement to determine position, just time
+
+        const bToA = Line.getIntersection( 
+          a.x1, a.y1, a.x2, a.y2,
+          b.x1, b.y1, b.x1 + otherDX - thisDX, b.y1 + otherDY - thisDY, 
+        );
+
+        if ( bToA && bToA.uB < closestHit.time ) {
+          closestHit = {
+            time: bToA.uB,
+            position: {
+              x: b.x1 + otherDX * bToA.uB,
+              y: b.y1 + otherDY * bToA.uB,
+            }
+          };
         }
       } );
     } );
 
     // TODO: Return range of points if already intersecting? (e.g. bite)
+
+    closestHit.entities = [ this, other ];
 
     return closestHit;
   }

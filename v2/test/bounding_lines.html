@@ -3,13 +3,24 @@
 
 <script type="module">
   import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { EntitySimulator } from './EntitySimulator.js';
+  import { ValuesPanel } from './ValuesPanel.js';
   import { Entity } from '../src/Entity.js';
   import { BoundingLines } from '../src/BoundingLines.js';
+
+  const Values = {
+    Adx: 50,
+    Ady: 60,
+    Bdx: -70,
+    Bdy: 90
+  };
 
   const entities = [
     new Entity( {
       x: 400,
       y: 400,
+      dx: Values.Adx,
+      dy: Values.Ady,
       size: 40,
       boundingLines: new BoundingLines( [
         [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
@@ -18,12 +29,17 @@
     new Entity( {
       x: 450,
       y: 400,
+      dx: Values.Bdx,
+      dy: Values.Bdy,
       size: 40,
       boundingLines: new BoundingLines( [
         [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
       ] ),
     } ),
   ];
+
+  new ValuesPanel( Values ).valueChanged = refresh;
+  new EntitySimulator( entities ).onInput = refresh;
 
   const canvas = new AnimatedCanvas();
 
@@ -35,34 +51,75 @@
     entities.forEach( e => e.draw( ctx ) );
 
     const [ a, b ] = entities;
-    const hit = a.boundingLines.getHit( b.boundingLines, 0, 0 );
+    
+    ctx.strokeStyle = 'orange';
 
-    if ( hit.position ) {
+    ctx.beginPath();
+    a.boundingLines.lines.forEach( line => {
+      ctx.moveTo( line.x1, line.y1 );
+      ctx.lineTo( line.x1 + a.dx, line.y1 + a.dy );
+    } );
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate( a.dx, a.dy );
+
+    ctx.setLineDash( [ 5, 5 ] );
+    a.boundingLines.draw( ctx );
+
+    ctx.restore();
+
+    ctx.beginPath();
+    b.boundingLines.lines.forEach( line => {
+      ctx.moveTo( line.x1, line.y1 );
+      ctx.lineTo( line.x1 + b.dx, line.y1 + b.dy );
+    } );
+    ctx.stroke();
+
+    ctx.save();
+    ctx.translate( b.dx, b.dy );
+
+    ctx.setLineDash( [ 5, 5 ] );
+    b.boundingLines.draw( ctx );
+
+    ctx.restore();
+
+    const hit = a.boundingLines.getHit( b.boundingLines, a.dx, a.dy, b.dx, b.dy );
+
+    if ( hit.time < Infinity ) {
       ctx.beginPath();
       ctx.arc( hit.position.x, hit.position.y, 5, 0, Math.PI * 2 );
-      ctx.fillStyle = 'yellow';
+      ctx.fillStyle = hit.time == 0 ? 'yellow' : 'orange';
       ctx.fill();
+
+      // TODO: Position and normal of hit? ( needs to know two separate speeds...pass them all in instead of just relative)
+
+      ctx.save();
+      ctx.translate( a.dx * hit.time, a.dy * hit.time );
+
+      ctx.strokeStyle = 'yellow';
+      ctx.setLineDash( [ 5, 5 ] );
+      a.boundingLines.draw( ctx );
+
+      ctx.restore();
+
+      ctx.save();
+      ctx.translate( b.dx * hit.time, b.dy * hit.time );
+
+      ctx.strokeStyle = 'yellow';
+      ctx.setLineDash( [ 5, 5 ] );
+      b.boundingLines.draw( ctx );
+
+      ctx.restore();
     }
   };
 
   // canvas.start();
-  canvas.update( 0 );
-  canvas.redraw();
-
-  let mouseX, mouseY;
-  
-  document.addEventListener( 'mousemove', ( e ) => {
-    mouseX ??= e.clientX;
-    mouseY ??= e.clientY;
-
-    entities[ 0 ].x += e.clientX - mouseX;
-    entities[ 0 ].y += e.clientY - mouseY;
-
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-
+  function refresh() {
     canvas.update( 0 );
     canvas.redraw();
-  } );
+  }
+  refresh();
+
   
 </script>

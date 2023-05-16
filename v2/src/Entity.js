@@ -1,4 +1,6 @@
 export class Entity {
+  static DebugBounds = true;
+
   x = 0;
   y = 0;
   angle = 0;
@@ -62,7 +64,10 @@ export class Entity {
 
     ctx.restore();
 
-    this.boundingLines?.draw( ctx );
+    if ( Entity.DebugBounds ) {
+      ctx.strokeStyle = 'red';
+      this.boundingLines?.draw( ctx );
+    }
   }
 
   getOffset( offset ) {
