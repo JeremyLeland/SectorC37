@@ -1,4 +1,4 @@
-<title>Shooting Practice</title>
+<title>Sector C37</title>
 <link rel="stylesheet" href="./grid.css">
 
 <script type="module">
@@ -8,8 +8,10 @@
   import { Player, Ship, Rock } from './src/SectorC37.js';
   import * as Util from './src/Util.js';
 
+  const PLAYER_RESPAWN_DELAY = 2000;
+  let playerSpawnTimer = PLAYER_RESPAWN_DELAY;
 
-  const player = new Player( { x: 0, y: 0, angle: 0 } );
+  let player = new Player( { x: 0, y: 0, angle: 0 } );
 
   const world = new World( 1000 );
   world.entities = [ player ];
@@ -53,6 +55,9 @@
 
       player.target = { x: mouseX - scrollX, y: mouseY - scrollY };
     }
+    else {
+      playerSpawnTimer -= dt;
+    }
 
     world.update( dt );
   };
@@ -93,7 +98,16 @@
     if ( e.key == 'Control' )   player.isSliding = false;
   } );
   
-  document.addEventListener( 'mousedown', ( e ) => player.isShooting = true  );
+  document.addEventListener( 'mousedown', ( e ) => {
+    if ( player.isAlive ) {
+      player.isShooting = true;
+    }
+    else if ( playerSpawnTimer < 0 ) {
+      playerSpawnTimer = PLAYER_RESPAWN_DELAY;
+      player = new Player( { x: 0, y: 0, angle: 0 } );
+      world.entities.push( player );
+    }
+  } );
   document.addEventListener( 'mouseup',   ( e ) => player.isShooting = false );
   document.addEventListener( 'mousemove', ( e ) => {
     mouseX = e.clientX;
