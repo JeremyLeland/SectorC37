@@ -72,16 +72,28 @@ export class Player extends Actor {
 
 class PlayerBullet extends Entity {
   size = 4;
-  trailLength = 40;
+  trail = new Trail( { maxWidth: this.size, maxLength: 40 } );
   mass = 0.05;
   damage = 10;
   color = 'orange';
-  drawPath = bulletPath();
   lifeSpan = 1000;
 
   boundingLines = new BoundingLines( [
     [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
   ] );
+
+  update( dt, entities ) {
+    super.update( dt, entities );
+
+    this.trail.update( this );
+  }
+
+  draw( ctx ) {
+    ctx.fillStyle = this.color;
+    ctx.fill( this.trail.getPath() );
+
+    super.draw( ctx );
+  }
 }
 
 class PlayerGun extends Gun {

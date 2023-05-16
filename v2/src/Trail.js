@@ -59,8 +59,18 @@ export class Trail {
     }
       
     const path = new Path2D();
+    
     left.forEach( p => path.lineTo( p.x, p.y ) );
     right.forEach( p => path.lineTo( p.x, p.y ) );
+
+    if ( this.head ) {
+      path.arc(
+        this.head.x, this.head.y, this.maxWidth, 
+        ( this.segments[ 0 ]?.angle ?? 0 ) - Math.PI / 2,
+        ( this.segments[ 0 ]?.angle ?? 0 ) + Math.PI / 2,
+      );
+    }
+
     path.closePath();
 
     return path;
