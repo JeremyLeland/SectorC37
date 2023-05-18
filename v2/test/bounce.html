@@ -1,0 +1,48 @@
+<title>Bouncing Rocks</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { World } from '../src/World.js';
+  import { Player, Ship, Rock } from '../src/SectorC37.js';
+
+  
+  const world = new World( 1000 );
+  
+  const spacing = 200;
+
+  for ( let r = 0; r < window.innerHeight / spacing; r ++ ) {
+    for ( let c = 0; c < window.innerWidth / spacing; c ++ ) {
+      world.entities.push( new Rock( { 
+        x: ( c + 0.25 + 0.5 * Math.random() ) * spacing, 
+        y: ( r + 0.25 + 0.5 * Math.random() ) * spacing,
+        dx: 0.1 * ( Math.random() - 0.5 ),
+        dy: 0.1 * ( Math.random() - 0.5 ),
+        dAngle: 0.004 * ( Math.random() - 0.5 ),
+      } ) );
+    }
+  }
+
+  // world.entities.push( new Rock( { x: 200, y: 200, dx: 0.1, dy: 0 } ) );
+  // world.entities.push( new Rock( { x: 400, y: 200, dx: -0.1, dy: 0 } ) );
+
+  const canvas = new AnimatedCanvas();
+
+  canvas.update = ( dt ) => {
+    world.update( dt );
+
+    world.entities.forEach( e => {
+      if ( e.x - e.size < 0 )  e.dx = -e.dx;
+      if ( e.y - e.size < 0 )  e.dy = -e.dy;
+      if ( e.x + e.size > window.innerWidth )   e.dx = -e.dx;
+      if ( e.y + e.size > window.innerHeight )  e.dy = -e.dy;
+    })
+  };
+  
+  canvas.draw = ( ctx ) => {
+    world.draw( ctx );
+  };
+
+  canvas.start();
+  
+</script>

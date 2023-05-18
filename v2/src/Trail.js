@@ -7,14 +7,16 @@ export class Trail {
   head;
   segments = [];
 
+  offset = { front: 0, side: 0, angle: 0 };
+
   constructor( values ) {
     Object.assign( this, values );
   }
 
-  update( { x, y } ) {
+  update( entity ) {
     if ( this.head ) {
-      const cx = x - this.head.x;
-      const cy = y - this.head.y;
+      const cx = entity.x - this.head.x;
+      const cy = entity.y - this.head.y;
 
       this.segments.unshift( {
         angle: Math.atan2( cy, cx ),
@@ -22,7 +24,7 @@ export class Trail {
       } );
     }
 
-    this.head = { x: x, y: y };
+    this.head = entity.getOffset( this.offset );
 
     let remaining = this.maxLength;
     this.segments = this.segments.filter( s => {
@@ -59,7 +61,7 @@ export class Trail {
     }
       
     const path = new Path2D();
-    
+
     left.forEach( p => path.lineTo( p.x, p.y ) );
     right.forEach( p => path.lineTo( p.x, p.y ) );
 

@@ -75,9 +75,7 @@ export class Actor extends Entity {
     
     this.guns.forEach( gun => gun.update( dt, this ) );
 
-    this.trails?.forEach( trail => trail.update(
-      this.getOffset( { front: -0.5, side: 0, angle: 0 } )
-    ) );
+    this.trails?.forEach( trail => trail.update( this ) );
   }
 
   align( others ) {

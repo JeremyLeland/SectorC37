@@ -23,6 +23,8 @@ export class Entity {
   life = 1;
   lifeSpan = Infinity;
   isAlive = true;
+  
+  mass = 1;
 
   boundingLines;
 

@@ -17,12 +17,14 @@ export class Rock extends Entity {
   )`;
   drawPath = rockPath( this.boundingLines.points );
 
-  dx = 0.1 * ( Math.random() - 0.5 );
-  dy = 0.1 * ( Math.random() - 0.5 );
-  dAngle = 0.004 * ( Math.random() - 0.5 );
+  // dx = 0.1 * ( Math.random() - 0.5 );
+  // dy = 0.1 * ( Math.random() - 0.5 );
+  // dAngle = 0.004 * ( Math.random() - 0.5 );
 
   life = this.size * 100;
   damage = this.size;
+
+  mass = this.size;
 }
 
 function rockPoints() {
@@ -55,6 +57,7 @@ export class Player extends Actor {
 
   life = 200;
   damage = 100;
+  mass = 1;
 
   guns = [
     new PlayerGun( { offset: { front: 1, side: -1, angle: 0 } } ),
@@ -62,7 +65,7 @@ export class Player extends Actor {
   ];
 
   trails = [
-    new Trail( { maxWidth: this.size / 3, maxLength: 50 } ),
+    new Trail( { offset: { front: -1, side: 0, angle: 0 }, maxWidth: this.size / 3, maxLength: 50 } ),
   ];
 
   boundingLines = new BoundingLines( [
@@ -125,6 +128,7 @@ export class Ship extends Actor {
 
   life = 20;
   damage = 50;
+  mass = 1;
 
   guns = [
     new ShipGun( { offset: { front: 1, side: -1, angle: 0 } } ),
