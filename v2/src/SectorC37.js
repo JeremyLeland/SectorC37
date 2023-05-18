@@ -4,6 +4,9 @@ import { Gun } from './Gun.js';
 import { Trail } from './Trail.js';
 import { BoundingLines } from './BoundingLines.js';
 
+//
+// Rocks
+//
 export class Rock extends Entity {
   type = 'rock';
   size = 10 + Math.random() * 50;
@@ -16,10 +19,6 @@ export class Rock extends Entity {
     ${ 20 + Math.random() * 10 }%
   )`;
   drawPath = rockPath( this.boundingLines.points );
-
-  // dx = 0.1 * ( Math.random() - 0.5 );
-  // dy = 0.1 * ( Math.random() - 0.5 );
-  // dAngle = 0.004 * ( Math.random() - 0.5 );
 
   life = this.size * 100;
   damage = this.size;
@@ -45,6 +44,9 @@ function rockPath( points ) {
   return path;
 }
 
+//
+// Ships
+//
 export class Player extends Actor {
   type = 'player';
   size = 16;
@@ -65,49 +67,18 @@ export class Player extends Actor {
   ];
 
   trails = [
-    new Trail( { offset: { front: -1, side: 0, angle: 0 }, maxWidth: this.size / 3, maxLength: 50 } ),
+    new Trail( { 
+      offset: { front: -1, side: 0, angle: 0 }, 
+      maxWidth: this.size / 3, 
+      maxLength: 20,
+      color: 'seagreen',
+    } ),
   ];
 
   boundingLines = new BoundingLines( [
     [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
   ] );
 }
-
-class PlayerBullet extends Entity {
-  size = 3;
-  trail = new Trail( { maxWidth: this.size, maxLength: 40 } );
-  mass = 0.05;
-  damage = 10;
-  color = 'orange';
-  lifeSpan = 1000;
-
-  boundingLines = new BoundingLines( [
-    [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
-  ] );
-
-  update( dt, entities ) {
-    super.update( dt, entities );
-
-    this.trail.update( this );
-  }
-
-  draw( ctx ) {
-    ctx.fillStyle = this.color;
-    ctx.fill( this.trail.getPath() );
-
-    super.draw( ctx );
-  }
-}
-
-class PlayerGun extends Gun {
-  timeBetweenShots = 200;
-  bulletSpeed = 0.6;
-
-  getBullet( values ) {
-    return new PlayerBullet( values );
-  }
-}
-
 
 export class Ship extends Actor {
   type = 'ship';
@@ -135,6 +106,15 @@ export class Ship extends Actor {
     new ShipGun( { offset: { front: 1, side:  1, angle: 0 } } ),
   ];
 
+  trails = [
+    new Trail( { 
+      offset: { front: -1, side: 0, angle: 0 }, 
+      maxWidth: this.size / 3, 
+      maxLength: 20,
+      color: 'lightblue',
+    } ),
+  ];
+
   boundingLines = new BoundingLines( [
     [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
   ] );
@@ -148,18 +128,63 @@ function shipPath() {
   return path;
 }
 
-class ShipBullet extends Entity {
-  size = 4;
-  trailLength = 40;
+//
+// Bullets
+//
+
+class PlayerBullet extends Entity {
+  size = 2;
+  trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'orange' } );
   mass = 0.05;
   damage = 10;
-  color = 'yellow';
-  drawPath = bulletPath();
   lifeSpan = 1000;
 
   boundingLines = new BoundingLines( [
     [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
   ] );
+
+  update( dt, entities ) {
+    super.update( dt, entities );
+
+    this.trail.update( this );
+  }
+
+  draw( ctx ) {
+    this.trail.draw( ctx );
+    super.draw( ctx );  // for debug visuals
+  }
+}
+
+class ShipBullet extends Entity {
+  size = 2;
+  trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'yellow' } );
+  mass = 0.05;
+  damage = 10;
+  lifeSpan = 1000;
+
+  boundingLines = new BoundingLines( [
+    [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
+  ] );
+
+  update( dt, entities ) {
+    super.update( dt, entities );
+
+    this.trail.update( this );
+  }
+
+  draw( ctx ) {
+    this.trail.draw( ctx );
+    super.draw( ctx );  // for debug visuals
+  }
+}
+
+class PlayerGun extends Gun {
+  timeBetweenShots = 200;
+  bulletSpeed = 0.6;
+
+  getBullet( values ) {
+    return new PlayerBullet( values );
+  }
 }
 
 class ShipGun extends Gun {

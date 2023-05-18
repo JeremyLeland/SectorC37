@@ -145,7 +145,7 @@ export class Actor extends Entity {
   draw( ctx ) {
     if ( this.trails ) {
       ctx.fillStyle = 'red';
-      this.trails.forEach( trail => ctx.fill( trail.getPath() ) );
+      this.trails.forEach( trail => trail.draw( ctx ) );
     }
 
     super.draw( ctx );

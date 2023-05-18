@@ -9,6 +9,7 @@ export class Trail {
   length = 0;
 
   offset = { front: 0, side: 0, angle: 0 };
+  color = 'red';
 
   constructor( values ) {
     Object.assign( this, values );
@@ -36,7 +37,7 @@ export class Trail {
     } );
   }
 
-  getPath() {
+  draw( ctx ) {
     const left = [], right = [];
 
     if ( this.head ) {
@@ -79,6 +80,7 @@ export class Trail {
 
     path.closePath();
 
-    return path;
+    ctx.fillStyle = this.color;
+    ctx.fill( path );
   }
 }
