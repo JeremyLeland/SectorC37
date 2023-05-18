@@ -74,7 +74,7 @@ export class Player extends Actor {
 }
 
 class PlayerBullet extends Entity {
-  size = 4;
+  size = 3;
   trail = new Trail( { maxWidth: this.size, maxLength: 40 } );
   mass = 0.05;
   damage = 10;

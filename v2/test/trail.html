@@ -12,16 +12,18 @@
 
     head;
     segments = [];
+    length = 0;
 
     update( x, y ) {
       if ( this.head ) {
         const cx = x - this.head.x;
         const cy = y - this.head.y;
+        const angle = Math.atan2( cy, cx );
+        const length = Math.hypot( cx, cy );
 
-        this.segments.unshift( {
-          angle: Math.atan2( cy, cx ),
-          length: Math.hypot( cx, cy ),
-        } );
+        this.segments.unshift( { angle: angle, length: length } );
+
+        this.length = Math.min( this.length + length, this.maxLength );
       }
 
       this.head = { x: x, y: y };
@@ -40,7 +42,7 @@
       const left = [], right = [];
 
       let x = this.head.x, y = this.head.y;
-      let remaining = this.maxLength;
+      let remaining = this.length;
       this.segments.forEach( s => {
         const width = this.maxWidth * remaining / this.maxLength;
 
@@ -66,7 +68,7 @@
       left.forEach( p => path.lineTo( p.x, p.y ) );
       right.forEach( p => path.lineTo( p.x, p.y ) );
       path.arc(
-        this.head.x, this.head.y, this.maxWidth, 
+        this.head.x, this.head.y, this.maxWidth * this.length / this.maxLength, 
         ( this.segments[ 0 ]?.angle ?? 0 ) - Math.PI / 2,
         ( this.segments[ 0 ]?.angle ?? 0 )+ Math.PI / 2,
       );

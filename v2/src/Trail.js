@@ -6,6 +6,7 @@ export class Trail {
 
   head;
   segments = [];
+  length = 0;
 
   offset = { front: 0, side: 0, angle: 0 };
 
@@ -17,11 +18,12 @@ export class Trail {
     if ( this.head ) {
       const cx = entity.x - this.head.x;
       const cy = entity.y - this.head.y;
+      const angle = Math.atan2( cy, cx );
+      const length = Math.hypot( cx, cy );
 
-      this.segments.unshift( {
-        angle: Math.atan2( cy, cx ),
-        length: Math.hypot( cx, cy ),
-      } );
+      this.segments.unshift( { angle: angle, length: length } );
+
+      this.length = Math.min( this.length + length, this.maxLength );
     }
 
     this.head = entity.getOffset( this.offset );
@@ -39,7 +41,7 @@ export class Trail {
 
     if ( this.head ) {
       let x = this.head.x, y = this.head.y;
-      let remaining = this.maxLength;
+      let remaining = this.length;
       this.segments.forEach( s => {
         const width = this.maxWidth * remaining / this.maxLength;
         
@@ -58,6 +60,8 @@ export class Trail {
         
         remaining -= s.length;
       } );
+
+      left.push( { x: x, y: y } );
     }
       
     const path = new Path2D();
@@ -67,9 +71,9 @@ export class Trail {
 
     if ( this.head ) {
       path.arc(
-        this.head.x, this.head.y, this.maxWidth, 
-        ( this.segments[ 0 ]?.angle ?? 0 ) - Math.PI / 2,
-        ( this.segments[ 0 ]?.angle ?? 0 ) + Math.PI / 2,
+        this.head.x, this.head.y, this.maxWidth * this.length / this.maxLength, 
+        this.head.angle - Math.PI / 2,
+        this.head.angle + Math.PI / 2,
       );
     }
 
