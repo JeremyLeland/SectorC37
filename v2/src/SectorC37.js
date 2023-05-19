@@ -24,6 +24,24 @@ export class Rock extends Entity {
   damage = this.size;
 
   mass = this.size;
+
+  bleed( hit ) {
+    // TODO: Normal should come from hit object
+    const normal = Math.atan2( hit.position.y - this.y, hit.position.x - this.x );
+
+    const angle = normal + 0.3 * ( -0.5 + Math.random() );
+
+    this.createdEntities.push( new Entity( {
+      x: hit.position.x,
+      y: hit.position.y,
+      dx: 0.1 * Math.cos( angle ),
+      dy: 0.1 * Math.sin( angle ),
+      size: 3 + 3 * Math.random(),
+      lifeSpan: 1000 + 1000 * Math.random(),
+      color: this.color,
+      drawPath: rockPath( rockPoints() ),
+    } ) );
+  }
 }
 
 function rockPoints() {

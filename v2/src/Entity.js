@@ -58,6 +58,11 @@ export class Entity {
     ctx.rotate( this.angle );
     ctx.scale( this.size, this.size );
 
+    // Fade out at end of lifespan
+    if ( this.lifeSpan < 1000 ) {
+      ctx.globalAlpha = this.lifeSpan / 1000;
+    }
+
     ctx.fillStyle = this.color;
     ctx.fill( this.drawPath );
     ctx.strokeStyle = 'black';
@@ -93,6 +98,9 @@ export class Entity {
       const hit = this.boundingLines.getHit( other.boundingLines, this.dx, this.dy, other.dx, other.dy );
       hit.entities = [ this, other ];
       return hit;
+    }
+    else {
+      return { time: Infinity };
     }
   }
 
