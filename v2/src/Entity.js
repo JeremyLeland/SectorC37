@@ -118,6 +118,43 @@ export class Entity {
     } );
   }
 
-  bleed( hit ) {}
-  die( hit ) {}
+  bleed( hit ) {
+    if ( this.getBleedParticle ) {
+      // TODO: Normal should come from hit object
+      const normal = Math.atan2( hit.position.y - this.y, hit.position.x - this.x );
+      
+      const angle = normal + 0.3 * ( -0.5 + Math.random() );
+      
+      this.createdEntities.push( 
+        Object.assign( this.getBleedParticle(), {
+          x: hit.position.x,
+          y: hit.position.y,
+          dx: 0.1 * Math.cos( angle ),
+          dy: 0.1 * Math.sin( angle ),
+          dAngle: 0.01 * ( -0.5 + Math.random() ),
+          lifeSpan: 1000 + 1000 * Math.random(),
+        } )
+      );
+    }
+  }
+
+  die( hit ) {
+    if ( this.getBleedParticle ) {
+      for ( let i = 0; i < 40; i ++ ) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * this.size;
+        
+        this.createdEntities.push( 
+          Object.assign( this.getBleedParticle(), {
+            x: this.x + Math.cos( angle ) * dist,
+            y: this.y + Math.sin( angle ) * dist,
+            dx: 0.5 * this.dx + ( 0.01 + 0.1 * Math.random() ) * Math.cos( angle ),
+            dy: 0.5 * this.dy + ( 0.01 + 0.1 * Math.random() ) * Math.sin( angle ),
+            dAngle: 0.01 * ( -0.5 + Math.random() ),
+            lifeSpan: 1000 + 1000 * Math.random(),
+          } )
+        );
+      }
+    }
+  }
 }

@@ -1,0 +1,30 @@
+<title>Bouncing Rocks</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { World } from '../src/World.js';
+  import { Player, Ship, Rock } from '../src/SectorC37.js';
+
+  
+  const world = new World( 1000 );
+  
+
+  const ship = new Ship( { x: 200, y: 200, speed: 0 } );
+  world.entities.push( ship );
+
+  const canvas = new AnimatedCanvas();
+
+  canvas.update = ( dt ) => {
+    world.update( dt );
+  };
+  
+  canvas.draw = ( ctx ) => {
+    world.draw( ctx );
+  };
+
+  canvas.start();
+
+  document.addEventListener( 'keydown', e => ship.die() );
+  
+</script>
