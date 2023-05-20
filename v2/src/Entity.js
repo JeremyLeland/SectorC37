@@ -131,7 +131,7 @@ export class Entity {
           y: hit.position.y,
           dx: 0.1 * Math.cos( angle ),
           dy: 0.1 * Math.sin( angle ),
-          dAngle: 0.01 * ( -0.5 + Math.random() ),
+          dAngle: 0.02 * ( -0.5 + Math.random() ),
           lifeSpan: 1000 + 1000 * Math.random(),
         } )
       );
@@ -139,10 +139,28 @@ export class Entity {
   }
 
   die( hit ) {
+    if ( this.getDieParticle ) {
+      for ( let i = 0; i < 40; i ++ ) {
+        const angle = Math.random() * Math.PI * 2;
+        const dist = Math.random() * this.size / 2;
+        
+        this.createdEntities.push( 
+          Object.assign( this.getDieParticle(), {
+            x: this.x,// + Math.cos( angle ) * dist,
+            y: this.y,// + Math.sin( angle ) * dist,
+            dx: 0.5 * this.dx + ( 0.01 + 0.03 * Math.random() ) * Math.cos( angle ),
+            dy: 0.5 * this.dy + ( 0.01 + 0.03 * Math.random() ) * Math.sin( angle ),
+            dAngle: 0.02 * ( -0.5 + Math.random() ),
+            lifeSpan: 500 + 500 * Math.random(),
+          } )
+        );
+      }
+    }
+
     if ( this.getBleedParticle ) {
       for ( let i = 0; i < 40; i ++ ) {
         const angle = Math.random() * Math.PI * 2;
-        const dist = Math.random() * this.size;
+        const dist = 0.5 + Math.random() * this.size;
         
         this.createdEntities.push( 
           Object.assign( this.getBleedParticle(), {
@@ -150,7 +168,7 @@ export class Entity {
             y: this.y + Math.sin( angle ) * dist,
             dx: 0.5 * this.dx + ( 0.01 + 0.1 * Math.random() ) * Math.cos( angle ),
             dy: 0.5 * this.dy + ( 0.01 + 0.1 * Math.random() ) * Math.sin( angle ),
-            dAngle: 0.01 * ( -0.5 + Math.random() ),
+            dAngle: 0.02 * ( -0.5 + Math.random() ),
             lifeSpan: 1000 + 1000 * Math.random(),
           } )
         );

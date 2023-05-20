@@ -93,6 +93,14 @@ export class Player extends Actor {
       drawPath: rockPath( randPoints( 3 ) ),
     } ); 
   }
+
+  getDieParticle() {
+    return new Fire( {
+      size: 10 * Math.random(),
+      dSize: 0.03,
+      drawPath: rockPath( randPoints( 5 ) ),
+    } ); 
+  }
 }
 
 export class Ship extends Actor {
@@ -141,6 +149,14 @@ export class Ship extends Actor {
       drawPath: rockPath( randPoints( 3 ) ),
     } ); 
   }
+
+  getDieParticle() {
+    return new Fire( {
+      size: 10 * Math.random(),
+      dSize: 0.03,
+      drawPath: rockPath( randPoints( 5 ) ),
+    } ); 
+  }
 }
 
 function shipPath() {
@@ -160,7 +176,7 @@ class PlayerBullet extends Entity {
   trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'orange' } );
   mass = 0.05;
   damage = 10;
-  lifeSpan = 1000;
+  lifeSpan = 5000;
 
   boundingLines = new BoundingLines( [
     [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
@@ -183,7 +199,7 @@ class ShipBullet extends Entity {
   trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'yellow' } );
   mass = 0.05;
   damage = 10;
-  lifeSpan = 1000;
+  lifeSpan = 5000;
 
   boundingLines = new BoundingLines( [
     [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
@@ -219,13 +235,26 @@ class ShipGun extends Gun {
   }
 }
 
-function bulletPath() {
-  const path = new Path2D();
-  path.moveTo( -1, 0 );
-  path.arc( 0, 0, 1, -1, 1 );
-  path.closePath();
-  return path;
-}
+//
+// Particles
+//
 
+class Fire extends Entity {
+  color = `hsl(
+    ${ 16 + 48 * Math.random() }deg,
+    ${ 50 + 50 * Math.random() }%,
+    ${ 15 + 50 * Math.random() }%
+  )`;
+
+  draw( ctx ) {
+    ctx.filter = 'blur( 8px )'; // NOTE: 8px is faster than other values?!?
+    ctx.globalCompositeOperation = 'screen';
+    // ctx.globalAlpha = 0.1;
+    super.draw( ctx );
+    ctx.globalCompositeOperation = 'source-over';
+    // ctx.globalAlpha = 1;
+    ctx.filter = 'none';
+  }
+}
 
 
