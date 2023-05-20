@@ -65,6 +65,12 @@
     }
 
     world.update( dt );
+
+    // Keep rocks inside world (TODO: wrap around instead of bounce?)
+    world.entities.filter( e => e instanceof Rock ).forEach( rock => {
+      if ( rock.x + rock.size < -world.size || rock.x - rock.size > world.size )  rock.dx = -rock.dx;
+      if ( rock.y + rock.size < -world.size || rock.y - rock.size > world.size )  rock.dy = -rock.dy;
+    } );
   };
   
   canvas.draw = ( ctx ) => {
