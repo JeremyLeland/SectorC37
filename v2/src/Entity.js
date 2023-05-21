@@ -123,24 +123,26 @@ export class Entity {
       // TODO: Normal should come from hit object
       const normal = Math.atan2( hit.position.y - this.y, hit.position.x - this.x );
       
-      const angle = normal + 0.3 * ( -0.5 + Math.random() );
-      
-      this.createdEntities.push( 
-        Object.assign( this.getBleedParticle(), {
-          x: hit.position.x,
-          y: hit.position.y,
-          dx: 0.1 * Math.cos( angle ),
-          dy: 0.1 * Math.sin( angle ),
-          dAngle: 0.02 * ( -0.5 + Math.random() ),
-          lifeSpan: 1000 + 1000 * Math.random(),
-        } )
-      );
+      for ( let i = 0; i < 2; i ++ ) {
+        const angle = normal + 0.5 * ( -0.5 + Math.random() );
+        
+        this.createdEntities.push( 
+          Object.assign( this.getBleedParticle(), {
+            x: hit.position.x,
+            y: hit.position.y,
+            dx: 0.1 * Math.cos( angle ),
+            dy: 0.1 * Math.sin( angle ),
+            dAngle: 0.02 * ( -0.5 + Math.random() ),
+            lifeSpan: 1000 + 1000 * Math.random(),
+          } )
+        );
+      }
     }
   }
 
   die( hit ) {
     if ( this.getDieParticle ) {
-      for ( let i = 0; i < 40; i ++ ) {
+      for ( let i = 0; i < this.size; i ++ ) {
         const angle = Math.random() * Math.PI * 2;
         const dist = Math.random() * this.size / 2;
         
@@ -158,7 +160,7 @@ export class Entity {
     }
 
     if ( this.getBleedParticle ) {
-      for ( let i = 0; i < 40; i ++ ) {
+      for ( let i = 0; i < this.size; i ++ ) {
         const angle = Math.random() * Math.PI * 2;
         const dist = 0.5 + Math.random() * this.size;
         

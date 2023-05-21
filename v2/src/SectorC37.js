@@ -13,6 +13,7 @@ export class Rock extends Entity {
     super( values );
 
     this.type = 'rock';
+    this.size = values.size ?? 20;
 
     const points = randPoints( 10 + 5 * Math.random() );
     this.boundingLines = new BoundingLines( points );
@@ -25,7 +26,7 @@ export class Rock extends Entity {
     )`;
 
     this.life = this.size;
-    this.damage = this.size * 10;
+    this.damage = this.size;
     this.mass = this.size;
   }
 
@@ -45,24 +46,15 @@ export class Rock extends Entity {
         const angle = angleOffset + Math.PI * 2 * ( i /*+ 0.25 + 0.5 * Math.random()*/ ) / numChildren;
         const dist = this.size / 2;
         
-        const rock = new Rock();
-        rock.size = this.size / 3;
-        rock.x = this.x + Math.cos( angle ) * dist;
-        rock.y = this.y + Math.sin( angle ) * dist;
-        rock.dx = 0.5 * this.dx + ( 0.01 + 0.01 * Math.random() ) * Math.cos( angle );
-        rock.dy = 0.5 * this.dy + ( 0.01 + 0.01 * Math.random() ) * Math.sin( angle );
-        rock.dAngle = 0.01 * ( -0.5 + Math.random() );
-        
         this.createdEntities.push( 
-          // new Rock( {
-            //   size: this.size / 4,
-            //   x: this.x + Math.cos( angle ) * dist,
-            //   y: this.y + Math.sin( angle ) * dist,
-        //   dx: 0.5 * this.dx + ( 0.01 + 0.03 * Math.random() ) * Math.cos( angle ),
-        //   dy: 0.5 * this.dy + ( 0.01 + 0.03 * Math.random() ) * Math.sin( angle ),
-        //   dAngle: 0.02 * ( -0.5 + Math.random() ),
-        // } )
-        rock
+          new Rock( {
+            size: this.size / 3,
+            x: this.x + Math.cos( angle ) * dist,
+            y: this.y + Math.sin( angle ) * dist,
+            dx: 0.5 * this.dx + ( 0.01 + 0.01 * Math.random() ) * Math.cos( angle ),
+            dy: 0.5 * this.dy + ( 0.01 + 0.01 * Math.random() ) * Math.sin( angle ),
+            dAngle: 0.01 * ( -0.5 + Math.random() ),
+        } )
         );
       }
     }
@@ -101,7 +93,7 @@ export class Player extends Actor {
   turnSpeed = 0.005;
   moveSpeed = 0.2;
 
-  life = 200;
+  life = 50;
   damage = 100;
   mass = 1;
 
@@ -212,7 +204,7 @@ class PlayerBullet extends Entity {
   size = 2;
   trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'orange' } );
   mass = 0.05;
-  damage = 1;
+  damage = 2;
   lifeSpan = 5000;
 
   boundingLines = new BoundingLines( [
