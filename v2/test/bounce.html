@@ -11,20 +11,22 @@
   
   const spacing = 200;
 
-  for ( let r = 0; r < window.innerHeight / spacing; r ++ ) {
-    for ( let c = 0; c < window.innerWidth / spacing; c ++ ) {
-      world.entities.push( new Rock( { 
-        x: ( c + 0.25 + 0.5 * Math.random() ) * spacing, 
-        y: ( r + 0.25 + 0.5 * Math.random() ) * spacing,
-        dx: 0.1 * ( Math.random() - 0.5 ),
-        dy: 0.1 * ( Math.random() - 0.5 ),
-        dAngle: 0.004 * ( Math.random() - 0.5 ),
-      } ) );
-    }
-  }
+  // for ( let r = 0; r < window.innerHeight / spacing; r ++ ) {
+  //   for ( let c = 0; c < window.innerWidth / spacing; c ++ ) {
+  //     world.entities.push( new Rock( { 
+  //       x: ( c + 0.25 + 0.5 * Math.random() ) * spacing, 
+  //       y: ( r + 0.25 + 0.5 * Math.random() ) * spacing,
+  //       dx: 0.1 * ( Math.random() - 0.5 ),
+  //       dy: 0.1 * ( Math.random() - 0.5 ),
+  //       dAngle: 0.004 * ( Math.random() - 0.5 ),
+  //       size: 10 + Math.random() * 50,
+  //     } ) );
+  //   }
+  // }
 
-  // world.entities.push( new Rock( { x: 200, y: 200, dx: 0.1, dy: 0 } ) );
-  // world.entities.push( new Rock( { x: 400, y: 200, dx: -0.1, dy: 0 } ) );
+  world.entities.push( new Rock( { x: 200, y: 200, dx: 0.1, dy: 0, size: 60 } ) );
+  // world.entities.push( new Rock( { x: 400, y: 200, dx: -0.05, dy: 0, size: 30 } ) );
+  world.entities.push( new Rock( { x: 700, y: 200, dx: -0.1, dy: 0, size: 80 } ) );
 
   const canvas = new AnimatedCanvas();
 

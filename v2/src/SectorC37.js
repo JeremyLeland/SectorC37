@@ -8,22 +8,26 @@ import { BoundingLines } from './BoundingLines.js';
 // Rocks
 //
 export class Rock extends Entity {
-  type = 'rock';
-  size = 10 + Math.random() * 50;
+  
+  constructor( values ) {
+    super( values );
 
-  boundingLines = new BoundingLines( randPoints( 10 + 5 * Math.random() ) );
+    this.type = 'rock';
 
-  color = `hsl( 
-    ${ 20 + Math.random() * 10 }deg, 
-    ${ 100 }%, 
-    ${ 20 + Math.random() * 10 }%
-  )`;
-  drawPath = rockPath( this.boundingLines.points );
+    const points = randPoints( 10 + 5 * Math.random() );
+    this.boundingLines = new BoundingLines( points );
+    this.drawPath = rockPath( points );
 
-  life = this.size * 100;
-  damage = this.size;
+    this.color = `hsl( 
+      ${ 20 + Math.random() * 10 }deg, 
+      ${ 100 }%, 
+      ${ 20 + Math.random() * 10 }%
+    )`;
 
-  mass = this.size;
+    this.life = this.size;
+    this.damage = this.size * 10;
+    this.mass = this.size;
+  }
 
   getBleedParticle() {
     return new Entity( {
@@ -31,6 +35,39 @@ export class Rock extends Entity {
       color: this.color,
       drawPath: rockPath( randPoints( 5 + 5 * Math.random() ) ),
     } );
+  }
+
+  die( hit ) {
+    if ( this.size > 20 ) {
+      const numChildren = 4;
+      const angleOffset = Math.PI * Math.random();
+      for ( let i = 0; i < numChildren; i ++ ) {
+        const angle = angleOffset + Math.PI * 2 * ( i /*+ 0.25 + 0.5 * Math.random()*/ ) / numChildren;
+        const dist = this.size / 2;
+        
+        const rock = new Rock();
+        rock.size = this.size / 3;
+        rock.x = this.x + Math.cos( angle ) * dist;
+        rock.y = this.y + Math.sin( angle ) * dist;
+        rock.dx = 0.5 * this.dx + ( 0.01 + 0.01 * Math.random() ) * Math.cos( angle );
+        rock.dy = 0.5 * this.dy + ( 0.01 + 0.01 * Math.random() ) * Math.sin( angle );
+        rock.dAngle = 0.01 * ( -0.5 + Math.random() );
+        
+        this.createdEntities.push( 
+          // new Rock( {
+            //   size: this.size / 4,
+            //   x: this.x + Math.cos( angle ) * dist,
+            //   y: this.y + Math.sin( angle ) * dist,
+        //   dx: 0.5 * this.dx + ( 0.01 + 0.03 * Math.random() ) * Math.cos( angle ),
+        //   dy: 0.5 * this.dy + ( 0.01 + 0.03 * Math.random() ) * Math.sin( angle ),
+        //   dAngle: 0.02 * ( -0.5 + Math.random() ),
+        // } )
+        rock
+        );
+      }
+    }
+
+    super.die( hit );
   }
 }
 
@@ -175,7 +212,7 @@ class PlayerBullet extends Entity {
   size = 2;
   trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'orange' } );
   mass = 0.05;
-  damage = 10;
+  damage = 1;
   lifeSpan = 5000;
 
   boundingLines = new BoundingLines( [
@@ -198,7 +235,7 @@ class ShipBullet extends Entity {
   size = 2;
   trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'yellow' } );
   mass = 0.05;
-  damage = 10;
+  damage = 2;
   lifeSpan = 5000;
 
   boundingLines = new BoundingLines( [

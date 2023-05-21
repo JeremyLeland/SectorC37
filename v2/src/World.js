@@ -39,6 +39,8 @@ export class World {
       if ( closestHit.time < dt ) {
         closestHit.entities.forEach( e => e.hitWith( closestHit ) );
 
+        // TODO: Should this be handled any differently if the impact destroys one of the objects?
+
         const A = closestHit.entities[ 0 ];
         const B = closestHit.entities[ 1 ];
 
