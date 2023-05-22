@@ -6,7 +6,7 @@ const Constants = {
   AvoidDistance: 200,
   TargetWeight: 0.25,
   AlignWeight: 5,
-  AvoidWeight: 2,
+  AvoidWeight: 4,
   ShootDistance: 300,
   ShootAngle: 0.25,
   UIScale: 100,
@@ -14,13 +14,21 @@ const Constants = {
 };
 
 export class Actor extends Entity {
+  static DebugNavigation = false;
+
   accel = 0.002;  // temp: trying out accelerating by direction, then capping it
 
   turnSpeed = 0;
   moveSpeed = 0;
   goalAngle = 0;
 
-  target;
+  goal;
+
+  targetGoal;
+  wanderGoal;
+
+  wanders = true;
+  targets;
   aligns;
   avoids;
 
@@ -28,28 +36,42 @@ export class Actor extends Entity {
   isShooting = false;
   isSliding = false;
 
-  update( dt, entities ) {
-    if ( this.target ) {
-      const tx = this.target.x - this.x;
-      const ty = this.target.y - this.y;
-      const tangle = Math.atan2( ty, tx );
+  update( dt, world ) {
+    if ( this.wanders ) {
+      this.wander( world );
+    }
 
-      this.goalAngle = tangle;
+    if ( this.targets ) {
+      this.target( world.entities.filter( e => e != this && this.targets.includes( e.type ) ) );
+    }
 
-      if ( this.target.isAlive ) {
+    this.goal = this.targetGoal ?? this.wanderGoal;
+
+    if ( this.goal ) {
+      this.goalAngle = Math.atan2( this.goal.y - this.y, this.goal.x - this.x );
+    }
+
+    if ( this.targets ) {
+      if ( this.targetGoal ) {
+        const tx = this.targetGoal.x - this.x;
+        const ty = this.targetGoal.y - this.y;
+        const tangle = Math.atan2( ty, tx );
         const tdist = Math.hypot( tx, ty );// - this.size - this.target.size;
-        const inFront = Math.abs( tangle - this.angle ) < Constants.ShootAngle;
 
+        const inFront = Math.abs( tangle - this.angle ) < Constants.ShootAngle;
         this.isShooting = inFront && tdist < Constants.ShootDistance;
+      }
+      else {
+        this.isShooting = false;
       }
     }
 
     if ( this.aligns ) {
-      this.align( entities.filter( e => e != this && this.aligns.includes( e.type ) ) );
+      this.align( world.entities.filter( e => e != this && this.aligns.includes( e.type ) ) );
     }
 
     if ( this.avoids ) {
-      this.avoid( entities.filter( e => e != this && this.avoids.includes( e.type ) ) );
+      this.avoid( world.entities.filter( e => e != this && this.avoids.includes( e.type ) ) );
     }
 
     const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );
@@ -76,6 +98,47 @@ export class Actor extends Entity {
     this.guns.forEach( gun => gun.update( dt, this ) );
 
     this.trails?.forEach( trail => trail.update( this ) );
+  }
+
+  wander( world ) {
+    if ( this.wanderGoal ) {
+      const dist = Math.hypot( this.wanderGoal.x - this.x, this.wanderGoal.y - this.y );
+      if ( dist < 50 ) {
+        this.wanderGoal = null;
+      }
+    }
+
+    if ( !this.wanderGoal ) {
+      const angle = Math.PI * 2 * Math.random();
+      const dist = world.size * ( 0.25 + 0.5 * Math.random() );
+
+      this.wanderGoal = { 
+        x: Math.cos( angle ) * dist, 
+        y: Math.sin( angle ) * dist, 
+      };
+    }
+  }
+
+  target( others ) {
+    let closest = { dist: Infinity };
+
+    others.forEach( other => {
+      if ( other.isAlive ) {
+        const cx = other.x - this.x;
+        const cy = other.y - this.y;
+        const dist = Math.hypot( cx, cy );
+        
+        if ( dist < closest.dist ) {
+          closest = {
+            entity: other,
+            dist: dist
+          };
+        }
+      }
+    } );
+
+    const TARGET_DIST = 500;
+    this.targetGoal = closest.dist < TARGET_DIST ? closest.entity : null;
   }
 
   align( others ) {
@@ -150,11 +213,11 @@ export class Actor extends Entity {
 
     super.draw( ctx );
 
-    if ( Constants.Debug ) {
-      if ( this.target ) {
+    if ( Actor.DebugNavigation ) {
+      if ( this.goal ) {
         ctx.strokeStyle = 'gray';
         ctx.beginPath();
-        ctx.moveTo( this.target.x, this.target.y );
+        ctx.moveTo( this.goal.x, this.goal.y );
         ctx.lineTo( this.x, this.y );
         ctx.setLineDash( [ 5, 5 ] );
         ctx.stroke();

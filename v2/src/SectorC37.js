@@ -19,7 +19,7 @@ export class Rock extends Entity {
     this.boundingLines = new BoundingLines( points );
     this.drawPath = rockPath( points );
 
-    this.color = `hsl( 
+    this.color = values.color ?? `hsl( 
       ${ 20 + Math.random() * 10 }deg, 
       ${ 100 }%, 
       ${ 20 + Math.random() * 10 }%
@@ -32,7 +32,7 @@ export class Rock extends Entity {
 
   getBleedParticle() {
     return new Entity( {
-      size: 3 + 3 * Math.random(),
+      size: 2 + 2 * Math.random(),
       color: this.color,
       drawPath: rockPath( randPoints( 5 + 5 * Math.random() ) ),
     } );
@@ -49,6 +49,7 @@ export class Rock extends Entity {
         this.createdEntities.push( 
           new Rock( {
             size: this.size / 3,
+            color: this.color,
             x: this.x + Math.cos( angle ) * dist,
             y: this.y + Math.sin( angle ) * dist,
             dx: 0.5 * this.dx + ( 0.01 + 0.01 * Math.random() ) * Math.cos( angle ),
@@ -85,13 +86,15 @@ function rockPath( points ) {
 //
 export class Player extends Actor {
   type = 'player';
-  size = 16;
+  size = 12;
 
   color = 'green';
   drawPath = shipPath();
 
   turnSpeed = 0.005;
   moveSpeed = 0.2;
+
+  wanders = false;
 
   life = 50;
   damage = 100;
@@ -134,7 +137,7 @@ export class Player extends Actor {
 
 export class Ship extends Actor {
   type = 'ship';
-  size = 16;
+  size = 12;
 
   color = `hsl( 
     ${ 205 + Math.random() * 10 }deg, 
@@ -146,6 +149,7 @@ export class Ship extends Actor {
   turnSpeed = 0.004;
   moveSpeed = 0.15;
 
+  targets = [ 'player' ];
   avoids = [ 'rock', 'player' ];
   aligns = [ 'ship' ];
 
@@ -201,7 +205,7 @@ function shipPath() {
 //
 
 class PlayerBullet extends Entity {
-  size = 2;
+  size = 1;
   trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'orange' } );
   mass = 0.05;
   damage = 2;
@@ -224,7 +228,7 @@ class PlayerBullet extends Entity {
 }
 
 class ShipBullet extends Entity {
-  size = 2;
+  size = 1;
   trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'yellow' } );
   mass = 0.05;
   damage = 2;

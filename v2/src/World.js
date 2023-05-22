@@ -1,4 +1,6 @@
 export class World {
+  static DebugBounds = false;
+  
   entities = [];
 
   constructor( size = 100 ) {
@@ -34,7 +36,7 @@ export class World {
 
       let updateTime = Math.min( closestHit.time, dt );
 
-      this.entities.forEach( entity => entity.update( updateTime, this.entities ) );
+      this.entities.forEach( entity => entity.update( updateTime, this ) );
 
       if ( closestHit.time < dt ) {
         closestHit.entities.forEach( e => e.hitWith( closestHit ) );
@@ -99,5 +101,11 @@ export class World {
 
   draw( ctx ) {
     this.entities.forEach( entity => entity.draw( ctx ) );
+
+    if ( World.DebugBounds ) {
+      ctx.beginPath();
+      ctx.arc( 0, 0, this.size, 0, Math.PI * 2 );
+      ctx.stroke();
+    }
   }
 }
