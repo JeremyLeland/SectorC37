@@ -153,7 +153,7 @@ export class Ship extends Actor {
   avoids = [ 'rock', 'player' ];
   aligns = [ 'ship' ];
 
-  life = 20;
+  life = 10;
   damage = 50;
   mass = 1;
 
