@@ -101,8 +101,8 @@ export class Player extends Actor {
   mass = 1;
 
   guns = [
-    new PlayerGun( { offset: { front: 1, side: -1, angle: 0 } } ),
-    new PlayerGun( { offset: { front: 1, side:  1, angle: 0 } } ),
+    new PlayerGun( { offset: { front: 0, side: -1, angle: 0 } } ),
+    new PlayerGun( { offset: { front: 0, side:  1, angle: 0 } } ),
   ];
 
   trails = [
@@ -158,8 +158,8 @@ export class Ship extends Actor {
   mass = 1;
 
   guns = [
-    new ShipGun( { offset: { front: 1, side: -1, angle: 0 } } ),
-    new ShipGun( { offset: { front: 1, side:  1, angle: 0 } } ),
+    new ShipGun( { offset: { front: 0, side: -1, angle: 0 } } ),
+    new ShipGun( { offset: { front: 0, side:  1, angle: 0 } } ),
   ];
 
   trails = [

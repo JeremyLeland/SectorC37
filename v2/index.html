@@ -1,12 +1,56 @@
 <title>Sector C37</title>
 <link rel="stylesheet" href="./grid.css">
 
+<style>
+  #ui {
+    position: absolute;
+    vertical-align: top;
+    display: flex;
+    gap: 8px;
+    margin-left: 4px;
+  }
+
+  .outer_bar {
+    width: 150px;
+    height: 8px;
+    margin-top: 5px;
+    border: 1px solid white;
+  }
+
+  .inner_bar {
+    height: 100%;
+  }
+
+  #health { background-color: rgba( 255, 0, 0, 0.5 ); }
+  #energy { background-color: rgba( 0, 200, 255, 0.5 ); }
+  #minimap { background-color: rgba( 20, 20, 20, 0.5 ); }
+</style>
+
+<body>
+  <div id="ui">
+    Health:
+    <div class="outer_bar">
+      <div class="inner_bar" id="health"></div>
+    </div>
+    Energy:
+    <div class="outer_bar">
+      <div class="inner_bar" id="energy"></div>
+    </div>
+    <canvas id="minimap" width="100" height="100"></canvas>
+    <label for="enemies">Enemies: </label>
+    <span id="enemies"></span>
+  </div>
+</body>
+
 <script type="module">
   import { AnimatedCanvas } from './src/AnimatedCanvas.js';
   import { World } from './src/World.js';
   import { Starfield } from './src/Starfield.js';
   import { Player, Ship, Rock } from './src/SectorC37.js';
   import * as Util from './src/Util.js';
+
+  const minimapCtx = document.getElementById( 'minimap' ).getContext( '2d' );
+  const enemiesUI = document.getElementById( 'enemies' );
 
   const PLAYER_RESPAWN_DELAY = 2000;
   let playerSpawnTimer = PLAYER_RESPAWN_DELAY;
@@ -106,7 +150,33 @@
     // ctx.stroke();
 
     ctx.restore();
+
+    drawMinimap( minimapCtx );
+
+    const numEnemies = world.entities.filter( e => e instanceof Ship ).length;
+    enemiesUI.innerText = numEnemies;
   };
+
+  function drawMinimap( ctx ) {
+    // Assume a square minimap
+    const scale = ctx.canvas.width / ( world.size * 2 );
+
+    ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
+
+    ctx.save();
+    ctx.translate( ctx.canvas.width / 2, ctx.canvas.height / 2 );
+    ctx.scale( scale, scale );
+    
+    // world.entities.filter( e => e.size > 8 ).forEach( e => {
+    world.entities.filter( e => e.boundingLines ).forEach( e => {
+      ctx.beginPath();
+      ctx.arc( e.x, e.y, e.size, 0, Math.PI * 2 );
+      ctx.fillStyle = e.color;
+      ctx.fill();
+    } );
+
+    ctx.restore();
+  }
 
   canvas.start();
 
