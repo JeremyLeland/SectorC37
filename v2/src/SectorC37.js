@@ -109,7 +109,7 @@ export class Player extends Actor {
     new Trail( { 
       offset: { front: -1, side: 0, angle: 0 }, 
       maxWidth: this.size / 3, 
-      maxLength: 20,
+      goalLength: 20,
       color: 'seagreen',
     } ),
   ];
@@ -166,7 +166,7 @@ export class Ship extends Actor {
     new Trail( { 
       offset: { front: -1, side: 0, angle: 0 }, 
       maxWidth: this.size / 3, 
-      maxLength: 20,
+      goalLength: 20,
       color: 'lightblue',
     } ),
   ];
@@ -206,7 +206,7 @@ function shipPath() {
 
 class PlayerBullet extends Entity {
   size = 1;
-  trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'orange' } );
+  trail = new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'orange' } );
   mass = 0.05;
   damage = 2;
   lifeSpan = 5000;
@@ -218,7 +218,7 @@ class PlayerBullet extends Entity {
   update( dt, entities ) {
     super.update( dt, entities );
 
-    this.trail.update( this );
+    this.trail.update( dt, this );
   }
 
   draw( ctx ) {
@@ -229,7 +229,7 @@ class PlayerBullet extends Entity {
 
 class ShipBullet extends Entity {
   size = 1;
-  trail = new Trail( { maxWidth: this.size, maxLength: 40, color: 'yellow' } );
+  trail = new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'yellow' } );
   mass = 0.05;
   damage = 2;
   lifeSpan = 5000;
@@ -241,7 +241,7 @@ class ShipBullet extends Entity {
   update( dt, entities ) {
     super.update( dt, entities );
 
-    this.trail.update( this );
+    this.trail.update( dt, this );
   }
 
   draw( ctx ) {

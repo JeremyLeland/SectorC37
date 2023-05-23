@@ -79,15 +79,25 @@ export class Actor extends Entity {
     this.angle += Math.sign( goalTurn ) * turn;
     this.angle = Util.fixAngle( this.angle );
     
-    if ( !this.isSliding ) {
+    if ( this.isSliding ) {
+      this.trails?.forEach( trail => trail.goalLength = 0 );
+    }
+    else {
+      this.trails?.forEach( trail => trail.goalLength = 20 );   // TODO: Don't hardcode, maybe save original value in trail?
+
       this.dx += Math.cos( this.angle ) * this.accel * dt;
       this.dy += Math.sin( this.angle ) * this.accel * dt;
     }
 
+    if ( this.isSprinting ) {
+      this.trails?.forEach( trail => trail.goalLength = 20 * 1.5 );
+    }
+
     const vel = Math.hypot( this.dx, this.dy );
-    if ( vel > this.moveSpeed ) {
-      this.dx *= this.moveSpeed / vel;
-      this.dy *= this.moveSpeed / vel;
+    const speed = this.moveSpeed * ( this.isSprinting && !this.isSliding ? 1.5 : 1 );
+    if ( vel > speed ) {
+      this.dx *= speed / vel;
+      this.dy *= speed / vel;
     }
 
     this.x += this.dx * dt;
@@ -97,7 +107,7 @@ export class Actor extends Entity {
     
     this.guns.forEach( gun => gun.update( dt, this ) );
 
-    this.trails?.forEach( trail => trail.update( this ) );
+    this.trails?.forEach( trail => trail.update( dt, this ) );
   }
 
   wander( world ) {

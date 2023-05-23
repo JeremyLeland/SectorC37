@@ -2,6 +2,8 @@
 <link rel="stylesheet" href="./grid.css">
 
 <style>
+  body { cursor: crosshair; }
+  
   #ui {
     position: absolute;
     vertical-align: top;
@@ -183,11 +185,13 @@
   let mouseX = 0, mouseY = 0;
 
   document.addEventListener( 'keydown', ( e ) => {
-    if ( e.key == 'Control' )   player.isSliding = true;
+    if ( e.key == 'Control' )   player.isSliding   = true;
+    if ( e.key == 'Shift'   )   player.isSprinting = true;
   } );
 
   document.addEventListener( 'keyup', ( e ) => {
-    if ( e.key == 'Control' )   player.isSliding = false;
+    if ( e.key == 'Control' )   player.isSliding   = false;
+    if ( e.key == 'Shift'   )   player.isSprinting = false;
   } );
   
   document.addEventListener( 'mousedown', ( e ) => {

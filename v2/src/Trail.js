@@ -1,35 +1,51 @@
 export class Trail {
+  goalLength = 1000;
+  dLength = 0.1;
+
   maxWidth = 20;
-  maxLength = 1000;
-
+  
   // TODO: Track length for drawing purposes?
-
   head;
   segments = [];
   length = 0;
-
+  
   offset = { front: 0, side: 0, angle: 0 };
   color = 'red';
+
+  #maxLength = 0;
 
   constructor( values ) {
     Object.assign( this, values );
   }
 
-  update( entity ) {
-    if ( this.head ) {
-      const cx = entity.x - this.head.x;
-      const cy = entity.y - this.head.y;
-      const angle = Math.atan2( cy, cx );
-      const length = Math.hypot( cx, cy );
+  update( dt, parent ) {
+    const diff = this.goalLength - this.#maxLength;
+    const delta = Math.min( Math.abs( diff ), this.dLength * dt );
+    this.#maxLength += Math.sign( diff ) * delta;
 
-      this.segments.unshift( { angle: angle, length: length } );
+    // if ( this.goalLength > this.#maxLength ) {
+    //   this.#maxLength = this.goalLength;  // it'll slowly grow as we add segments
+    // }
+    // else if ( this.goalLength < this.#maxLength ) {
+    //   this.#maxLength = Math.max( this.#maxLength - this.dLength * dt, this.goalLength );
+    // }
 
-      this.length = Math.min( this.length + length, this.maxLength );
+    if ( parent ) {
+      if ( this.head ) {
+        const cx = parent.x - this.head.x;
+        const cy = parent.y - this.head.y;
+        const angle = Math.atan2( cy, cx );
+        const length = Math.hypot( cx, cy );
+        
+        this.segments.unshift( { angle: angle, length: length } );
+        
+        this.length = Math.min( this.length + length, this.#maxLength );
+      }
+      
+      this.head = parent.getOffset( this.offset );
     }
 
-    this.head = entity.getOffset( this.offset );
-
-    let remaining = this.maxLength;
+    let remaining = this.#maxLength;
     this.segments = this.segments.filter( s => {
       s.length = Math.min( s.length, remaining );
       remaining -= s.length;
@@ -44,7 +60,7 @@ export class Trail {
       let x = this.head.x, y = this.head.y;
       let remaining = this.length;
       this.segments.forEach( s => {
-        const width = this.maxWidth * remaining / this.maxLength;
+        const width = this.maxWidth * remaining / this.#maxLength;
         
         left.push( {
           x: x - Math.sin( s.angle ) * width,
@@ -72,7 +88,7 @@ export class Trail {
 
     if ( this.head ) {
       path.arc(
-        this.head.x, this.head.y, this.maxWidth * this.length / this.maxLength, 
+        this.head.x, this.head.y, this.maxWidth * this.length / this.#maxLength, 
         this.head.angle - Math.PI / 2,
         this.head.angle + Math.PI / 2,
       );
