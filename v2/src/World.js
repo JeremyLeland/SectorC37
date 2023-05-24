@@ -11,6 +11,11 @@ export class World {
     const prevHits = [];
 
     for ( let tries = 0; dt > 0 && tries < 8; tries ++ ) {
+
+      if ( tries == 7 ) {
+        debugger;
+      }
+
       let closestHit = { time: Infinity };
       
       for ( let i = 0; i < this.entities.length; i ++ ) {

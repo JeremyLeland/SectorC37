@@ -3,7 +3,7 @@
 
 <style>
   body { cursor: crosshair; }
-  
+
   #ui {
     position: absolute;
     vertical-align: top;
@@ -51,6 +51,7 @@
   import { Player, Ship, Rock } from './src/SectorC37.js';
   import * as Util from './src/Util.js';
 
+  const healthUI = document.getElementById( 'health' );
   const minimapCtx = document.getElementById( 'minimap' ).getContext( '2d' );
   const enemiesUI = document.getElementById( 'enemies' );
 
@@ -152,6 +153,8 @@
     // ctx.stroke();
 
     ctx.restore();
+
+    healthUI.style.width = `${ 100 * Math.max( 0, player.life ) / Player.MaxLife }%`;
 
     drawMinimap( minimapCtx );
 

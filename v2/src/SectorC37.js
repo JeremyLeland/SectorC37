@@ -85,6 +85,8 @@ function rockPath( points ) {
 // Ships
 //
 export class Player extends Actor {
+  static MaxLife = 50;
+
   type = 'player';
   size = 12;
 
@@ -96,7 +98,7 @@ export class Player extends Actor {
 
   wanders = false;
 
-  life = 50;
+  life = Player.MaxLife;
   damage = 100;
   mass = 1;
 

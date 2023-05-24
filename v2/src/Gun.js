@@ -25,7 +25,7 @@ export class Gun {
     if ( this.timeUntilReady < 0 ) {
       this.isReloading = false;
 
-      if ( owner.isShooting && this.ammo > 0 ) {
+      if ( owner.isShooting && !owner.isSprinting && this.ammo > 0 ) {
         for ( let i = 0; i < this.bulletsPerShot; i ++ ) {
           const values = owner.getOffset( this.offset );
 
