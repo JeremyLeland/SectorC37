@@ -36,6 +36,9 @@ export class Actor extends Entity {
   isShooting = false;
   isSliding = false;
 
+  energy = 0;
+  energyRechargeRate = 0;
+
   update( dt, world ) {
     if ( this.wanders ) {
       this.wander( world );
@@ -79,6 +82,7 @@ export class Actor extends Entity {
     this.angle += Math.sign( goalTurn ) * turn;
     this.angle = Util.fixAngle( this.angle );
     
+    // TODO: Rework the sliding/sprinting section, especially with regards to tail length
     if ( this.isSliding ) {
       this.trails?.forEach( trail => trail.goalLength = 0 );
     }
@@ -89,8 +93,13 @@ export class Actor extends Entity {
       this.dy += Math.sin( this.angle ) * this.accel * dt;
     }
 
-    if ( this.isSprinting ) {
+    if ( this.isSprinting && this.energy > 0.1 * dt ) {
       this.trails?.forEach( trail => trail.goalLength = 20 * 1.5 );
+      this.energy -= 0.1 * dt;   // TODO: Don't hardcode this
+    }
+    else {
+      // this.trails?.forEach( trail => trail.goalLength = 20 );
+      this.isSprinting = false;
     }
 
     const vel = Math.hypot( this.dx, this.dy );
@@ -108,6 +117,8 @@ export class Actor extends Entity {
     this.guns.forEach( gun => gun.update( dt, this ) );
 
     this.trails?.forEach( trail => trail.update( dt, this ) );
+
+    this.energy = Math.min( this.maxEnergy, this.energy + this.energyRechargeRate * dt );
   }
 
   wander( world ) {

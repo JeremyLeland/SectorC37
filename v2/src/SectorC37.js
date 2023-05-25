@@ -85,8 +85,6 @@ function rockPath( points ) {
 // Ships
 //
 export class Player extends Actor {
-  static MaxLife = 50;
-
   type = 'player';
   size = 12;
 
@@ -98,7 +96,12 @@ export class Player extends Actor {
 
   wanders = false;
 
-  life = Player.MaxLife;
+  maxLife = 50;
+  life = this.maxLife;
+  maxEnergy = 100;
+  energy = this.maxEnergy;
+  energyRechargeRate = this.maxEnergy / 5000;
+
   damage = 100;
   mass = 1;
 
@@ -155,7 +158,13 @@ export class Ship extends Actor {
   avoids = [ 'rock', 'player' ];
   aligns = [ 'ship' ];
 
-  life = 10;
+  maxLife = 10;
+  life = this.maxLife;
+
+  maxEnergy = 50;
+  energy = this.maxEnergy;
+  energyRechargeRate = this.maxEnergy / 5000;
+
   damage = 50;
   mass = 1;
 
@@ -255,6 +264,7 @@ class ShipBullet extends Entity {
 class PlayerGun extends Gun {
   timeBetweenShots = 200;
   bulletSpeed = 0.6;
+  energyCost = 5;
 
   getBullet( values ) {
     return new PlayerBullet( values );
@@ -264,6 +274,7 @@ class PlayerGun extends Gun {
 class ShipGun extends Gun {
   timeBetweenShots = 200;
   bulletSpeed = 0.6;
+  energyCost = 5;
 
   getBullet( values ) {
     return new ShipBullet( values );

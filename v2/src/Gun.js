@@ -12,7 +12,7 @@ export class Gun {
   bulletSpeed = 0;
   reloadTime = 0;
 
-  bulletTemplate;
+  energyCost = 0;
 
   constructor( values ) {
     Object.assign( this, values );
@@ -25,7 +25,7 @@ export class Gun {
     if ( this.timeUntilReady < 0 ) {
       this.isReloading = false;
 
-      if ( owner.isShooting && !owner.isSprinting && this.ammo > 0 ) {
+      if ( owner.isShooting && !owner.isSprinting && this.ammo > 0 && owner.energy > this.energyCost ) {
         for ( let i = 0; i < this.bulletsPerShot; i ++ ) {
           const values = owner.getOffset( this.offset );
 
@@ -35,6 +35,8 @@ export class Gun {
           values.dy = owner.dy + Math.sin( values.angle ) * this.bulletSpeed;
           
           owner.createdEntities.push( this.getBullet( values ) );
+
+          owner.energy -= this.energyCost;
         }
 
         this.ammo --;
