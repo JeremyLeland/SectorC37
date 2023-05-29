@@ -29,10 +29,12 @@ export class World {
             continue;
           }
 
-          const hit = A.getHit( B );
-          
-          if ( 0 <= hit.time && hit.time < closestHit.time ) {
-            closestHit = hit;
+          if ( A.hits?.includes( B.type ) || B.hits?.includes( A.type ) ) { 
+            const hit = A.getHit( B );
+            
+            if ( 0 <= hit.time && hit.time < closestHit.time ) {
+              closestHit = hit;
+            }
           }
         }
       }

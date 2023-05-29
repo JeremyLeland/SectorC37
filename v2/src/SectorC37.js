@@ -8,6 +8,8 @@ import { BoundingLines } from './BoundingLines.js';
 // Rocks
 //
 export class Rock extends Entity {
+
+  hits = [ 'player', 'ship', 'rock', 'bullet' ];
   
   constructor( values ) {
     super( values );
@@ -102,6 +104,8 @@ export class Player extends Actor {
   energy = this.maxEnergy;
   energyRechargeRate = this.maxEnergy / 5000;
 
+  hits = [ 'rock', 'ship', 'bullet' ];
+
   damage = 100;
   mass = 1;
 
@@ -165,6 +169,8 @@ export class Ship extends Actor {
   energy = this.maxEnergy;
   energyRechargeRate = this.maxEnergy / 5000;
 
+  hits = [ 'player', 'ship', 'rock', 'bullet' ];
+
   damage = 50;
   mass = 1;
 
@@ -216,6 +222,7 @@ function shipPath() {
 //
 
 class PlayerBullet extends Entity {
+  type = 'bullet';
   size = 1;
   trail = new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'orange' } );
   mass = 0.05;
@@ -239,6 +246,7 @@ class PlayerBullet extends Entity {
 }
 
 class ShipBullet extends Entity {
+  type = 'bullet';
   size = 1;
   trail = new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'yellow' } );
   mass = 0.05;
