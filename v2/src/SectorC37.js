@@ -95,14 +95,17 @@ export class Player extends Actor {
 
   turnSpeed = 0.005;
   moveSpeed = 0.2;
+  sprintSpeed = 0.3;
 
   wanders = false;
 
   maxLife = 50;
   life = this.maxLife;
   maxEnergy = 100;
+  moveEnergy = 0.01;
+  sprintEnergy = 0.04;
+  energyRechargeRate = 0.03;
   energy = this.maxEnergy;
-  energyRechargeRate = this.maxEnergy / 5000;
 
   hits = [ 'rock', 'ship', 'bullet' ];
 
@@ -114,11 +117,12 @@ export class Player extends Actor {
     new PlayerGun( { offset: { front: 0, side:  1, angle: 0 } } ),
   ];
 
+  trailLength = 20;
   trails = [
     new Trail( { 
       offset: { front: -1, side: 0, angle: 0 }, 
       maxWidth: this.size / 3, 
-      goalLength: 20,
+      goalLength: this.trailLength,
       color: 'seagreen',
     } ),
   ];
@@ -167,7 +171,8 @@ export class Ship extends Actor {
 
   maxEnergy = 50;
   energy = this.maxEnergy;
-  energyRechargeRate = this.maxEnergy / 5000;
+  moveEnergy = 0.1;
+  energyRechargeRate = 0.2;
 
   hits = [ 'player', 'ship', 'rock', 'bullet' ];
 
@@ -179,11 +184,12 @@ export class Ship extends Actor {
     new ShipGun( { offset: { front: 0, side:  1, angle: 0 } } ),
   ];
 
+  trailLength = 20;
   trails = [
     new Trail( { 
       offset: { front: -1, side: 0, angle: 0 }, 
       maxWidth: this.size / 3, 
-      goalLength: 20,
+      goalLength: this.trailLength,
       color: 'lightblue',
     } ),
   ];

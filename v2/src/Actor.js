@@ -13,11 +13,13 @@ const Constants = {
   Debug: false,
 };
 
+const SPRINT_MULTIPLIER = 2;
+
 export class Actor extends Entity {
   static DebugNavigation = false;
 
   accel = 0.002;  // temp: trying out accelerating by direction, then capping it
-
+  
   turnSpeed = 0;
   moveSpeed = 0;
   goalAngle = 0;
@@ -40,20 +42,36 @@ export class Actor extends Entity {
   energyRechargeRate = 0;
 
   update( dt, world ) {
-    if ( this.wanders ) {
-      this.wander( world );
+    //
+    // Goal setting (based on world around us)
+    //
+    if ( world ) {
+      if ( this.wanders ) {
+        this.wander( world );
+      }
+
+      if ( this.targets ) {
+        this.target( world.entities.filter( e => e != this && this.targets.includes( e.type ) ) );
+      }
+
+      this.goal = this.targetGoal ?? this.wanderGoal;
+
+      if ( this.goal ) {
+        this.goalAngle = Math.atan2( this.goal.y - this.y, this.goal.x - this.x );
+      } 
+
+      if ( this.aligns ) {
+        this.align( world.entities.filter( e => e != this && this.aligns.includes( e.type ) ) );
+      }
+
+      if ( this.avoids ) {
+        this.avoid( world.entities.filter( e => e != this && this.avoids.includes( e.type ) ) );
+      }
     }
 
-    if ( this.targets ) {
-      this.target( world.entities.filter( e => e != this && this.targets.includes( e.type ) ) );
-    }
-
-    this.goal = this.targetGoal ?? this.wanderGoal;
-
-    if ( this.goal ) {
-      this.goalAngle = Math.atan2( this.goal.y - this.y, this.goal.x - this.x );
-    }
-
+    //
+    // Shooting
+    //
     if ( this.targets ) {
       if ( this.targetGoal ) {
         const tx = this.targetGoal.x - this.x;
@@ -69,56 +87,64 @@ export class Actor extends Entity {
       }
     }
 
-    if ( this.aligns ) {
-      this.align( world.entities.filter( e => e != this && this.aligns.includes( e.type ) ) );
-    }
-
-    if ( this.avoids ) {
-      this.avoid( world.entities.filter( e => e != this && this.avoids.includes( e.type ) ) );
-    }
-
+    // 
+    // Turn
+    //
     const goalTurn = Util.deltaAngle( this.angle, this.goalAngle );
     const turn = Math.min( Math.abs( goalTurn ), this.turnSpeed * dt );
     this.angle += Math.sign( goalTurn ) * turn;
     this.angle = Util.fixAngle( this.angle );
-    
-    // TODO: Rework the sliding/sprinting section, especially with regards to tail length
-    if ( this.isSliding ) {
+
+    //
+    // Sprinting / Sliding and Energy Management
+    //
+    let actualSpeed;
+    // are we sprinting (and do we have enough energy?)
+    if ( this.isSprinting && this.energy > this.sprintEnergy * dt ) {
+      actualSpeed = this.sprintSpeed;
+      this.energy -= this.sprintEnergy * dt;
+      this.trails?.forEach( trail => trail.goalLength = this.trailLength * SPRINT_MULTIPLIER );
+    }
+    // can we go normal speed at least (if we're not trying to slide anyway)
+    else if ( !this.isSliding && this.energy > this.moveEnergy * dt ) {
+      actualSpeed = this.moveSpeed;
+      this.energy -= this.moveEnergy * dt;
+      this.trails?.forEach( trail => trail.goalLength = this.trailLength );
+    }
+    // then we're sliding whether we want to or not
+    else {
+      actualSpeed = 0;
       this.trails?.forEach( trail => trail.goalLength = 0 );
     }
-    else {
-      this.trails?.forEach( trail => trail.goalLength = 20 );   // TODO: Don't hardcode, maybe save original value in trail?
 
+    this.energy = Math.min( this.maxEnergy, this.energy + this.energyRechargeRate * dt );
+
+    //
+    // Velocity
+    //
+    if ( actualSpeed > 0 ) {
       this.dx += Math.cos( this.angle ) * this.accel * dt;
       this.dy += Math.sin( this.angle ) * this.accel * dt;
+      
+      const vel = Math.hypot( this.dx, this.dy );
+      if ( vel > actualSpeed ) {
+        this.dx *= actualSpeed / vel;
+        this.dy *= actualSpeed / vel;
+      }
     }
 
-    if ( this.isSprinting && this.energy > 0.1 * dt ) {
-      this.trails?.forEach( trail => trail.goalLength = 20 * 1.5 );
-      this.energy -= 0.1 * dt;   // TODO: Don't hardcode this
-    }
-    else {
-      // this.trails?.forEach( trail => trail.goalLength = 20 );
-      this.isSprinting = false;
-    }
-
-    const vel = Math.hypot( this.dx, this.dy );
-    const speed = this.moveSpeed * ( this.isSprinting && !this.isSliding ? 1.5 : 1 );
-    if ( vel > speed ) {
-      this.dx *= speed / vel;
-      this.dy *= speed / vel;
-    }
-
+    //
+    // Position
+    //
     this.x += this.dx * dt;
     this.y += this.dy * dt;
 
+    //
+    // Updating dependents
+    //
     this.boundingLines?.update( this );
-    
     this.guns.forEach( gun => gun.update( dt, this ) );
-
     this.trails?.forEach( trail => trail.update( dt, this ) );
-
-    this.energy = Math.min( this.maxEnergy, this.energy + this.energyRechargeRate * dt );
   }
 
   wander( world ) {
