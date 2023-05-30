@@ -13,7 +13,7 @@ export class World {
     for ( let tries = 0; dt > 0 && tries < 8; tries ++ ) {
 
       if ( tries == 7 ) {
-        debugger;
+        debugger;   // TODO: Record how many tries for debug graphs?
       }
 
       let closestHit = { time: Infinity };
@@ -29,12 +29,15 @@ export class World {
             continue;
           }
 
-          if ( A.hits?.includes( B.type ) || B.hits?.includes( A.type ) ) { 
-            const hit = A.getHit( B );
-            
-            if ( 0 <= hit.time && hit.time < closestHit.time ) {
-              closestHit = hit;
-            }
+          // Make sure these entities can hit each other
+          if ( A.nohit?.includes( B.type ) || B.nohit?.includes( A.type ) ) {
+            continue;
+          }
+
+          const hit = A.getHit( B );
+          
+          if ( 0 <= hit.time && hit.time < closestHit.time ) {
+            closestHit = hit;
           }
         }
       }

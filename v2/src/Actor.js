@@ -36,9 +36,13 @@ export class Actor extends Entity {
 
   guns = [];
   isShooting = false;
+  isSprinting = false;
   isSliding = false;
 
+  maxEnergy = 0;
   energy = 0;
+  moveEnergy = 0;
+  sprintEnergy = 0;
   energyRechargeRate = 0;
 
   update( dt, world ) {
@@ -100,13 +104,13 @@ export class Actor extends Entity {
     //
     let actualSpeed;
     // are we sprinting (and do we have enough energy?)
-    if ( this.isSprinting && this.energy > this.sprintEnergy * dt ) {
+    if ( this.isSprinting && this.energy >= this.sprintEnergy * dt ) {
       actualSpeed = this.sprintSpeed;
       this.energy -= this.sprintEnergy * dt;
       this.trails?.forEach( trail => trail.goalLength = this.trailLength * SPRINT_MULTIPLIER );
     }
     // can we go normal speed at least (if we're not trying to slide anyway)
-    else if ( !this.isSliding && this.energy > this.moveEnergy * dt ) {
+    else if ( !this.isSliding && this.energy >= this.moveEnergy * dt ) {
       actualSpeed = this.moveSpeed;
       this.energy -= this.moveEnergy * dt;
       this.trails?.forEach( trail => trail.goalLength = this.trailLength );

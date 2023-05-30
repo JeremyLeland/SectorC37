@@ -8,9 +8,6 @@ import { BoundingLines } from './BoundingLines.js';
 // Rocks
 //
 export class Rock extends Entity {
-
-  hits = [ 'player', 'ship', 'rock', 'bullet' ];
-  
   constructor( values ) {
     super( values );
 
@@ -107,15 +104,13 @@ export class Player extends Actor {
   energyRechargeRate = 0.03;
   energy = this.maxEnergy;
 
-  hits = [ 'rock', 'ship', 'bullet' ];
-
   damage = 100;
   mass = 1;
 
   guns = [
     new PlayerGun( { offset: { front: 0, side: -1, angle: 0 } } ),
     new PlayerGun( { offset: { front: 0, side:  1, angle: 0 } } ),
-    new MissleGun( { offset: { front: 1, side:  0, angle: 0 } } ),
+    new MissleGun( { offset: { front: 2, side:  0, angle: 0 } } ),
   ];
 
   trailLength = 20;
@@ -174,8 +169,6 @@ export class Ship extends Actor {
   energy = this.maxEnergy;
   moveEnergy = 0.1;
   energyRechargeRate = 0.2;
-
-  hits = [ 'player', 'ship', 'rock', 'bullet' ];
 
   damage = 50;
   mass = 1;
@@ -241,6 +234,7 @@ class PlayerBullet extends Entity {
   boundingLines = new BoundingLines( [
     [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
   ] );
+  nohit = [ 'bullet' ];
 }
 
 class ShipBullet extends Entity {
@@ -256,16 +250,18 @@ class ShipBullet extends Entity {
   boundingLines = new BoundingLines( [
     [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
   ] );
+  nohit = [ 'bullet' ];
 }
 
-class Missle extends Entity {
+class Missle extends Actor {
   type = 'missle';
-  size = 10;
+  size = 7;
+  trailLength = 25;
   trails = [
     new Trail( { 
       offset: { front: -1, side: 0, angle: 0 }, 
       maxWidth: this.size / 3, 
-      goalLength: 30, 
+      goalLength: this.trailLength, 
       dLength: 0.6, 
       color: 'orange' 
     } )
@@ -280,6 +276,13 @@ class Missle extends Entity {
   boundingLines = new BoundingLines( [
     [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
   ] );
+  nohit = [ 'bullet' ];
+
+  targets = [ 'ship' ];
+  turnSpeed = 0.004;
+  moveSpeed = 0.25;
+
+  // TODO: Limited energy? (so they eventually stop navigating and just crash)
 }
 
 class PlayerGun extends Gun {
@@ -304,7 +307,7 @@ class ShipGun extends Gun {
 
 class MissleGun extends Gun {
   timeBetweenShots = 2000;
-  bulletSpeed = 0.1;
+  bulletSpeed = 0.2;
   energyCost = 5;
 
   getBullet( values ) {
