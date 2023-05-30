@@ -19,13 +19,13 @@ export class Gun {
     this.ammo = this.maxAmmo;
   }
 
-  update( dt, owner ) {
+  update( dt, owner, isShooting ) {
     this.timeUntilReady -= dt;
 
     if ( this.timeUntilReady < 0 ) {
       this.isReloading = false;
 
-      if ( owner.isShooting && !owner.isSprinting && this.ammo > 0 && owner.energy > this.energyCost ) {
+      if ( isShooting && !owner.isSprinting && this.ammo > 0 && owner.energy > this.energyCost ) {
         for ( let i = 0; i < this.bulletsPerShot; i ++ ) {
           const values = owner.getOffset( this.offset );
 

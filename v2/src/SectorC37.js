@@ -107,9 +107,15 @@ export class Player extends Actor {
   damage = 100;
   mass = 1;
 
-  guns = [
+  isShootingPrimary = false;
+  isShootingSecondary = false;
+
+  primaryGuns = [
     new PlayerGun( { offset: { front: 0, side: -1, angle: 0 } } ),
     new PlayerGun( { offset: { front: 0, side:  1, angle: 0 } } ),
+  ];
+  
+  secondaryGuns = [
     new MissleGun( { offset: { front: 2, side:  0, angle: 0 } } ),
   ];
 
@@ -126,6 +132,13 @@ export class Player extends Actor {
   boundingLines = new BoundingLines( [
     [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
   ] );
+
+  update( dt, world ) {
+    super.update( dt, world );
+
+    this.primaryGuns?.forEach( gun => gun.update( dt, this, this.isShootingPrimary ) );
+    this.secondaryGuns?.forEach( gun => gun.update( dt, this, this.isShootingSecondary ) );
+  }
 
   getBleedParticle() {
     return new Entity( {

@@ -201,7 +201,8 @@
   
   document.addEventListener( 'mousedown', ( e ) => {
     if ( player.isAlive ) {
-      player.isShooting = true;
+      if ( e.button == 0 )  player.isShootingPrimary = true;
+      if ( e.button == 2 )  player.isShootingSecondary = true;
     }
     else if ( playerSpawnTimer < 0 ) {
       playerSpawnTimer = PLAYER_RESPAWN_DELAY;
@@ -209,7 +210,10 @@
       world.entities.push( player );
     }
   } );
-  document.addEventListener( 'mouseup',   ( e ) => player.isShooting = false );
+  document.addEventListener( 'mouseup',   ( e ) => {
+    if ( e.button == 0 )  player.isShootingPrimary = false;
+    if ( e.button == 2 )  player.isShootingSecondary = false;
+  } );
   document.addEventListener( 'mousemove', ( e ) => {
     mouseX = e.clientX;
     mouseY = e.clientY;

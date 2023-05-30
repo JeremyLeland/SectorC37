@@ -147,7 +147,7 @@ export class Actor extends Entity {
     // Updating dependents
     //
     this.boundingLines?.update( this );
-    this.guns.forEach( gun => gun.update( dt, this ) );
+    this.guns?.forEach( gun => gun.update( dt, this, this.isShooting ) );
     this.trails?.forEach( trail => trail.update( dt, this ) );
   }
 
