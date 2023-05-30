@@ -115,6 +115,7 @@ export class Player extends Actor {
   guns = [
     new PlayerGun( { offset: { front: 0, side: -1, angle: 0 } } ),
     new PlayerGun( { offset: { front: 0, side:  1, angle: 0 } } ),
+    new MissleGun( { offset: { front: 1, side:  0, angle: 0 } } ),
   ];
 
   trailLength = 20;
@@ -230,7 +231,9 @@ function shipPath() {
 class PlayerBullet extends Entity {
   type = 'bullet';
   size = 1;
-  trail = new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'orange' } );
+  trails = [ 
+    new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'orange' } ) 
+  ];
   mass = 0.05;
   damage = 2;
   lifeSpan = 5000;
@@ -238,23 +241,14 @@ class PlayerBullet extends Entity {
   boundingLines = new BoundingLines( [
     [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
   ] );
-
-  update( dt, entities ) {
-    super.update( dt, entities );
-
-    this.trail.update( dt, this );
-  }
-
-  draw( ctx ) {
-    this.trail.draw( ctx );
-    super.draw( ctx );  // for debug visuals
-  }
 }
 
 class ShipBullet extends Entity {
   type = 'bullet';
   size = 1;
-  trail = new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'yellow' } );
+  trails = [
+    new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'yellow' } )
+  ];
   mass = 0.05;
   damage = 2;
   lifeSpan = 5000;
@@ -262,17 +256,30 @@ class ShipBullet extends Entity {
   boundingLines = new BoundingLines( [
     [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
   ] );
+}
 
-  update( dt, entities ) {
-    super.update( dt, entities );
+class Missle extends Entity {
+  type = 'missle';
+  size = 10;
+  trails = [
+    new Trail( { 
+      offset: { front: -1, side: 0, angle: 0 }, 
+      maxWidth: this.size / 3, 
+      goalLength: 30, 
+      dLength: 0.6, 
+      color: 'orange' 
+    } )
+  ];
+  mass = 0.5;
+  damage = 20;
+  lifeSpan = 10000;
 
-    this.trail.update( dt, this );
-  }
+  color = 'gray';
+  drawPath = shipPath();
 
-  draw( ctx ) {
-    this.trail.draw( ctx );
-    super.draw( ctx );  // for debug visuals
-  }
+  boundingLines = new BoundingLines( [
+    [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
+  ] );
 }
 
 class PlayerGun extends Gun {
@@ -292,6 +299,16 @@ class ShipGun extends Gun {
 
   getBullet( values ) {
     return new ShipBullet( values );
+  }
+}
+
+class MissleGun extends Gun {
+  timeBetweenShots = 2000;
+  bulletSpeed = 0.1;
+  energyCost = 5;
+
+  getBullet( values ) {
+    return new Missle( values );
   }
 }
 

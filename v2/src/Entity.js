@@ -28,6 +28,8 @@ export class Entity {
 
   boundingLines;
 
+  trails;
+
   createdEntities = [];
 
   constructor( values ) {
@@ -49,9 +51,13 @@ export class Entity {
 
     this.lifeSpan -= dt;
     this.isAlive = this.life > 0 && this.lifeSpan > 0;
+
+    this.trails?.forEach( trail => trail.update( dt, this ) );
   }
 
   draw( ctx ) {
+    this.trails?.forEach( trail => trail.draw( ctx ) );
+
     ctx.save();
 
     ctx.translate( this.x, this.y );
