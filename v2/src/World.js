@@ -12,7 +12,7 @@ export class World {
 
     for ( let tries = 0; dt > 0 && tries < 8; tries ++ ) {
 
-      if ( tries == 7 ) {
+      if ( tries > 2 ) {
         debugger;   // TODO: Record how many tries for debug graphs?
       }
 
@@ -114,7 +114,20 @@ export class World {
 
     if ( World.DebugBounds ) {
       ctx.beginPath();
-      ctx.arc( 0, 0, this.size, 0, Math.PI * 2 );
+
+      const DIST_SPACING = 100;
+      for ( let d = 1; d <= this.size / DIST_SPACING; d ++ ) {
+        ctx.arc( 0, 0, d * DIST_SPACING, 0, Math.PI * 2 );
+      }
+
+      const ANGLE_SPACES = 8;
+      for ( let i = 0; i < ANGLE_SPACES; i ++ ) {
+        const angle = Math.PI * 2 * i / ANGLE_SPACES;
+        ctx.moveTo( 0, 0 );
+        ctx.lineTo( Math.cos( angle ) * this.size, Math.sin( angle ) * this.size );
+      }
+    
+      ctx.strokeStyle = 'rgba( 100, 100, 100, 0.2 )';
       ctx.stroke();
     }
   }

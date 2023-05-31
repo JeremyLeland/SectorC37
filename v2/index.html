@@ -51,6 +51,9 @@
   import { Player, Ship, Rock } from './src/SectorC37.js';
   import * as Util from './src/Util.js';
 
+  const PLAYABLE_RADIUS = 1000, OUTSIDE_RADIUS = 500;
+
+
   const healthUI = document.getElementById( 'health' );
   const energyUI = document.getElementById( 'energy' );
   const minimapCtx = document.getElementById( 'minimap' ).getContext( '2d' );
@@ -64,7 +67,8 @@
 
   let player = new Player( { x: 0, y: 0, angle: 0 } );
 
-  const world = new World( 1000 );
+  World.DebugBounds = true;
+  const world = new World( PLAYABLE_RADIUS + OUTSIDE_RADIUS );
   world.entities = [ player ];
 
   const numRocks = 10, rockSpacing = 300;
@@ -84,10 +88,10 @@
     }
   }
 
-  const numShips = 10, shipSpacing = 200;
+  const numShips = 10;
   for ( let i = 0; i < numShips; i ++ ) {
     const angle = Math.PI * 2 * ( i + 0.25 + 0.5 * Math.random() ) / numShips;
-    const dist = world.size + shipSpacing * ( 0.25 + 0.5 * Math.random() );
+    const dist = PLAYABLE_RADIUS + OUTSIDE_RADIUS * ( 0.25 + 0.5 * Math.random() );
     spawnShip( angle, dist );
   }
 
@@ -104,13 +108,14 @@
   const starfield = new Starfield( world.size * 2, world.size * 2 , 1000, 2 );
 
   let scrollX = 0, scrollY = 0;
+  const SCROLL_LIMIT = PLAYABLE_RADIUS / Math.SQRT2;
 
   const canvas = new AnimatedCanvas();
 
   canvas.update = ( dt ) => {
     if ( player.isAlive ) {  
-      scrollX = Math.min( world.size, Math.max( window.innerWidth - world.size, window.innerWidth / 2 - player.x ) );
-      scrollY = Math.min( world.size, Math.max( window.innerHeight - world.size, window.innerHeight / 2 - player.y ) );
+      scrollX = Math.min( SCROLL_LIMIT, Math.max( window.innerWidth - SCROLL_LIMIT, window.innerWidth / 2 - player.x ) );
+      scrollY = Math.min( SCROLL_LIMIT, Math.max( window.innerHeight - SCROLL_LIMIT, window.innerHeight / 2 - player.y ) );
 
       player.targetGoal = { x: mouseX - scrollX, y: mouseY - scrollY };
     }
@@ -138,20 +143,6 @@
     ctx.save();
     ctx.translate( scrollX, scrollY );
     world.draw( ctx );
-
-    // ctx.beginPath();
-    
-    // for ( let d = 1; d < world.size / rockSpacing; d ++ ) {
-    //   ctx.arc( 0, 0, rockSpacing * d, 0, Math.PI * 2 );
-    // }
-
-    // for ( let i = 0; i < numRocks; i ++ ) {
-    //   const angle = Math.PI * 2 * i / numRocks;
-    //   ctx.moveTo( 0, 0 );
-    //   ctx.lineTo( Math.cos( angle ) * world.size, Math.sin( angle ) * world.size );
-    // }
-    
-    // ctx.stroke();
 
     ctx.restore();
 
