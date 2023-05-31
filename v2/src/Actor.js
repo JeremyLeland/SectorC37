@@ -77,18 +77,21 @@ export class Actor extends Entity {
     // Shooting
     //
     if ( this.targets ) {
-      if ( this.targetGoal ) {
-        const tx = this.targetGoal.x - this.x;
-        const ty = this.targetGoal.y - this.y;
-        const tangle = Math.atan2( ty, tx );
-        const tdist = Math.hypot( tx, ty );// - this.size - this.target.size;
+      const inFront = world.entities.filter( e => {
+        if ( e == this )  return false;
 
-        const inFront = Math.abs( tangle - this.angle ) < Constants.ShootAngle;
-        this.isShooting = inFront && tdist < Constants.ShootDistance;
-      }
-      else {
-        this.isShooting = false;
-      }
+        const cx = e.x - this.x;
+        const cy = e.y - this.y;
+        const angle = Math.atan2( cy, cx );
+        const dist = Math.hypot( cx, cy );// - this.size - this.target.size;
+  
+        return Math.abs( angle - this.angle ) < Constants.ShootAngle && dist < Constants.ShootDistance;
+      } );
+
+      const hasTarget = inFront.find( e => this.targets.includes( e.type ) );
+      const hasAlly = inFront.find( e => e.type == this.type );   // TODO: Allies of other types?
+
+      this.isShooting = hasTarget && !hasAlly;
     }
 
     // 

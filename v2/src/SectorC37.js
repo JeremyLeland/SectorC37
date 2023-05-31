@@ -293,7 +293,7 @@ class Missle extends Actor {
 
   targets = [ 'ship' ];
   turnSpeed = 0.004;
-  moveSpeed = 0.25;
+  moveSpeed = 0.3;
 
   // TODO: Limited energy? (so they eventually stop navigating and just crash)
 }
