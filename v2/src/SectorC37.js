@@ -3,6 +3,7 @@ import { Actor } from './Actor.js';
 import { Gun } from './Gun.js';
 import { Trail } from './Trail.js';
 import { BoundingLines } from './BoundingLines.js';
+import { World } from './World.js';
 
 //
 // Rocks
@@ -24,7 +25,7 @@ export class Rock extends Entity {
       ${ 20 + Math.random() * 10 }%
     )`;
 
-    this.life = this.size;
+    this.life = this.size * 1000;
     this.damage = this.size;
     this.mass = this.size;
   }
@@ -351,3 +352,61 @@ class Fire extends Entity {
 }
 
 
+//
+// Level
+//
+
+export class Level {
+  world;
+  
+  rockSpawnDelay = 3000;
+  rockSpawnTimer = this.rockSpawnDelay;
+
+  constructor( playableSize = 1000, spawnSize = 500 ) {
+    this.playableSize = playableSize;
+    this.spawnSize = spawnSize;
+
+    this.world = new World( playableSize + spawnSize );
+
+    const numRocks = Math.pow( playableSize, 2 ) / 20000;
+
+    for ( let i = 0; i < numRocks; i ++ ) {
+      this.spawnRock();
+    }
+  }
+
+  update( dt ) {
+    this.world.update( dt );
+
+    if ( ( this.rockSpawnTimer -= dt ) < 0 ) {
+      this.rockSpawnTimer += this.rockSpawnDelay;
+      this.spawnRock( this.playableSize );
+    }
+  }
+
+  draw( ctx ) {
+    this.world.draw( ctx );
+  }
+
+  spawnRock( minRadius = 0 ) {
+    const rockSize = 10 + 50 * Math.random();
+
+    const spawn = this.world.getSpawnPoint( rockSize * 2, { minRadius: minRadius } );
+    if ( spawn ) {
+      const moveAngle = minRadius == 0 ? 
+        Math.random() * Math.PI * 2 : 
+        Math.atan2( -spawn.y, -spawn.x ) + 0.5 * ( -0.5 + Math.random() );
+      const moveSpeed = 0.05 + 0.05 * ( -0.5 + Math.random() );
+
+      this.world.entities.push( new Rock( { 
+        x: spawn.x,
+        y: spawn.y,
+        dx: Math.cos( moveAngle ) * moveSpeed,
+        dy: Math.sin( moveAngle ) * moveSpeed,
+        angle: Math.random() * Math.PI * 2,
+        dAngle: 0.004 * ( -0.5 + Math.random() ),
+        size: rockSize,
+      } ) );
+    }
+  }
+}

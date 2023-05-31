@@ -1,0 +1,29 @@
+<title>Spawning Rocks</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { World } from '../src/World.js';
+  import { Starfield } from '../src/Starfield.js';
+  import { Rock, Level } from '../src/SectorC37.js';
+  import * as Util from '../src/Util.js';
+
+  World.DebugBounds = true;
+  const level = new Level( 200, 200 );
+
+  const canvas = new AnimatedCanvas();
+
+  canvas.update = ( dt ) => {
+    level.update( dt );
+  };
+  
+  canvas.draw = ( ctx ) => {
+    ctx.fillRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
+    ctx.translate( window.innerWidth / 2, window.innerHeight / 2 );
+
+    level.draw( ctx );
+  };
+
+  canvas.start();
+  
+</script>

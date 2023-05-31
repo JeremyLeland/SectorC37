@@ -105,7 +105,10 @@ export class World {
         e => createdEntities.push( ...e.createdEntities.splice( 0 ) )
       );
       this.entities.push( ...createdEntities );
-      this.entities = this.entities.filter( e => e.isAlive );
+      this.entities = this.entities.filter( e => e.isAlive && 
+        -this.size < e.x + e.size && e.x - e.size < this.size &&
+        -this.size < e.y + e.size && e.y - e.size < this.size
+      );
     }
   }
 
@@ -129,6 +132,19 @@ export class World {
     
       ctx.strokeStyle = 'rgba( 100, 100, 100, 0.2 )';
       ctx.stroke();
+    }
+  }
+
+  getSpawnPoint( radius, { minRadius = 0, maxRadius = this.size } = {} ) {
+    for ( let tries = 0; tries < 10; tries ++ ) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = minRadius + radius + ( maxRadius - minRadius - radius * 2 ) * Math.random();
+      const x = Math.cos( angle ) * dist;
+      const y = Math.sin( angle ) * dist;
+
+      if ( !this.entities.find( e => Math.hypot( e.x - x, e.y - y ) < e.size + radius ) ) {
+        return { x: x, y: y };
+      }
     }
   }
 }
