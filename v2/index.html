@@ -2,7 +2,14 @@
 <link rel="stylesheet" href="./grid.css">
 
 <style>
-  body { cursor: crosshair; }
+  body {
+    cursor: crosshair;
+
+    display: flex;
+    /* align-items: center; */
+    justify-content: center;
+    height: 100%;
+  }
 
   #ui {
     position: absolute;
@@ -26,6 +33,20 @@
   #health { background-color: rgba( 255, 0, 0, 0.5 ); }
   #energy { background-color: rgba( 0, 200, 255, 0.5 ); }
   #minimap { background-color: rgba( 20, 20, 20, 0.5 ); }
+
+  #title {
+    position: absolute;
+    font-size: 100;
+    font-family: 'Courier New', Courier, monospace;
+    bottom: 50%;
+  }
+
+  #message {
+    position: absolute;
+    font-size: 20;
+    font-family: 'Courier New', Courier, monospace;
+    top: 60%;
+  }
 </style>
 
 <body>
@@ -34,14 +55,19 @@
     <div class="outer_bar">
       <div class="inner_bar" id="health"></div>
     </div>
+    <div>
+      <canvas id="minimap" width="100" height="100"></canvas>
+      <br>
+      <label for="enemies">Enemies: </label>
+      <span id="enemies"></span>
+    </div>
     Energy:
     <div class="outer_bar">
       <div class="inner_bar" id="energy"></div>
     </div>
-    <canvas id="minimap" width="100" height="100"></canvas>
-    <label for="enemies">Enemies: </label>
-    <span id="enemies"></span>
   </div>
+  <div id="title">Sector C37</div>
+  <div id="message">Click to Spawn</div>
 </body>
 
 <script type="module">
@@ -58,6 +84,9 @@
   const energyUI = document.getElementById( 'energy' );
   const minimapCtx = document.getElementById( 'minimap' ).getContext( '2d' );
   const enemiesUI = document.getElementById( 'enemies' );
+
+  const titleUI = document.getElementById( 'title' );
+  const messageUI = document.getElementById( 'message' );
 
   const PLAYER_RESPAWN_DELAY = 2000;
   let playerSpawnTimer = 0;
@@ -84,6 +113,9 @@
       playerSpawnTimer = PLAYER_RESPAWN_DELAY;
       player = new Player( { x: spawn.x, y: spawn.y, angle: Math.atan2( -spawn.y, -spawn.x ) } );
       level.world.entities.push( player );
+
+      title.style.visibility = 'hidden';
+      message.style.visibility = 'hidden';
     }
   }
 
@@ -113,6 +145,10 @@
     }
     else {
       playerSpawnTimer -= dt;
+
+      if ( playerSpawnTimer < 0 ) {
+        message.style.visibility = 'visible';
+      }
     }
 
     if ( ( enemySpawnTimer -= dt ) < 0 ) {
@@ -157,10 +193,9 @@
     ctx.translate( ctx.canvas.width / 2, ctx.canvas.height / 2 );
     ctx.scale( scale, scale );
     
-    // level.world.entities.filter( e => e.size > 8 ).forEach( e => {
-    level.world.entities.filter( e => e.boundingLines ).forEach( e => {
+    level.world.entities.filter( e => e.boundingLines && e.size > 10 ).forEach( e => {
       ctx.beginPath();
-      ctx.arc( e.x, e.y, e.size, 0, Math.PI * 2 );
+      ctx.arc( e.x, e.y, Math.max( 2 / scale, e.size ), 0, Math.PI * 2 );
       ctx.fillStyle = e.color;
       ctx.fill();
     } );
