@@ -180,7 +180,7 @@ export class Entity {
 
   die( hit ) {
     if ( this.getDieParticle ) {
-      for ( let i = 0; i < this.size * 4; i ++ ) {
+      for ( let i = 0; i < this.size * 3; i ++ ) {
         const angle = Math.random() * Math.PI * 2;
         const dist = Math.random() * this.size / 2;
 
