@@ -17,6 +17,7 @@
     display: flex;
     gap: 8px;
     margin-left: 4px;
+    font-family: monospace;
   }
 
   .outer_bar {
@@ -32,19 +33,28 @@
 
   #health { background-color: rgba( 255, 0, 0, 0.5 ); }
   #energy { background-color: rgba( 0, 200, 255, 0.5 ); }
-  #minimap { background-color: rgba( 20, 20, 20, 0.5 ); }
+  #minimap {
+    --dark: rgba( 20, 20, 20, 0.5 );
+    --light: rgba( 100, 100, 100, 0.5 );
+    background-image: radial-gradient( 
+      var( --light ) 0px, var( --dark ) 2px,
+      var( --dark ) 16px, var( --light ) 17px, var( --dark ) 18px, 
+      var( --dark ) 32px, var( --light ) 33px, var( --dark ) 34px
+    );
+    clip-path: circle( 50% );
+  }
 
   #title {
     position: absolute;
     font-size: 100;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: monospace;
     bottom: 50%;
   }
 
   #message {
     position: absolute;
     font-size: 20;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: monospace;
     top: 60%;
   }
 </style>
@@ -189,7 +199,7 @@
 
   function drawMinimap( ctx ) {
     // Assume a square minimap
-    const scale = ctx.canvas.width / ( level.world.size * 2 );
+    const scale = ctx.canvas.width / ( level.playableRadius * 2 );
 
     ctx.clearRect( 0, 0, ctx.canvas.width, ctx.canvas.height );
 
