@@ -34,8 +34,10 @@ export class BoundingLines {
 
   // Find when we would hit another set of BoundingLines (with given velocities)
   getHit( other, thisDX, thisDY, otherDX, otherDY ) {
-
-    let closestHit = { time: Infinity };
+    const closestHit = { 
+      time: Infinity, 
+      position: { x: 0, y: 0 } 
+    };
 
     this.lines.forEach( a => {
       other.lines.forEach( b => {
@@ -48,16 +50,10 @@ export class BoundingLines {
           b.x1, b.y1, b.x2, b.y2,
         );
 
-        if ( intersection && 
-              0 <= intersection.uA && intersection.uA <= 1 && 
-              0 <= intersection.uB && intersection.uB <= 1 ) {
-          closestHit = { 
-            time: 0, 
-            position: {
-              x: a.x1 + ( a.x2 - a.x1 ) * intersection.uA,
-              y: a.y1 + ( a.y2 - a.y1 ) * intersection.uA,
-            }
-          };
+        if ( 0 <= intersection && intersection <= 1 ) {
+          closestHit.time = 0;
+          closestHit.position.x = a.x1 + ( a.x2 - a.x1 ) * intersection;
+          closestHit.position.y = a.y1 + ( a.y2 - a.y1 ) * intersection;
         }
 
         // Test endpoints against lines
@@ -66,33 +62,21 @@ export class BoundingLines {
           b.x1, b.y1, b.x2, b.y2,
         );
 
-        if ( aToB && 
-             0 <= aToB.uB && aToB.uB <= 1 &&
-             0 < aToB.uA && aToB.uA < closestHit.time ) {
-          closestHit = {
-            time: aToB.uA,
-            position: {
-              x: a.x1 + thisDX * aToB.uA,
-              y: a.y1 + thisDY * aToB.uA,
-            }
-          };
+        if ( 0 < aToB && aToB < closestHit.time ) {
+          closestHit.time = aToB;
+          closestHit.position.x = a.x1 + thisDX * aToB;
+          closestHit.position.y = a.y1 + thisDY * aToB;
         }
 
         const bToA = Line.getIntersection( 
+          b.x1, b.y1, b.x1 + otherDX - thisDX, b.y1 + otherDY - thisDY,
           a.x1, a.y1, a.x2, a.y2,
-          b.x1, b.y1, b.x1 + otherDX - thisDX, b.y1 + otherDY - thisDY, 
         );
 
-        if ( bToA && 
-             0 <= bToA.uA && bToA.uA <= 1 &&
-             0 < bToA.uB && bToA.uB < closestHit.time ) {
-          closestHit = {
-            time: bToA.uB,
-            position: {
-              x: b.x1 + otherDX * bToA.uB,
-              y: b.y1 + otherDY * bToA.uB,
-            }
-          };
+        if ( 0 < bToA && bToA < closestHit.time ) {
+          closestHit.time = bToA;
+          closestHit.position.x = b.x1 + otherDX * bToA;
+          closestHit.position.y = b.y1 + otherDY * bToA;
         }
       } );
     } );

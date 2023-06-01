@@ -9,7 +9,12 @@
   import * as Util from '../src/Util.js';
 
   World.DebugBounds = true;
-  const level = new Level( 200, 200 );
+  const level = new Level( { 
+    playableRadius: 1000, 
+    spawnRadius: 200, 
+    startingRocks: 150,
+    rockSpawnDelay: 5000, 
+  } );
 
   const canvas = new AnimatedCanvas();
 

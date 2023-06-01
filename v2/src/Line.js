@@ -43,14 +43,20 @@ export class Line {
       const uA = ( ( x4 - x3 ) * ( y1 - y3 ) - ( y4 - y3 ) * ( x1 - x3 ) ) / D;
       const uB = ( ( x2 - x1 ) * ( y1 - y3 ) - ( y2 - y1 ) * ( x1 - x3 ) ) / D;
 
-      return {
-        uA: uA,
-        uB: uB,
-        // position: {
-        //   x: x1 + ( x2 - x1 ) * uA,
-        //   y: y1 + ( y2 - y1 ) * uA,
-        // }
+      // Bounds check uB here so we can just return uA
+      if ( 0 <= uB && uB <= 1 ) {
+        return uA;
       }
+      // return {
+      //   uA: uA,
+      //   uB: uB,
+      //   // position: {
+      //   //   x: x1 + ( x2 - x1 ) * uA,
+      //   //   y: y1 + ( y2 - y1 ) * uA,
+      //   // }
+      // }
     }
+
+    return Infinity;
   }
 }

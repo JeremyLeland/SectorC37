@@ -13,7 +13,7 @@ export class World {
     for ( let tries = 0; dt > 0 && tries < 16; tries ++ ) {
 
       if ( tries == 15 ) {
-        debugger;   // TODO: Record how many tries for debug graphs?
+        // debugger;   // TODO: Record how many tries for debug graphs?
       }
 
       let closestHit = { time: Infinity };
@@ -34,7 +34,7 @@ export class World {
             continue;
           }
 
-          if ( A.getQuickHit( B ).time < dt ) {
+          if ( A.getQuickHitTime( B ) < dt ) {
             const hit = A.getHit( B );
             
             if ( 0 <= hit.time && hit.time < closestHit.time ) {

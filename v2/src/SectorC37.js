@@ -358,19 +358,20 @@ class Fire extends Entity {
 
 export class Level {
   world;
+
+  playableRadius = 1000;
+  spawnRadius = 500;
+  startingRocks = 10;
   
   rockSpawnDelay = 3000;
   rockSpawnTimer = this.rockSpawnDelay;
 
-  constructor( playableSize = 1000, spawnSize = 500 ) {
-    this.playableSize = playableSize;
-    this.spawnSize = spawnSize;
+  constructor( values ) {
+    Object.assign( this, values );
 
-    this.world = new World( playableSize + spawnSize );
+    this.world = new World( this.playableRadius + this.spawnRadius );
 
-    const numRocks = Math.pow( playableSize, 2 ) / 20000;
-
-    for ( let i = 0; i < numRocks; i ++ ) {
+    for ( let i = 0; i < this.startingRocks; i ++ ) {
       this.spawnRock();
     }
   }
@@ -380,7 +381,7 @@ export class Level {
 
     if ( ( this.rockSpawnTimer -= dt ) < 0 ) {
       this.rockSpawnTimer += this.rockSpawnDelay;
-      this.spawnRock( this.playableSize );
+      this.spawnRock( this.playableRadius );
     }
   }
 

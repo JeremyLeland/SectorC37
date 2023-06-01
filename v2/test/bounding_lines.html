@@ -43,6 +43,8 @@
 
   const canvas = new AnimatedCanvas();
 
+  Entity.DebugBounds = true;
+
   canvas.update = ( dt ) => {
     entities.forEach( e => e.update( dt ) );
   };

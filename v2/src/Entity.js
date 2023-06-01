@@ -94,7 +94,7 @@ export class Entity {
     }
   }
 
-  getQuickHit( other ) {
+  getQuickHitTime( other ) {
     if ( this.boundingLines && other.boundingLines ) {
 
       // See https://stackoverflow.com/questions/33140999/at-what-delta-time-will-two-objects-collide
@@ -114,13 +114,10 @@ export class Entity {
       // If the objects don't collide, the discriminant will be negative
       // We only care about first intersection, so just return t0 (which uses -b)
       
-      return {
-        time: disc < 0 ? Infinity : ( -b - Math.sqrt( disc ) ) / ( 2 * a ),
-        // entities: [ this, other ],
-      }
+      return disc < 0 ? Infinity : ( -b - Math.sqrt( disc ) ) / ( 2 * a );
     }
     else {
-      return { time: Infinity };
+      return Infinity;
     }
   }
 

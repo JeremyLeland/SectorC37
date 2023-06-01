@@ -98,7 +98,11 @@
 
   // World.DebugBounds = true;
 
-  const level = new Level( PLAYABLE_RADIUS, OUTSIDE_RADIUS );
+  const level = new Level( { 
+    playableRadius: PLAYABLE_RADIUS, 
+    spawnRadius: OUTSIDE_RADIUS, 
+    startingRocks: 30, 
+  } );
 
   const numShips = 10;
   for ( let i = 0; i < numShips; i ++ ) {
