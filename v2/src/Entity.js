@@ -94,6 +94,36 @@ export class Entity {
     }
   }
 
+  getQuickHit( other ) {
+    if ( this.boundingLines && other.boundingLines ) {
+
+      // See https://stackoverflow.com/questions/33140999/at-what-delta-time-will-two-objects-collide
+    
+      const cx = this.x - other.x
+      const cy = this.y - other.y
+      const vx = this.dx - other.dx;
+      const vy = this.dy - other.dy;
+      const rr = this.size + other.size;
+
+      const a = vx * vx + vy * vy;
+      const b = 2 * ( cx * vx + cy * vy );
+      const c = cx * cx + cy * cy - rr * rr;
+
+      const disc = b * b - 4 * a * c;
+
+      // If the objects don't collide, the discriminant will be negative
+      // We only care about first intersection, so just return t0 (which uses -b)
+      
+      return {
+        time: disc < 0 ? Infinity : ( -b - Math.sqrt( disc ) ) / ( 2 * a ),
+        // entities: [ this, other ],
+      }
+    }
+    else {
+      return { time: Infinity };
+    }
+  }
+
   getHit( other ) {
     if ( this.boundingLines && other.boundingLines ) {
 

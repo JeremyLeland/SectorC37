@@ -10,9 +10,9 @@ export class World {
   update( dt ) {
     const prevHits = [];
 
-    for ( let tries = 0; dt > 0 && tries < 8; tries ++ ) {
+    for ( let tries = 0; dt > 0 && tries < 16; tries ++ ) {
 
-      if ( tries > 2 ) {
+      if ( tries == 15 ) {
         debugger;   // TODO: Record how many tries for debug graphs?
       }
 
@@ -34,10 +34,12 @@ export class World {
             continue;
           }
 
-          const hit = A.getHit( B );
-          
-          if ( 0 <= hit.time && hit.time < closestHit.time ) {
-            closestHit = hit;
+          if ( A.getQuickHit( B ).time < dt ) {
+            const hit = A.getHit( B );
+            
+            if ( 0 <= hit.time && hit.time < closestHit.time ) {
+              closestHit = hit;
+            }
           }
         }
       }
