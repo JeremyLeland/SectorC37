@@ -1,5 +1,5 @@
 export class Gun {
-  offset = { front: 0, side: 0, angle: 0 };
+  offsets = [];
 
   ammo = 0;
   timeUntilReady = 0;
@@ -26,19 +26,25 @@ export class Gun {
       this.isReloading = false;
 
       if ( isShooting && !owner.isSprinting && this.ammo > 0 && owner.energy > this.energyCost ) {
-        for ( let i = 0; i < this.bulletsPerShot; i ++ ) {
-          const values = owner.getOffset( this.offset );
+        this.offsets.forEach( offset => {
+          const offsetPosition = owner.getOffsetPosition( offset );
 
-          values.angle += this.spread * ( -0.5 + Math.random() );
-          
-          values.dx = owner.dx + Math.cos( values.angle ) * this.bulletSpeed;
-          values.dy = owner.dy + Math.sin( values.angle ) * this.bulletSpeed;
-          
-          owner.createdEntities.push( this.getBullet( values ) );
+          for ( let i = 0; i < this.bulletsPerShot; i ++ ) {
+            const bullet = this.getBullet( offsetPosition );
+            
+            bullet.angle += this.spread * ( -0.5 + Math.random() );
+            
+            bullet.dx = owner.dx + Math.cos( bullet.angle ) * this.bulletSpeed;
+            bullet.dy = owner.dy + Math.sin( bullet.angle ) * this.bulletSpeed;
+            
+            owner.createdEntities.push( bullet );
 
-          owner.energy -= this.energyCost;
-        }
+          }
+        } );
+        
+        owner.energy -= this.energyCost;
 
+        // TODO: How does this apply to multiple offsets?
         this.ammo --;
 
         if ( this.ammo == 0 ) {

@@ -222,13 +222,17 @@
   let mouseX = 0, mouseY = 0;
 
   document.addEventListener( 'keydown', ( e ) => {
-    if ( e.key == 'Control' )   player.isSliding   = true;
-    if ( e.key == 'Shift'   )   player.isSprinting = true;
+    if ( player ) {
+      if ( e.key == 'Control' )   player.isSliding   = true;
+      if ( e.key == 'Shift'   )   player.isSprinting = true;
+    }
   } );
 
   document.addEventListener( 'keyup', ( e ) => {
-    if ( e.key == 'Control' )   player.isSliding   = false;
-    if ( e.key == 'Shift'   )   player.isSprinting = false;
+    if ( player ) {
+      if ( e.key == 'Control' )   player.isSliding   = false;
+      if ( e.key == 'Shift'   )   player.isSprinting = false;
+    }
   } );
   
   document.addEventListener( 'mousedown', ( e ) => {
@@ -241,8 +245,10 @@
     }
   } );
   document.addEventListener( 'mouseup',   ( e ) => {
-    if ( e.button == 0 )  player.isShootingPrimary = false;
-    if ( e.button == 2 )  player.isShootingSecondary = false;
+    if ( player ) {
+      if ( e.button == 0 )  player.isShootingPrimary = false;
+      if ( e.button == 2 )  player.isShootingSecondary = false;
+    }
   } );
   document.addEventListener( 'mousemove', ( e ) => {
     mouseX = e.clientX;

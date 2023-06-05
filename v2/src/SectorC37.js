@@ -112,12 +112,16 @@ export class Player extends Actor {
   isShootingSecondary = false;
 
   primaryGuns = [
-    new PlayerGun( { offset: { front: 0, side: -1, angle: 0 } } ),
-    new PlayerGun( { offset: { front: 0, side:  1, angle: 0 } } ),
+    new PlayerGun( { offsets: [ 
+      { front: 0, side: -1, angle: -0.1 },
+      { front: 0, side: -1, angle:  0.0 },
+      { front: 0, side:  1, angle:  0.0 },
+      { front: 0, side:  1, angle:  0.1 },
+    ] } ),
   ];
   
   secondaryGuns = [
-    new MissleGun( { offset: { front: 2, side:  0, angle: 0 } } ),
+    new MissleGun( { offsets: [ { front: 2, side:  0, angle: 0 } ] } ),
   ];
 
   trailLength = 20;
@@ -188,8 +192,10 @@ export class Ship extends Actor {
   mass = 1;
 
   guns = [
-    new ShipGun( { offset: { front: 0, side: -1, angle: 0 } } ),
-    new ShipGun( { offset: { front: 0, side:  1, angle: 0 } } ),
+    new ShipGun( { offsets: [ 
+      { front: 0, side: -1, angle:  0.0 },
+      { front: 0, side:  1, angle:  0.0 },
+    ] } ),
   ];
 
   trailLength = 20;

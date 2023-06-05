@@ -42,7 +42,7 @@ export class Trail {
         this.length = Math.min( this.length + length, this.#maxLength );
       }
       
-      this.head = parent.getOffset( this.offset );
+      this.head = parent.getOffsetPosition( this.offset );
     }
 
     let remaining = this.#maxLength;

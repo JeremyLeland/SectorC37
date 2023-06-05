@@ -83,7 +83,7 @@ export class Entity {
     }
   }
 
-  getOffset( offset ) {
+  getOffsetPosition( offset ) {
     const cos = Math.cos( this.angle );
     const sin = Math.sin( this.angle );
     
