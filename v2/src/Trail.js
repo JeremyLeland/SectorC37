@@ -31,9 +31,11 @@ export class Trail {
     // }
 
     if ( parent ) {
+      const newHead = parent.getOffsetPosition( this.offset );
+
       if ( this.head ) {
-        const cx = parent.x - this.head.x;
-        const cy = parent.y - this.head.y;
+        const cx = newHead.x - this.head.x;
+        const cy = newHead.y - this.head.y;
         const angle = Math.atan2( cy, cx );
         const length = Math.hypot( cx, cy );
         
@@ -42,7 +44,7 @@ export class Trail {
         this.length = Math.min( this.length + length, this.#maxLength );
       }
       
-      this.head = parent.getOffsetPosition( this.offset );
+      this.head = newHead;
     }
 
     let remaining = this.#maxLength;
