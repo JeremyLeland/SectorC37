@@ -84,7 +84,7 @@
   import { AnimatedCanvas } from './src/AnimatedCanvas.js';
   import { World } from './src/World.js';
   import { Starfield } from './src/Starfield.js';
-  import { Player, Ship, Frigate, Rock, Level } from './src/SectorC37.js';
+  import { Player, Scout, Frigate, Rock, Level } from './src/SectorC37.js';
   import * as Util from './src/Util.js';
 
   const PLAYABLE_RADIUS = 1000, OUTSIDE_RADIUS = 500;
@@ -169,7 +169,7 @@
 
     drawMinimap( minimapCtx );
 
-    const numEnemies = level.world.entities.filter( e => e instanceof Ship || e instanceof Frigate ).length;
+    const numEnemies = level.world.entities.filter( e => e instanceof Scout || e instanceof Frigate ).length;
     enemiesUI.innerText = numEnemies;
   };
 

@@ -162,8 +162,8 @@ export class Player extends Actor {
   }
 }
 
-export class Ship extends Actor {
-  type = 'ship';
+export class Scout extends Actor {
+  type = 'scout';
   size = 12;
 
   color = `hsl( 
@@ -178,7 +178,7 @@ export class Ship extends Actor {
 
   targets = [ 'player' ];
   avoids = [ 'rock', 'player', 'frigate' ];
-  aligns = [ 'ship' ];
+  aligns = [ 'scout' ];
 
   maxLife = 10;
   life = this.maxLife;
@@ -192,7 +192,7 @@ export class Ship extends Actor {
   mass = 1;
 
   guns = [
-    new ShipGun( { offsets: [ 
+    new ScoutGun( { offsets: [ 
       { front: 0, side: -1, angle:  0.0 },
       { front: 0, side:  1, angle:  0.0 },
     ] } ),
@@ -331,7 +331,7 @@ class PlayerBullet extends Bullet {
   ];
 }
 
-class ShipBullet extends Bullet {
+class ScoutBullet extends Bullet {
   trails = [
     new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'lightblue' } )
   ];
@@ -368,7 +368,7 @@ class Missle extends Actor {
   ] );
   nohit = [ 'bullet' ];
 
-  targets = [ 'ship', 'frigate' ];
+  targets = [ 'scout', 'frigate' ];
   turnSpeed = 0.004;
   moveSpeed = 0.3;
 
@@ -401,13 +401,13 @@ class PlayerGun extends Gun {
   }
 }
 
-class ShipGun extends Gun {
+class ScoutGun extends Gun {
   timeBetweenShots = 200;
   bulletSpeed = 0.6;
   energyCost = 5;
 
   getBullet( values ) {
-    return new ShipBullet( values );
+    return new ScoutBullet( values );
   }
 }
 
@@ -464,14 +464,14 @@ export class Level {
   playableRadius = 1000;
   spawnRadius = 500;
   startingRocks = 10;
-  startingShips = 5;
+  startingScouts = 5;
   startingFrigates = 1;
   
   rockSpawnDelay = 3000;
   rockSpawnTimer = this.rockSpawnDelay;
 
-  shipSpawnDelay = 5000;
-  shipSpawnTimer = this.shipSpawnDelay;
+  scoutSpawnDelay = 5000;
+  scoutSpawnTimer = this.scoutSpawnDelay;
 
   frigateSpawnDelay = 10000;
   frigateSpawnTimer = this.frigateSpawnDelay;
@@ -485,8 +485,8 @@ export class Level {
       this.spawnRock();
     }
 
-    for ( let i = 0; i < this.startingShips; i ++ ) {
-      this.spawnShip( new Ship() );
+    for ( let i = 0; i < this.startingScouts; i ++ ) {
+      this.spawnShip( new Scout() );
     }
 
     for ( let i = 0; i < this.startingFrigates; i ++ ) {
@@ -502,9 +502,9 @@ export class Level {
       this.spawnRock( this.playableRadius );
     }
 
-    if ( ( this.shipSpawnTimer -= dt ) < 0 ) {
-      this.shipSpawnTimer += this.shipSpawnDelay;
-      this.spawnShip( new Ship(), this.playableRadius );
+    if ( ( this.scoutSpawnTimer -= dt ) < 0 ) {
+      this.scoutSpawnTimer += this.scoutSpawnDelay;
+      this.spawnShip( new Scout(), this.playableRadius );
     }
 
     if ( ( this.frigateSpawnTimer -= dt ) < 0 ) {
