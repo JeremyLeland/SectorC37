@@ -4,7 +4,7 @@
 <script type="module">
   import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
   import { World } from '../src/World.js';
-  import { Player, Ship, Rock } from '../src/SectorC37.js';
+  import { Player, Ship, Frigate, Rock } from '../src/SectorC37.js';
   import { Actor } from '../src/Actor.js';
 
   Actor.DebugNavigation = true;
@@ -20,8 +20,8 @@
       world.entities.push( new Rock( { 
         x: ( c + 0.25 + 0.5 * Math.random() ) * spacing, 
         y: ( r + 0.25 + 0.5 * Math.random() ) * spacing,
-        dx: 0.1 * ( Math.random() - 0.5 ),
-        dy: 0.1 * ( Math.random() - 0.5 ),
+        //dx: 0.1 * ( Math.random() - 0.5 ),
+        //dy: 0.1 * ( Math.random() - 0.5 ),
         dAngle: 0.004 * ( Math.random() - 0.5 ),
         size: 10 + Math.random() * 50,
       } ) );
@@ -33,7 +33,7 @@
   // world.entities.push( new Rock( { x: 300, y: 100, size: 80 } ) );
 
   world.entities.push( new Ship( { x: -300, y: -200 } ) );
-  world.entities.push( new Ship( { x: 0, y: 0 } ) );
+  world.entities.push( new Frigate( { x: 0, y: 0 } ) );
   world.entities.push( new Ship( { x: 200, y: 300 } ) );
 
   const canvas = new AnimatedCanvas();

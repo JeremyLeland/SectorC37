@@ -17,7 +17,7 @@ export class Rock extends Entity {
 
     const points = randPoints( 10 + 5 * Math.random() );
     this.boundingLines = new BoundingLines( points );
-    this.drawPath = rockPath( points );
+    this.drawPath = linePath( points );
 
     this.color = values.color ?? `hsl( 
       ${ 20 + Math.random() * 10 }deg, 
@@ -34,7 +34,7 @@ export class Rock extends Entity {
     return new Entity( {
       size: 2 + 2 * Math.random(),
       color: this.color,
-      drawPath: rockPath( randPoints( 5 + 5 * Math.random() ) ),
+      drawPath: linePath( randPoints( 5 + 5 * Math.random() ) ),
     } );
   }
 
@@ -74,7 +74,7 @@ function randPoints( sides ) {
   return points;
 }
 
-function rockPath( points ) {
+function linePath( points ) {
   const path = new Path2D();
   points.forEach( p => path.lineTo( p[ 0 ], p[ 1 ] ) );
   path.closePath();
@@ -149,7 +149,7 @@ export class Player extends Actor {
     return new Entity( {
       size: 3 + 3 * Math.random(),
       color: this.color,
-      drawPath: rockPath( randPoints( 3 ) ),
+      drawPath: linePath( randPoints( 3 ) ),
     } ); 
   }
 
@@ -157,7 +157,7 @@ export class Player extends Actor {
     return new Fire( {
       size: 10 * Math.random(),
       dSize: 0.03,
-      drawPath: rockPath( randPoints( 5 ) ),
+      drawPath: linePath( randPoints( 5 ) ),
     } ); 
   }
 }
@@ -177,7 +177,7 @@ export class Ship extends Actor {
   moveSpeed = 0.15;
 
   targets = [ 'player' ];
-  avoids = [ 'rock', 'player' ];
+  avoids = [ 'rock', 'player', 'frigate' ];
   aligns = [ 'ship' ];
 
   maxLife = 10;
@@ -216,7 +216,7 @@ export class Ship extends Actor {
     return new Entity( {
       size: 3 + 3 * Math.random(),
       color: this.color,
-      drawPath: rockPath( randPoints( 3 ) ),
+      drawPath: linePath( randPoints( 3 ) ),
     } ); 
   }
 
@@ -224,7 +224,78 @@ export class Ship extends Actor {
     return new Fire( {
       size: 10 * Math.random(),
       dSize: 0.03,
-      drawPath: rockPath( randPoints( 5 ) ),
+      drawPath: linePath( randPoints( 5 ) ),
+    } ); 
+  }
+}
+
+export class Frigate extends Actor {
+  type = 'frigate';
+  size = 20;
+
+  color = 'cyan';
+  drawPath = shipPath();
+
+  turnSpeed = 0.002;
+  moveSpeed = 0.1;
+
+  targets = [ 'player' ];
+  avoids = [ 'rock' ];
+  aligns = [ 'frigate' ];
+
+  maxLife = 100;
+  life = this.maxLife;
+
+  maxEnergy = 50;
+  energy = this.maxEnergy;
+  moveEnergy = 0.1;
+  energyRechargeRate = 0.2;
+
+  damage = 100;
+  mass = 2;
+
+  guns = [
+    new ShipGun( { offsets: [ 
+      { front: 0, side: -1, angle: 0 },
+      { front: 0.5, side: -0.5, angle: 0 },
+      { front: 0.5, side:  0.5, angle: 0 },
+      { front: 0, side:  1, angle: 0 },
+    ] } ),
+  ];
+
+  trailLength = 20;
+  trails = [
+    new Trail( { 
+      offset: { front: -0.7, side: -0.5, angle: 0 }, 
+      maxWidth: this.size / 4, 
+      goalLength: this.trailLength,
+      color: 'lightblue',
+    } ),
+    new Trail( { 
+      offset: { front: -0.7, side: 0.5, angle: 0 }, 
+      maxWidth: this.size / 4, 
+      goalLength: this.trailLength,
+      color: 'lightblue',
+    } ),
+  ];
+
+  boundingLines = new BoundingLines( [
+    [ 1, 0 ], [ -1, 1 ], [ -1, -1 ],
+  ] );
+
+  getBleedParticle() {
+    return new Entity( {
+      size: 3 + 3 * Math.random(),
+      color: this.color,
+      drawPath: linePath( randPoints( 3 ) ),
+    } ); 
+  }
+
+  getDieParticle() {
+    return new Fire( {
+      size: 10 * Math.random(),
+      dSize: 0.03,
+      drawPath: linePath( randPoints( 5 ) ),
     } ); 
   }
 }
@@ -298,11 +369,27 @@ class Missle extends Actor {
   ] );
   nohit = [ 'bullet' ];
 
-  targets = [ 'ship' ];
+  targets = [ 'ship', 'frigate' ];
   turnSpeed = 0.004;
   moveSpeed = 0.3;
 
   // TODO: Limited energy? (so they eventually stop navigating and just crash)
+
+  getBleedParticle() {
+    return new Entity( {
+      size: 3 + 3 * Math.random(),
+      color: this.color,
+      drawPath: linePath( randPoints( 3 ) ),
+    } ); 
+  }
+
+  getDieParticle() {
+    return new Fire( {
+      size: 10 * Math.random(),
+      dSize: 0.03,
+      drawPath: linePath( randPoints( 5 ) ),
+    } ); 
+  }
 }
 
 class PlayerGun extends Gun {
@@ -347,7 +434,7 @@ class Fire extends Entity {
   )`;
 
   draw( ctx ) {
-    ctx.filter = 'blur( 8px )'; // NOTE: 8px is faster than other values?!?
+    // ctx.filter = 'blur( 8px )'; // NOTE: 8px is faster than other values?!?
     ctx.globalCompositeOperation = 'screen';
     // ctx.globalAlpha = 0.1;
     super.draw( ctx );
@@ -368,9 +455,17 @@ export class Level {
   playableRadius = 1000;
   spawnRadius = 500;
   startingRocks = 10;
+  startingShips = 5;
+  startingFrigates = 1;
   
   rockSpawnDelay = 3000;
   rockSpawnTimer = this.rockSpawnDelay;
+
+  shipSpawnDelay = 5000;
+  shipSpawnTimer = this.shipSpawnDelay;
+
+  frigateSpawnDelay = 10000;
+  frigateSpawnTimer = this.frigateSpawnDelay;
 
   constructor( values ) {
     Object.assign( this, values );
@@ -380,6 +475,14 @@ export class Level {
     for ( let i = 0; i < this.startingRocks; i ++ ) {
       this.spawnRock();
     }
+
+    for ( let i = 0; i < this.startingShips; i ++ ) {
+      this.spawnShip( new Ship() );
+    }
+
+    for ( let i = 0; i < this.startingFrigates; i ++ ) {
+      this.spawnShip( new Frigate() );
+    }
   }
 
   update( dt ) {
@@ -388,6 +491,16 @@ export class Level {
     if ( ( this.rockSpawnTimer -= dt ) < 0 ) {
       this.rockSpawnTimer += this.rockSpawnDelay;
       this.spawnRock( this.playableRadius );
+    }
+
+    if ( ( this.shipSpawnTimer -= dt ) < 0 ) {
+      this.shipSpawnTimer += this.shipSpawnDelay;
+      this.spawnShip( new Ship(), this.playableRadius );
+    }
+
+    if ( ( this.frigateSpawnTimer -= dt ) < 0 ) {
+      this.frigateSpawnTimer += this.frigateSpawnDelay;
+      this.spawnShip( new Frigate(), this.playableRadius );
     }
   }
 
@@ -414,6 +527,17 @@ export class Level {
         dAngle: 0.004 * ( -0.5 + Math.random() ),
         size: rockSize,
       } ) );
+    }
+  }
+
+  spawnShip( ship, minRadius = 0 ) {
+    const spawn = this.world.getSpawnPoint( ship.size * 2, { minRadius: minRadius } );
+    if ( spawn ) {
+      ship.x = spawn.x;
+      ship.y = spawn.y;
+      ship.angle = Math.atan2( -spawn.y, -spawn.x );
+
+      this.world.entities.push( ship );
     }
   }
 }

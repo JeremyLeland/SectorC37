@@ -84,7 +84,7 @@
   import { AnimatedCanvas } from './src/AnimatedCanvas.js';
   import { World } from './src/World.js';
   import { Starfield } from './src/Starfield.js';
-  import { Player, Ship, Rock, Level } from './src/SectorC37.js';
+  import { Player, Ship, Frigate, Rock, Level } from './src/SectorC37.js';
   import * as Util from './src/Util.js';
 
   const PLAYABLE_RADIUS = 1000, OUTSIDE_RADIUS = 500;
@@ -101,8 +101,6 @@
   const PLAYER_RESPAWN_DELAY = 2000;
   let playerSpawnTimer = 0;
 
-  const ENEMY_SPAWN_DELAY = 5000;
-  let enemySpawnTimer = ENEMY_SPAWN_DELAY;
 
   let player;
 
@@ -114,13 +112,6 @@
     startingRocks: 30, 
   } );
 
-  const numShips = 10;
-  for ( let i = 0; i < numShips; i ++ ) {
-    const angle = Math.PI * 2 * ( i + 0.25 + 0.5 * Math.random() ) / numShips;
-    const dist = PLAYABLE_RADIUS + OUTSIDE_RADIUS * ( 0.25 + 0.5 * Math.random() );
-    spawnShip( angle, dist );
-  }
-
   function spawnPlayer() {
     const spawn = level.world.getSpawnPoint( 100, { maxRadius: 0.5 * PLAYABLE_RADIUS } );
     if ( spawn ) { 
@@ -131,16 +122,6 @@
       title.style.visibility = 'hidden';
       message.style.visibility = 'hidden';
     }
-  }
-
-  function spawnShip( angle, dist ) {
-    level.world.entities.push( 
-      new Ship( { 
-        x: Math.cos( angle ) * dist,
-        y: Math.sin( angle ) * dist,
-        angle: Math.random() * Math.PI * 2,
-      } )
-    );
   }
 
   const starfield = new Starfield( level.world.size * 2, level.world.size * 2 , 1000, 2 );
@@ -163,11 +144,6 @@
       if ( playerSpawnTimer < 0 ) {
         message.style.visibility = 'visible';
       }
-    }
-
-    if ( ( enemySpawnTimer -= dt ) < 0 ) {
-      enemySpawnTimer += ENEMY_SPAWN_DELAY;
-      spawnShip( Math.random() * Math.PI * 2, level.world.size + 100 * Math.random() );
     }
 
     level.update( dt );
@@ -193,7 +169,7 @@
 
     drawMinimap( minimapCtx );
 
-    const numEnemies = level.world.entities.filter( e => e instanceof Ship ).length;
+    const numEnemies = level.world.entities.filter( e => e instanceof Ship || e instanceof Frigate ).length;
     enemiesUI.innerText = numEnemies;
   };
 
