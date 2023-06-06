@@ -114,8 +114,8 @@ export class Player extends Actor {
   primaryGuns = [
     new PlayerGun( { offsets: [ 
       { front: 0, side: -1, angle: -0.1 },
-      { front: 0, side: -1, angle:  0.0 },
-      { front: 0, side:  1, angle:  0.0 },
+      { front: 0.5, side: -0.5, angle:  0.0 },
+      { front: 0.5, side:  0.5, angle:  0.0 },
       { front: 0, side:  1, angle:  0.1 },
     ] } ),
   ];
@@ -255,7 +255,7 @@ export class Frigate extends Actor {
   mass = 2;
 
   guns = [
-    new ShipGun( { offsets: [ 
+    new FrigateGun( { offsets: [ 
       { front: 0, side: -1, angle: 0 },
       { front: 0.5, side: -0.5, angle: 0 },
       { front: 0.5, side:  0.5, angle: 0 },
@@ -269,13 +269,13 @@ export class Frigate extends Actor {
       offset: { front: -0.7, side: -0.5, angle: 0 }, 
       maxWidth: this.size / 4, 
       goalLength: this.trailLength,
-      color: 'lightblue',
+      color: 'rgba( 200, 255, 255, 0.7 )',
     } ),
     new Trail( { 
       offset: { front: -0.7, side: 0.5, angle: 0 }, 
       maxWidth: this.size / 4, 
       goalLength: this.trailLength,
-      color: 'lightblue',
+      color: 'rgba( 200, 255, 255, 0.7 )',
     } ),
   ];
 
@@ -312,12 +312,9 @@ function shipPath() {
 // Bullets
 //
 
-class PlayerBullet extends Entity {
+class Bullet extends Entity {
   type = 'bullet';
   size = 1;
-  trails = [ 
-    new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'orange' } ) 
-  ];
   mass = 0.05;
   damage = 2;
   lifeSpan = 5000;
@@ -328,20 +325,22 @@ class PlayerBullet extends Entity {
   nohit = [ 'bullet' ];
 }
 
-class ShipBullet extends Entity {
-  type = 'bullet';
-  size = 1;
-  trails = [
-    new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'yellow' } )
+class PlayerBullet extends Bullet {
+  trails = [ 
+    new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'seagreen' } ) 
   ];
-  mass = 0.05;
-  damage = 2;
-  lifeSpan = 5000;
+}
 
-  boundingLines = new BoundingLines( [
-    [ -1, 0 ], [ 1, -1 ], [ 1, 1 ],
-  ] );
-  nohit = [ 'bullet' ];
+class ShipBullet extends Bullet {
+  trails = [
+    new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'lightblue' } )
+  ];
+}
+
+class FrigateBullet extends Bullet {
+  trails = [
+    new Trail( { maxWidth: this.size, goalLength: 40, dLength: 0.6, color: 'rgba( 200, 255, 255, 0.7 )' } )
+  ];
 }
 
 class Missle extends Actor {
@@ -409,6 +408,16 @@ class ShipGun extends Gun {
 
   getBullet( values ) {
     return new ShipBullet( values );
+  }
+}
+
+class FrigateGun extends Gun {
+  timeBetweenShots = 200;
+  bulletSpeed = 0.6;
+  energyCost = 5;
+
+  getBullet( values ) {
+    return new FrigateBullet( values );
   }
 }
 
