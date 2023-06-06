@@ -32,7 +32,7 @@ export class Rock extends Entity {
 
   getBleedParticle() {
     return new Entity( {
-      size: 2 + 2 * Math.random(),
+      size: 1 + 2 * Math.random(),
       color: this.color,
       drawPath: linePath( randPoints( 5 + 5 * Math.random() ) ),
     } );
@@ -89,7 +89,10 @@ export class Player extends Actor {
   size = 12;
 
   color = 'green';
-  drawPath = shipPath();
+  drawPath = new Path2D( `
+    M 1.0 0.2 L -0.25 0.5 L -0.25 1.0 L -1.0 0.75 
+    L -1.0 -0.75 L -0.25 -1.0 L -0.25 -0.5 L 1.0 -0.2 Z
+  ` );
 
   turnSpeed = 0.005;
   moveSpeed = 0.2;
@@ -147,7 +150,7 @@ export class Player extends Actor {
 
   getBleedParticle() {
     return new Entity( {
-      size: 3 + 3 * Math.random(),
+      size: 1 + 3 * Math.random(),
       color: this.color,
       drawPath: linePath( randPoints( 3 ) ),
     } ); 
@@ -214,7 +217,7 @@ export class Scout extends Actor {
 
   getBleedParticle() {
     return new Entity( {
-      size: 3 + 3 * Math.random(),
+      size: 1 + 3 * Math.random(),
       color: this.color,
       drawPath: linePath( randPoints( 3 ) ),
     } ); 
@@ -285,7 +288,7 @@ export class Frigate extends Actor {
 
   getBleedParticle() {
     return new Entity( {
-      size: 3 + 3 * Math.random(),
+      size: 1 + 3 * Math.random(),
       color: this.color,
       drawPath: linePath( randPoints( 3 ) ),
     } ); 

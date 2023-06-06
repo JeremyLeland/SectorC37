@@ -1,0 +1,22 @@
+<title>Bouncing Rocks</title>
+<link rel="stylesheet" href="../grid.css">
+
+<script type="module">
+  import { AnimatedCanvas } from '../src/AnimatedCanvas.js';
+  import { Player, Scout, Frigate, Rock } from '../src/SectorC37.js';
+
+  const ships = [
+    new Player( { x: 100, y: 100 } ),
+    new Scout( { x: 200, y: 100 } ),
+    new Frigate( { x: 300, y: 100 } ),
+  ];
+  
+  const canvas = new AnimatedCanvas();
+
+  canvas.draw = ( ctx ) => {
+    ships.forEach( ship => ship.draw( ctx ) );
+  };
+
+  canvas.redraw();
+  
+</script>
